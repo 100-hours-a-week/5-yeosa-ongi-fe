@@ -2,8 +2,7 @@
 name: Task-Template
 about: Task-Template
 title: ''
-labels: Chore, Database, Deploy, Docker, Duplicate, Help Wanted, Infra, Question,
-  Refactor, Test
+labels: ''
 assignees: YuSung011017
 
 ---
