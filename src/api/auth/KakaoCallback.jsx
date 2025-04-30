@@ -1,7 +1,7 @@
 // KakaoCallback.js - 리다이렉트 처리 컴포넌트
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import useUserStore from "../../stores/store.jsx";
 
 const KakaoCallback = () => {
 	const location = useLocation();
@@ -9,6 +9,8 @@ const KakaoCallback = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
+	const user = useUserStore((state) => state.user);
+	const setUserData = useUserStore((state) => state.setUserData);
 	useEffect(() => {
 		// URL에서 인가 코드 추출
 		const code = new URLSearchParams(location.search).get("code");
@@ -24,20 +26,17 @@ const KakaoCallback = () => {
 
 	const getKakaoToken = async (code) => {
 		try {
-			// 백엔드 서버에 인가 코드 전송
-			const response = await axios.post("/api/auth/kakao", { code });
+			// const response = await axios.post("/api/auth/kakao", { code });
+			const response = {
+				data: { token: "ACCESS_TOKEN", user: "MOCK_USER" },
+			};
 
 			// 로그인 성공 처리
 			if (response.data.token) {
-				// JWT 토큰이나 사용자 정보 저장
-				localStorage.setItem("token", response.data.token);
-				localStorage.setItem(
-					"user",
-					JSON.stringify(response.data.user)
-				);
-
+				setUserData(response.data.token, response.data.user);
 				// 메인 페이지로 리다이렉트
-				navigate("/");
+				navigate("/main");
+				console.log("로그인에 성공했습니다.", user);
 			} else {
 				setError("로그인에 실패했습니다.");
 			}
