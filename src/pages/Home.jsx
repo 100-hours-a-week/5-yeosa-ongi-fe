@@ -1,9 +1,10 @@
 export default function Home() {
 	const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_REST_API_KEY;
-	const REDIRECT_URI = "http://localhost:5173/api/auth/KakaoCallback";
+	const REDIRECT_URI = "http://localhost:5173/auth/login/kakao";
 	const kakaoLoginUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-	const handleLogin = () => {
+	const handleLogin = async () => {
 		window.location.href = kakaoLoginUrl;
+		// const response = await kakaoLogin();
 	};
 	console.log("a", KAKAO_CLIENT_ID);
 	return (
