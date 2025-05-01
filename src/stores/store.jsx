@@ -6,8 +6,7 @@ const useUserStore = create(
 		(set, get) => ({
 			userAccessToken: "",
 			user: "",
-			setUserData: (token, user) =>
-				set({ userAccessToken: token, user: user }),
+			setUserData: (data) => set(data),
 			getUser: () => get().user,
 		}),
 		{

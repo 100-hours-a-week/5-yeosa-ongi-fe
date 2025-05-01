@@ -9,10 +9,19 @@ const KakaoCallback = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	const user = useUserStore((state) => state.user);
+	const user = useUserStore((state) => state);
 	const setUserData = useUserStore((state) => state.setUserData);
 
 	useEffect(() => {
+		const code = new URLSearchParams(location.search).get("code");
+
+		if (code) {
+			// 백엔드에 인가 코드를 전송하여 토큰 발급 요청
+			getKakaoToken(code);
+		} else {
+			setError("인가 코드를 찾을 수 없습니다.");
+			setLoading(false);
+		}
 		const getKakaoToken = async (code) => {
 			try {
 				//const response = await axios.post("/auth/login/kakao", { code });
@@ -31,36 +40,24 @@ const KakaoCallback = () => {
 						cacheTtl: 300,
 					},
 				};
+
 				const response = { data: MockResponse };
 
-				// 로그인 성공 처리
 				if (response.data.accessToken) {
-					setUserData(response.data.token, response.data.user);
-					console.log("로그인에 성공했습니다.");
-					// 메인 페이지로 리다이렉트
-					// navigate("/main");
+					setUserData(response.data);
+					console.log("로그인에 성공했습니다.", user);
+					navigate("/main");
 				} else {
 					setError("로그인에 실패했습니다.");
 				}
 			} catch (error) {
 				console.error("카카오 로그인 에러:", error);
 				setError("로그인 처리 중 오류가 발생했습니다.");
-				navigate("/main"); //DEV (일단 에러 제끼고 메인 페이지로 이동)
 			} finally {
 				setLoading(false);
 			}
 		};
-
-		const code = new URLSearchParams(location.search).get("code");
-
-		if (code) {
-			// 백엔드에 인가 코드를 전송하여 토큰 발급 요청
-			getKakaoToken(code);
-		} else {
-			setError("인가 코드를 찾을 수 없습니다.");
-			setLoading(false);
-		}
-	}, [location, navigate, setUserData]);
+	}, [location, navigate, setUserData, user]);
 
 	if (loading) {
 		return <div>로그인 처리 중...</div>;
