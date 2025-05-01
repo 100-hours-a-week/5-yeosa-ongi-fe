@@ -1,6 +1,7 @@
 // KakaoCallback.js - 리다이렉트 처리 컴포넌트
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import useUserStore from "../../stores/store";
 
 const MockResponse = {
 	code: "USER_ALREADY_REGISTERED",
