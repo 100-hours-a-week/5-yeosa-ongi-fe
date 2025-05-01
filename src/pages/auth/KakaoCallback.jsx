@@ -1,7 +1,20 @@
 // KakaoCallback.js - 리다이렉트 처리 컴포넌트
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import useUserStore from "../../stores/store.jsx";
+import { useLocation } from "react-router-dom";
+
+const MockResponse = {
+	code: "USER_ALREADY_REGISTERED",
+	message: "로그인을 완료했습니다.",
+	accessToken: "access_token_value",
+	refreshTokenExpiresIn: 1209600,
+	refreshToken: "refresh_token_value",
+	user: {
+		userId: 1,
+		nickname: "gray_123!",
+		profileImageURL: "https://ongi.s3.ap-northeast-2.amazonaws.com/1.jpg",
+		cacheTtl: 300,
+	},
+};
 
 const KakaoCallback = () => {
 	const location = useLocation();
@@ -14,24 +27,10 @@ const KakaoCallback = () => {
 
 	useEffect(() => {
 		const code = new URLSearchParams(location.search).get("code");
+
 		const getKakaoToken = async (code) => {
 			try {
 				//const response = await axios.post("/auth/login/kakao", { code });
-
-				const MockResponse = {
-					code: "USER_ALREADY_REGISTERED",
-					message: "로그인을 완료했습니다.",
-					accessToken: "access_token_value",
-					refreshTokenExpiresIn: 1209600,
-					refreshToken: "refresh_token_value",
-					user: {
-						userId: 1,
-						nickname: "gray_123!",
-						profileImageURL:
-							"https://ongi.s3.ap-northeast-2.amazonaws.com/1.jpg",
-						cacheTtl: 300,
-					},
-				};
 
 				const response = { data: MockResponse };
 
@@ -49,6 +48,7 @@ const KakaoCallback = () => {
 				setLoading(false);
 			}
 		};
+
 		if (code) {
 			// 백엔드에 인가 코드를 전송하여 토큰 발급 요청
 			getKakaoToken(code);
@@ -56,6 +56,7 @@ const KakaoCallback = () => {
 			setError("인가 코드를 찾을 수 없습니다.");
 			setLoading(false);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [location]);
 
 	if (loading) {
