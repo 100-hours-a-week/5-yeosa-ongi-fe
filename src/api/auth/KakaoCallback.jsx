@@ -54,7 +54,7 @@ const KakaoCallback = () => {
 	}
 
 	if (error) {
-		return <div>오류: {error}</div>;
+		return <div className="self-auto">오류: {error}</div>;
 	}
 
 	return null;
