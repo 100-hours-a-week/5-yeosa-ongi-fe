@@ -14,14 +14,6 @@ const KakaoCallback = () => {
 
 	useEffect(() => {
 		const code = new URLSearchParams(location.search).get("code");
-
-		if (code) {
-			// 백엔드에 인가 코드를 전송하여 토큰 발급 요청
-			getKakaoToken(code);
-		} else {
-			setError("인가 코드를 찾을 수 없습니다.");
-			setLoading(false);
-		}
 		const getKakaoToken = async (code) => {
 			try {
 				//const response = await axios.post("/auth/login/kakao", { code });
@@ -57,7 +49,14 @@ const KakaoCallback = () => {
 				setLoading(false);
 			}
 		};
-	}, [location, navigate, setUserData, user]);
+		if (code) {
+			// 백엔드에 인가 코드를 전송하여 토큰 발급 요청
+			getKakaoToken(code);
+		} else {
+			setError("인가 코드를 찾을 수 없습니다.");
+			setLoading(false);
+		}
+	}, [location]);
 
 	if (loading) {
 		return <div>로그인 처리 중...</div>;
