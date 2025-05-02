@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	/* 기본, 테마 1 (pastel pink) */
+	:root {
+		--color-primary: #f3d0d7;
+		--color-secondary: #ffefef;
+		--white-bage: #f6f5f2;
+		--white-blue: #f6f7fa;
+		--gray-light: #ebebeb;
+		--gray-dark: #7d7d7d;
+		--black-light: #343a3f;
+	}
+}
