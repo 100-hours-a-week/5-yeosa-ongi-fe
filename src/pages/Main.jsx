@@ -1,4 +1,4 @@
-import AlbumThumbnail from "../components/AlbumThumbnail";
+import Grid from "../components/Grid";
 
 const Main = () => {
 	return (
@@ -7,7 +7,7 @@ const Main = () => {
 			<div className="flex-col content">
 				<div className="flex w-full border-2 border-solid">지도</div>
 				<div>앨범 리스트</div>
-				<AlbumThumbnail></AlbumThumbnail>
+				<Grid />
 			</div>
 		</>
 	);

@@ -1,5 +1,7 @@
-const Grid = ({ col = 4, items = [] }) => {
-	mockItems = [1, 2, 3, 4, 5, 6, 7];
+import AlbumThumbnail from "./AlbumThumbnail";
+
+const Grid = ({ col = 4, items = [], ElementType = AlbumThumbnail }) => {
+	const mockItems = [1, 2, 3, 4, 5, 6, 7];
 
 	const chunkArrayByCol = (array, chunkSize) => {
 		return Array(Math.ceil(array.length / chunkSize))
@@ -10,12 +12,19 @@ const Grid = ({ col = 4, items = [] }) => {
 				return array.slice(start, start + chunkSize);
 			});
 	};
-
-	const items = chunkArrayByCol(mockItems, col);
+	const chunkArray = chunkArrayByCol(mockItems, col);
 	return (
 		<>
-			{items.map((item, index) => (
-				<div className="w-[100]px h-[100]px">{index}</div>
+			{chunkArray.map((array, index) => (
+				<div
+					className={`grid grid-cols-4`}
+					style={{ height: `calc(100vw / ${col})` }}>
+					{array.map((items, index) => (
+						<div className="border-[1px] border-solid">
+							<ElementType>{items}</ElementType>
+						</div>
+					))}
+				</div>
 			))}
 		</>
 	);
