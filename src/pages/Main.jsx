@@ -25,7 +25,7 @@ const Main = () => {
 			<Header />
 			<div className="flex-col content">
 				<div
-					className="border-solid border-b-t"
+					className="border-t border-solid"
 					style={{ height: "calc(80vw)" }}>
 					지도
 				</div>
