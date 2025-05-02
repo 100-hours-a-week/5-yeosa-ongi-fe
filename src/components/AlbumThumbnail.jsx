@@ -1,14 +1,16 @@
-const AlbumThumbnail = ({ width = 100, hieght = 100 }) => {
-	const hasCoworkes = false;
+const AlbumThumbnail = ({ width = 100, height = 100 }) => {
+	const hasCoworkers = false;
+
 	return (
 		<div
-			className={`w-[${width}px] h-[${hieght}px] border-[5px] border-solid`}>
+			className="border-[5px] border-solid"
+			style={{ width: `${width}px`, height: `${height}px` }}>
 			<img
 				className="object-cover w-full h-full"
 				src="public/default_image_no_image.jpg"
 				alt="Album thumbnail"
 			/>
-			{hasCoworkes ? `<Coworker>` : ""}
+			{hasCoworkers ? `<Coworker>` : ""}
 		</div>
 	);
 };
