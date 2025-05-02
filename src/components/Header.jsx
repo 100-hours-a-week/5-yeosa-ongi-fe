@@ -1,17 +1,29 @@
 const Header = () => {
 	return (
-		<div className="h-[80px] relative">
+		<header className="h-[80px] px-4 flex items-center justify-between shadow-sm">
 			<img
-				className="absolute h-[52px] left-2 top-1"
+				className="h-[52px] "
 				src="src/assets/ongi_logo_flat.png"></img>
-			<div></div>
-			<img
-				className="absolute h-[32px] right-16 top-4"
-				src="src/assets/icons/bell_icon.png"></img>
-			<img
-				src="src/assets/default_user_imgae.png"
-				className="h-[40px] right-3 absolute top-3"></img>
-		</div>
+			<div className="w-40"></div>
+			<div className="flex items-center space-x-0">
+				<button
+					className="p-2 transition-colors rounded-full hover:bg-gray-100 min-w-6"
+					aria-label="Notifications">
+					<img
+						className="h-6 md:h-7"
+						src="src/assets/icons/bell_icon.png"
+						alt="Notifications"></img>
+				</button>
+				<button
+					className="p-2 transition-colors rounded-full hover:bg-gray-100"
+					aria-label="Notifications">
+					<img
+						src="src/assets/default_user_imgae.png"
+						className="h-[40px] rounded-full"
+						alt="User Profile"></img>
+				</button>
+			</div>
+		</header>
 	);
 };
 
