@@ -23,12 +23,17 @@ const Main = () => {
 		<>
 			<div className="h-[80px]">Header</div>
 			<div className="flex-col content">
-				<div className="flex w-full border-2 border-solid">지도</div>
-
+				<div
+					className="border-2 border-solid"
+					style={{ height: "calc(80vw)" }}>
+					지도
+				</div>
 				<div>앨범 리스트</div>
-				{Object.keys(result).map((month, index) => (
-					<Month key={month} albums={result[month]} />
-				))}
+				<div className="h-[400px] overflow-y-auto">
+					{Object.keys(result).map((month, index) => (
+						<Month key={month} albums={result[month]} />
+					))}
+				</div>
 			</div>
 		</>
 	);
