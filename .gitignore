@@ -44,3 +44,12 @@ sketch
 .env.development.local
 .env.test.local
 .env.production.local
+*storybook.log
+
+### StorybookJs ###
+# gitignore template for the Storybook, UI guide for front apps
+# website: https://storybook.js.org/
+storybook-static
+dist
+build
+out
