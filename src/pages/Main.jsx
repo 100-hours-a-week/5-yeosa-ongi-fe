@@ -1,4 +1,5 @@
 import getMonthlyAlbum from "../../mock/getMonthlyAlbum.json";
+import Header from "../components/Header";
 import Month from "../components/Month";
 
 const Main = () => {
@@ -21,15 +22,15 @@ const Main = () => {
 
 	return (
 		<div className="h-screen overflow-hidden">
-			<div className="h-[80px]">Header</div>
+			<Header />
 			<div className="flex-col content">
 				<div
 					className="border-solid border-b-t"
 					style={{ height: "calc(80vw)" }}>
 					지도
 				</div>
-				<div className="h-[48px] relative rounded-t-2xl border-t-2 border-solid">
-					<div className="p-4 mb-8">
+				<div className="h-[48px] relative rounded-t-2xl border-t-2 border-solid mb-8">
+					<div className="p-4">
 						<div className="absolute flex flex-row gap-2">
 							<img
 								className="size-[24px]"
