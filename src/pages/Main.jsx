@@ -20,22 +20,45 @@ const Main = () => {
 	console.log(Object.keys(result));
 
 	return (
-		<>
+		<div className="h-screen overflow-hidden">
 			<div className="h-[80px]">Header</div>
 			<div className="flex-col content">
 				<div
-					className="border-2 border-solid"
+					className="border-solid border-b-t"
 					style={{ height: "calc(80vw)" }}>
 					지도
 				</div>
-				<div>앨범 리스트</div>
-				<div className="h-[400px] overflow-y-auto">
+				<div className="h-[48px] relative rounded-t-2xl border-t-2 border-solid">
+					<div className="p-4 mb-8">
+						<div className="absolute flex flex-row gap-2">
+							<img
+								className="size-[24px]"
+								src="src/assets/icons/images_icon.png"></img>
+							<div>00</div>
+						</div>
+						<div className="absolute flex flex-row gap-2 left-1/4">
+							<img
+								className="size-[24px]"
+								src="src/assets/icons/location_icon.png"></img>
+							<div>00</div>
+						</div>
+						<div className="absolute flex flex-row gap-2 right-4">
+							<div>community</div>
+							<img
+								className="size-[24px]"
+								src="src/assets/icons/community_icon.png"></img>
+						</div>
+					</div>
+				</div>
+				<div
+					className="overflow-y-auto"
+					style={{ height: "calc(100vh - 80vw - 80px)" }}>
 					{Object.keys(result).map((month, index) => (
 						<Month key={month} albums={result[month]} />
 					))}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 
