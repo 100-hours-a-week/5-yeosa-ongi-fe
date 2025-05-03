@@ -1,13 +1,16 @@
-import useMainPageStore from "../stores/mainPageStore";
+import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
 
-const AlbumThumbnail = ({ item }) => {
+const AlbumThumbnail = ({ id }) => {
 	const hasCoworkers = false;
+	const { albums } = useAlbumStore();
+	const album = albums[id];
+	console.log(album);
 	const { selectedId, selectItem } = useMainPageStore();
 	const handleSelect = () => {
-		if (selectedId === item.albumId) {
-			console.log("앨범 상세페이지로 이동 : ", item.albumId);
+		if (selectedId === id) {
+			console.log("앨범 상세페이지로 이동 : ", id);
 		}
-		selectItem(item.albumId);
+		selectItem(id);
 	};
 
 	return (
@@ -19,8 +22,12 @@ const AlbumThumbnail = ({ item }) => {
 				src="public/default-featured-image.jpg"
 				alt="Album thumbnail"
 			/>
-			{selectedId === item.albumId && (
-				<div className="absolute inset-0 z-10 bg-black opacity-25"></div>
+			{selectedId === id && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center bg-black opacity-55">
+					<span className="z-20 text-lg text-white">
+						{album.albumName}
+					</span>
+				</div>
 			)}
 			{hasCoworkers ? `<Coworker>` : ""}
 		</div>
