@@ -5,9 +5,12 @@ const AlbumThumbnail = ({ id }) => {
 	const { albums } = useAlbumStore();
 	const album = albums[id];
 	console.log(album);
-	const { selectedId, selectItem } = useMainPageStore();
+
+	const isSelected = useMainPageStore((state) => state.selectedId === id);
+	const selectItem = useMainPageStore((state) => state.selectItem);
+
 	const handleSelect = () => {
-		if (selectedId === id) {
+		if (isSelected) {
 			console.log("앨범 상세페이지로 이동 : ", id);
 		}
 		selectItem(id);
@@ -19,17 +22,38 @@ const AlbumThumbnail = ({ id }) => {
 			onClick={handleSelect}>
 			<img
 				className="object-cover w-full h-full"
-				src="public/default-featured-image.jpg"
+				src={`${album.thumbnailURL}`}
 				alt="Album thumbnail"
 			/>
-			{selectedId === id && (
+			{isSelected && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center bg-black opacity-55">
 					<span className="z-20 text-lg text-white">
 						{album.albumName}
 					</span>
 				</div>
 			)}
-			{hasCoworkers ? `<Coworker>` : ""}
+			{album.memberProfileImageURL.length !== 0 && (
+				<div className="absolute flex bottom-2 right-2">
+					{album.memberProfileImageURL.map((url, index) => (
+						<div
+							key={index}
+							className="overflow-hidden border-2 border-black rounded-full"
+							style={{
+								width: "24px",
+								height: "24px",
+								marginLeft: index > 0 ? "-8px" : "0",
+								zIndex:
+									album.memberProfileImageURL.length - index,
+							}}>
+							<img
+								className="object-cover w-full h-full"
+								src={`${url}`}
+								alt={`Collaborator ${index + 1}`}
+							/>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };
