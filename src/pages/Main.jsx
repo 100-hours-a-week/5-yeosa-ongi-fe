@@ -36,7 +36,11 @@ const Main = () => {
 					className="overflow-y-auto"
 					style={{ height: "calc(100vh - 80vw - 160px)" }}>
 					{Object.keys(result).map((month, index) => (
-						<Month key={month} albums={result[month]} />
+						<Month
+							key={month}
+							title={month}
+							albums={result[month]}
+						/>
 					))}
 				</div>
 			</div>

@@ -16,7 +16,7 @@ const Grid = ({ col = 4, items = [], ElementType = AlbumThumbnail }) => {
 				});
 		}
 	};
-	const chunkArray = chunkArrayByCol(items.albums, col);
+	const chunkArray = chunkArrayByCol(items, col);
 	return (
 		<>
 			{chunkArray.map((array, index) => (
