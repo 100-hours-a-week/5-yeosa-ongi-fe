@@ -1,15 +1,15 @@
-import { useState } from "react";
-import useSelectionStore from "../stores/selectionStore";
+import useMainPageStore from "../stores/mainPageStore";
 
-const AlbumThumbnail = () => {
+const AlbumThumbnail = ({ item }) => {
 	const hasCoworkers = false;
-	const [selected, setSelected] = useState(false);
+	const { selectedId, selectItem } = useMainPageStore();
 	const handleSelect = () => {
-		console.log("click");
-		setSelected(true);
-		selectItem(id);
+		if (selectedId === item.albumId) {
+			console.log("앨범 상세페이지로 이동 : ", item.albumId);
+		}
+		selectItem(item.albumId);
 	};
-	const { selectedId, selectItem } = useSelectionStore();
+
 	return (
 		<div
 			className="relative w-full h-full border border-solid"
@@ -19,8 +19,8 @@ const AlbumThumbnail = () => {
 				src="public/default-featured-image.jpg"
 				alt="Album thumbnail"
 			/>
-			{selected && (
-				<div className="absolute inset-0 z-10 bg-black opacity-20"></div>
+			{selectedId === item.albumId && (
+				<div className="absolute inset-0 z-10 bg-black opacity-25"></div>
 			)}
 			{hasCoworkers ? `<Coworker>` : ""}
 		</div>

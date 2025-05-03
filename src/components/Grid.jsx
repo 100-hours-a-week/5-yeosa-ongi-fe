@@ -25,7 +25,7 @@ const Grid = ({ col = 4, items = [], ElementType = AlbumThumbnail }) => {
 					style={{ height: `calc(100vw / ${col})` }}>
 					{array.map((item, index) => (
 						<div className="border-[1px] border-solid">
-							<ElementType>{item}</ElementType>
+							<ElementType item={item}></ElementType>
 						</div>
 					))}
 				</div>
