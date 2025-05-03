@@ -1,26 +1,19 @@
-import getMonthlyAlbum from "../../mock/getMonthlyAlbum.json";
+import { useEffect } from "react";
+import { fetchAlbumData } from "../api/mock/album";
 import AlbumListHeader from "../components/\bAlbumListHeader";
 import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
 import Month from "../components/Month";
+import { useAlbumStore } from "../stores/mainPageStore";
 
 const Main = () => {
-	const result = {};
-	const mockResponse = getMonthlyAlbum;
-	const albums = mockResponse.data.albums;
-	albums.forEach((album) => {
-		const date = new Date(album.createdAt);
-		const monthKey = `${date.getFullYear()}-${String(
-			date.getMonth() + 1
-		).padStart(2, "0")}`;
+	const { albumsByMonth, setAlbums } = useAlbumStore();
 
-		if (!result[monthKey]) {
-			result[monthKey] = [];
-		}
-		result[monthKey].push(album);
-	});
-	console.log(result);
-	console.log(Object.keys(result));
+	// Mount
+	useEffect(() => {
+		const response = fetchAlbumData();
+		setAlbums(response.data.albums);
+	}, []);
 
 	return (
 		<div className="h-screen overflow-hidden">
@@ -35,11 +28,11 @@ const Main = () => {
 				<div
 					className="overflow-y-auto"
 					style={{ height: "calc(100vh - 80vw - 160px)" }}>
-					{Object.keys(result).map((month, index) => (
+					{Object.keys(albumsByMonth).map((month, index) => (
 						<Month
 							key={month}
 							title={month}
-							albums={result[month]}
+							albumIds={albumsByMonth[month]}
 						/>
 					))}
 				</div>

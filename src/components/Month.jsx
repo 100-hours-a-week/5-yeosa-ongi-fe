@@ -1,12 +1,12 @@
 import AlbumThumbnail from "./AlbumThumbnail";
 import Grid from "./Grid";
 
-const Month = ({ albums, title }) => {
-	console.log("in Month", albums, title);
+const Month = ({ albumIds, title }) => {
+	console.log("in Month", albumIds, title);
 	return (
 		<>
 			<div className="h-10 p-1">{title}</div>
-			<Grid ElementType={AlbumThumbnail} items={albums}></Grid>
+			<Grid ElementType={AlbumThumbnail} items={albumIds}></Grid>
 		</>
 	);
 };

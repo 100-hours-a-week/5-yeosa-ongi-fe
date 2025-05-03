@@ -1,9 +1,7 @@
 import AlbumThumbnail from "./AlbumThumbnail";
 
 const Grid = ({ col = 4, items = [], ElementType = AlbumThumbnail }) => {
-	console.log("in Grid", items);
 	const chunkArrayByCol = (array, chunkSize) => {
-		console.log("in chunkArrayByCol", array);
 		if (!array || array.length === 0) {
 			return <div>데이터가 없습니다.</div>;
 		} else {
@@ -25,7 +23,7 @@ const Grid = ({ col = 4, items = [], ElementType = AlbumThumbnail }) => {
 					style={{ height: `calc(100vw / ${col})` }}>
 					{array.map((item, index) => (
 						<div className="border-[1px] border-solid">
-							<ElementType item={item}></ElementType>
+							<ElementType id={item}></ElementType>
 						</div>
 					))}
 				</div>
