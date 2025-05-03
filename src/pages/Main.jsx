@@ -1,5 +1,6 @@
 import getMonthlyAlbum from "../../mock/getMonthlyAlbum.json";
 import AlbumListHeader from "../components/\bAlbumListHeader";
+import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
 import Month from "../components/Month";
 
@@ -33,12 +34,13 @@ const Main = () => {
 				<AlbumListHeader />
 				<div
 					className="overflow-y-auto"
-					style={{ height: "calc(100vh - 80vw - 80px)" }}>
+					style={{ height: "calc(100vh - 80vw - 160px)" }}>
 					{Object.keys(result).map((month, index) => (
 						<Month key={month} albums={result[month]} />
 					))}
 				</div>
 			</div>
+			<FlottingButton />
 		</div>
 	);
 };
