@@ -2,7 +2,9 @@ import { create } from "zustand";
 
 const useMainPageStore = create((set) => ({
 	selectedId: null, // 현재 선택된 항목의 ID
+	selectedAlbumSummary: null,
 	// 항목 선택 함수
+	setSelectedAlbumSummary: (data) => set({ selectedAlbumSummary: data }),
 	selectItem: (id) => set({ selectedId: id }),
 	// 선택 취소 함수
 	clearSelection: () => set({ selectedId: null }),
@@ -33,7 +35,8 @@ const useAlbumStore = create((set, get) => ({
 			};
 			albumsByMonth[monthKey].push(album.albumId);
 		});
-		console.log(albums);
+		// console.log(albums);
+		// console.log(albumsByMonth);
 		set({
 			albums,
 			albumsByMonth,
@@ -73,7 +76,7 @@ const useAlbumStore = create((set, get) => ({
 			}
 		});
 
-		console.log("추가된 앨범:", updatedAlbums);
+		// console.log("추가된 앨범:", updatedAlbums);
 
 		// 상태 업데이트
 		set({

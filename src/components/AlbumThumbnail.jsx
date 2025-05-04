@@ -1,19 +1,23 @@
+import { albumSummary } from "../../mock/getAlbumSummary";
 import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
 
 const AlbumThumbnail = ({ id }) => {
 	const hasCoworkers = false;
 	const { albums } = useAlbumStore();
 	const album = albums[id];
-	console.log(album);
 
 	const isSelected = useMainPageStore((state) => state.selectedId === id);
 	const selectItem = useMainPageStore((state) => state.selectItem);
-
+	const setSelectedAlbumSummary = useMainPageStore(
+		(state) => state.setSelectedAlbumSummary
+	);
 	const handleSelect = () => {
 		if (isSelected) {
 			console.log("앨범 상세페이지로 이동 : ", id);
+		} else {
+			selectItem(id);
+			setSelectedAlbumSummary(albumSummary);
 		}
-		selectItem(id);
 	};
 
 	return (
