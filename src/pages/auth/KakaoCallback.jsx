@@ -28,12 +28,26 @@ const KakaoCallback = () => {
 
 	useEffect(() => {
 		const code = new URLSearchParams(location.search).get("code");
+		console.log("인증 코드 받음:", code);
 
 		const getKakaoToken = async (code) => {
 			try {
-				//const response = await axios.post("/auth/login/kakao", { code });
-
-				const response = { data: MockResponse };
+				const response = await fetch(
+					`/api/auth/login/kakao?code=${code}`,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							// CORS 요청에 유용한 헤더들
+							Accept: "application/json",
+						},
+						mode: "cors", // CORS 모드 명시
+					}
+				);
+				console.log(response);
+				const data = await response.json();
+				console.log(data);
+				// const response = { data: MockResponse };
 
 				if (response.data.accessToken) {
 					setUserData(response.data);
