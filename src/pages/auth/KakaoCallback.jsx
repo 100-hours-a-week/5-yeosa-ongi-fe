@@ -1,6 +1,7 @@
 // KakaoCallback.js - 리다이렉트 처리 컴포넌트
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../api/config";
 import useUserStore from "../../stores/store";
 
 const MockResponse = {
@@ -33,7 +34,7 @@ const KakaoCallback = () => {
 		const getKakaoToken = async (code) => {
 			try {
 				const response = await fetch(
-					`/api/auth/login/kakao?code=${code}`,
+					`${API_BASE_URL}/api/auth/login/kakao?code=${code}`,
 					{
 						method: "GET",
 						headers: {
@@ -45,14 +46,12 @@ const KakaoCallback = () => {
 					}
 				);
 				console.log(response);
-				const data = await response.json();
-				console.log(data);
 				// const response = { data: MockResponse };
 
 				if (response.data.accessToken) {
 					setUserData(response.data);
 					console.log("로그인에 성공했습니다.", user);
-					navigate("/main");
+					// navigate("/main");
 				} else {
 					setError("로그인에 실패했습니다.");
 				}
@@ -61,6 +60,7 @@ const KakaoCallback = () => {
 				setError("로그인 처리 중 오류가 발생했습니다.");
 			} finally {
 				setLoading(false);
+				navigate("/main");
 			}
 		};
 
