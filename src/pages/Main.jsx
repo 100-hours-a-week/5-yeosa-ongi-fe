@@ -3,6 +3,7 @@ import { fetchAlbumData } from "../api/mock/album";
 import AlbumListHeader from "../components/\bAlbumListHeader";
 import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
+import KaKaoMap from "../components/Map";
 import Month from "../components/Month";
 import useInfiniteScroll from "../hooks/infiniteScroll";
 import { useAlbumStore } from "../stores/mainPageStore";
@@ -45,7 +46,9 @@ const Main = () => {
 			<div className="flex-col content">
 				<div
 					className="border-t border-solid"
-					style={{ height: "calc(80vw)" }}></div>
+					style={{ height: "calc(80vw)" }}>
+					<KaKaoMap />
+				</div>
 				<AlbumListHeader />
 				<div
 					className="overflow-y-auto"
