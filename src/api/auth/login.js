@@ -1,10 +1,14 @@
-import { API_BASE_URL } from "../config";
 
 export const kakaoLogin = async () => {
     try {
-        const apiUrl = API_BASE_URL + "/api/auth";
+        console.log("dddd");
+        const apiUrl = "/api/auth";
         const requestOptions = {
             method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
         };
         const response = await fetch(apiUrl, requestOptions);
 
