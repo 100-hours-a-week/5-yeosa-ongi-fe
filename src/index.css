@@ -12,5 +12,12 @@
 		--color-gray-100: #ebebeb;
 		--color-gray-500: #7d7d7d;
 		--color-black: #343a3f;
+
+		/* 누락된 변수들 추가 */
+		--white-bage: #f6f5f2;
+		--white-blue: #f6f7fa;
+		--gray-light: #ebebeb;
+		--gray-dark: #7d7d7d;
+		--black-light: #343a3f;
 	}
 }
