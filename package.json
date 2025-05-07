@@ -1,5 +1,4 @@
 {
-  "proxy": "http://34.64.152.144:8080",
   "name": "ongi_react",
   "private": true,
   "version": "0.0.0",
