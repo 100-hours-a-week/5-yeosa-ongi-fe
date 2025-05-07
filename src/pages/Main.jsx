@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchAlbumData } from "../api/getAlbum";
+import { fetchAlbumData } from "../api/albums/albumMonthly";
 import AlbumListHeader from "../components/AlbumListHeader";
 import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
@@ -10,28 +10,44 @@ import { useAlbumStore } from "../stores/mainPageStore";
 
 const Main = () => {
 	const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore();
-
 	const [page, setPage] = useState(1); // 현재 페이지 번호
-
 	const [nextYearMonth, setNextYearMonth] = useState(null);
-
 	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
 
 	// Mount
 	useEffect(() => {
+		let isMounted = true;
 		const loadInitialData = async () => {
-			const response = fetchAlbumData(null);
-			setAlbums(response.data.albums);
-			setNextYearMonth(response.data.nextYearMonth);
-			setHasNext(response.data.hasNext == "true");
-		};
+			try {
+				setIsInitialLoading(true);
+				const result = await fetchAlbumData(null);
 
+				if (isMounted) {
+					console.log("초기 데이터 로드:", result);
+					setAlbums(result.data.albums);
+					setNextYearMonth(result.data.nextYearMonth);
+					setHasNext(result.data.hasNext === "true");
+				}
+			} catch (error) {
+				console.error("초기 데이터 로딩 오류:", error);
+			} finally {
+				if (isMounted) {
+					setIsInitialLoading(false);
+				}
+			}
+		};
 		loadInitialData();
+
+		return () => {
+			isMounted = false;
+		};
 	}, []);
 
 	const fetchMoreAlbums = useCallback(async () => {
-		const response = fetchAlbumData(nextYearMonth);
-		addAlbums(response.data.albums);
+		const response = await fetchAlbumData(nextYearMonth);
+		const result = await response.json;
+		console.log(result);
+		addAlbums(result.data);
 		setNextYearMonth(response.data.nextYearMonth);
 		return response.data.hasNext === "true";
 	}, [nextYearMonth, addAlbums]);
