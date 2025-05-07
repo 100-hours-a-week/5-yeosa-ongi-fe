@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Grid from "../components/Grid";
 import Input from "../components/Input";
+import CreateAlbumButton from "../components/common/CreateAlbumButton";
 
 const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
@@ -90,7 +91,15 @@ const AlbumEditor = () => {
 			<div>
 				<div className="m-2 mt-8">현재 {files.length}장 업로드 중</div>
 				<Grid items={gridItems} />
-			</div>
+				</div>
+				<CreateAlbumButton
+					disabled={files.length === 0}
+					onClick={() => {
+						if (files.length > 0) {
+						// 앨범 생성 로직 실행
+						}
+					}}
+				/>
 		</>
 	);
 };
