@@ -8,10 +8,12 @@ const Input = ({ onFileSelect }) => {
 		fileInputRef.current.click();
 	};
 	const handleFileChange = (e) => {
-		console.log("handleFIleChange 호출!");
-		const selectedFile = e.target.files[0];
-		if (selectedFile) {
-			onFileSelect(selectedFile);
+		console.log("handleFileChange 호출!");
+		const selectedFiles = Array.from(e.target.files);
+		if (selectedFiles.length > 0) {
+			selectedFiles.forEach(file => {
+				onFileSelect(file);
+			});
 		}
 	};
 	return (
@@ -26,6 +28,7 @@ const Input = ({ onFileSelect }) => {
 				className="hidden"
 				type="file"
 				accept="image/jpg, image/png, image/jpeg"
+				multiple
 				onChange={handleFileChange}
 			/>
 		</div>

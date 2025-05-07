@@ -34,15 +34,16 @@ const AlbumEditor = () => {
 		},
 		...files.map((fileItem, index) => ({
 			ElementType: () => (
-				<div className="relative">
+				<div className="relative w-full h-full">
 					{/* 이미지 미리보기 */}
 					<img
 						src={fileItem.preview}
 						alt={`Preview ${index}`}
-						className="object-cover w-full h-full rounded-lg"
+						className="absolute inset-0 w-full h-full object-cover rounded-lg"
 					/>
 					{/* 삭제 버튼 */}
 					<button
+						className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
 						onClick={() => {
 							// 파일 목록에서 해당 아이템 제거
 							setFiles(
