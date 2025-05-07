@@ -19,6 +19,7 @@ const MockResponse = {
 };
 
 const KakaoCallback = () => {
+	console.log("카카오 콜백");
 	const location = useLocation();
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(true);
@@ -34,24 +35,26 @@ const KakaoCallback = () => {
 		const getKakaoToken = async (code) => {
 			try {
 				const response = await fetch(
-					`${API_BASE_URL}/api/auth/login/kakao?code=${code}`,
+					`${API_BASE_URL}/auth/login/kakao?code=${code}`,
 					{
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							// CORS 요청에 유용한 헤더들
 							Accept: "application/json",
 						},
-						mode: "cors", // CORS 모드 명시
 					}
 				);
-				console.log(response);
-				// const response = { data: MockResponse };
 
-				if (response.data.accessToken) {
-					setUserData(response.data);
+				if (!response.ok) {
+					throw new Error(`HTTP error! Status: ${response.status}`);
+				}
+
+				const data = await response.json(); // fetch API에서는 이렇게 데이터에 접근해야 함
+
+				if (data.accessToken) {
+					setUserData(data);
 					console.log("로그인에 성공했습니다.", user);
-					// navigate("/main");
+					navigate("/main");
 				} else {
 					setError("로그인에 실패했습니다.");
 				}
@@ -60,7 +63,6 @@ const KakaoCallback = () => {
 				setError("로그인 처리 중 오류가 발생했습니다.");
 			} finally {
 				setLoading(false);
-				navigate("/main");
 			}
 		};
 

@@ -23,7 +23,8 @@ const Grid = ({ col = 4, items = [] }) => {
 					{array.map((item, index) => (
 						<div className="border-[1px] border-solid">
 							<item.ElementType
-								id={item.element}></item.ElementType>
+								id={item.element}
+								{...item.props}></item.ElementType>
 						</div>
 					))}
 				</div>

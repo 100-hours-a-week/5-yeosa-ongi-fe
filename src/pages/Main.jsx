@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchAlbumData } from "../api/mock/album";
-import AlbumListHeader from "../components/\bAlbumListHeader";
+import { fetchAlbumData } from "../api/getAlbum";
+import AlbumListHeader from "../components/AlbumListHeader";
 import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
 import KaKaoMap from "../components/Map";

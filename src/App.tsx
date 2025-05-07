@@ -14,6 +14,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/auth/callback/kakao" element={<KakaoCallback />} />
          <Route path="/auth/login/kakao" element={<KakaoCallback />} />
          <Route path="/main" element={<Main />} />
          <Route path="/album-editor/:albumId" element={<AlbumEditor />} />

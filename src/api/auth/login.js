@@ -1,7 +1,6 @@
 
 export const kakaoLogin = async () => {
     try {
-        console.log("dddd");
         const apiUrl = "/api/auth";
         const requestOptions = {
             method: 'GET',

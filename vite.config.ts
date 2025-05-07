@@ -11,7 +11,7 @@ export default defineConfig({
         // 필요한 경우 다음 옵션을 추가할 수 있습니다
         // rewrite: (path) => path.replace(/^\/api/, '')
       },      
-      '/auth': {
+      '/auth/login': {
         target: 'http://34.64.152.144:8080',
         changeOrigin: true,
       }

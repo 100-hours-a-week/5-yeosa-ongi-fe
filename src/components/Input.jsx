@@ -1,13 +1,19 @@
 import { useRef } from "react";
 
-const Input = () => {
+const Input = ({ onFileSelect }) => {
 	// 파일 입력 요소에 대한 참조 생성
 	const fileInputRef = useRef(null);
 
 	const handleClick = () => {
 		fileInputRef.current.click();
 	};
-
+	const handleFileChange = (e) => {
+		console.log("handleFIleChange 호출!");
+		const selectedFile = e.target.files[0];
+		if (selectedFile) {
+			onFileSelect(selectedFile);
+		}
+	};
 	return (
 		<div className="w-full h-full">
 			<div
@@ -20,7 +26,7 @@ const Input = () => {
 				className="hidden"
 				type="file"
 				accept="image/jpg, image/png, image/jpeg"
-				onChange={(e) => console.log(e.target.files[0])}
+				onChange={handleFileChange}
 			/>
 		</div>
 	);

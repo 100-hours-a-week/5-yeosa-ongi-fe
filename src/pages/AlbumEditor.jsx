@@ -1,13 +1,64 @@
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Grid from "../components/Grid";
-import Image from "../components/Imgae";
 import Input from "../components/Input";
 
 const AlbumEditor = () => {
-	const mock = [
-		{ ElementType: Input, element: 0 },
-		{ ElementType: Image, element: 1 },
+	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
+	const [files, setFiles] = useState([]);
+	const fileInputRef = useRef(null);
+
+	const handleFileAdded = (file) => {
+		if (!file) return;
+
+		// 파일에 대한 미리보기 URL 생성
+		const newFileItem = {
+			file,
+			preview: URL.createObjectURL(file),
+			id: Math.random().toString(36).substr(2, 9),
+		};
+
+		setFiles((prevFiles) => [...prevFiles, newFileItem]);
+	};
+
+	const handleAddMoreClick = () => {
+		fileInputRef.current.click();
+	};
+	const gridItems = [
+		{
+			ElementType: Input,
+			element: 0,
+			props: {
+				onFileSelect: handleFileAdded,
+			},
+		},
+		...files.map((fileItem, index) => ({
+			ElementType: () => (
+				<div className="relative">
+					{/* 이미지 미리보기 */}
+					<img
+						src={fileItem.preview}
+						alt={`Preview ${index}`}
+						className="object-cover w-full h-full rounded-lg"
+					/>
+					{/* 삭제 버튼 */}
+					<button
+						onClick={() => {
+							// 파일 목록에서 해당 아이템 제거
+							setFiles(
+								files.filter((item) => item.id !== fileItem.id)
+							);
+							// 메모리 누수 방지를 위해 URL 해제
+							URL.revokeObjectURL(fileItem.preview);
+						}}>
+						×
+					</button>
+				</div>
+			),
+			element: index + 1,
+		})),
 	];
+
 	const navigate = useNavigate();
 	const onClickBtn = () => {
 		navigate(-1); // 바로 이전 페이지로 이동, '/main' 등 직접 지정도 당연히 가능
@@ -36,8 +87,8 @@ const AlbumEditor = () => {
 			</div>
 
 			<div>
-				<div className="m-2 mt-8"> 현재 00장 업로드 중</div>
-				<Grid items={mock} />
+				<div className="m-2 mt-8">현재 {files.length}장 업로드 중</div>
+				<Grid items={gridItems} />
 			</div>
 		</>
 	);
