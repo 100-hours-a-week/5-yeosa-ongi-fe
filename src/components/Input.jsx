@@ -11,7 +11,7 @@ const Input = ({ onFileSelect }) => {
 		console.log("handleFileChange 호출!");
 		const selectedFiles = Array.from(e.target.files);
 		if (selectedFiles.length > 0) {
-			selectedFiles.forEach(file => {
+			selectedFiles.forEach((file) => {
 				onFileSelect(file);
 			});
 		}
@@ -27,7 +27,7 @@ const Input = ({ onFileSelect }) => {
 				ref={fileInputRef}
 				className="hidden"
 				type="file"
-				accept="image/jpg, image/png, image/jpeg"
+				accept="image/jpg, image/png, image/jpeg, image/heic"
 				multiple
 				onChange={handleFileChange}
 			/>
