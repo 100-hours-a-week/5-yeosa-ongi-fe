@@ -1,5 +1,4 @@
 const Grid = ({ col = 4, items = [] }) => {
-	console.log(items[0].ElementType);
 	const chunkArrayByCol = (array, chunkSize) => {
 		if (!array || array.length === 0) {
 			return <div>데이터가 없습니다.</div>;

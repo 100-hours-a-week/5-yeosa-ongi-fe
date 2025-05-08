@@ -4,7 +4,12 @@ import axios from "axios";
 import Grid from "../components/Grid";
 import Input from "../components/Input";
 import CreateAlbumButton from "../components/album/CreateAlbumButton";
-import { API_BASE_URL } from "../api/config";
+
+// Assets
+import axios from "axios";
+import { createAlbum } from "../api/albums/albumCreateApi";
+import { getPreSignedUrl } from "../api/albums/presignedUrl";
+import crossIcon from "../assets/cross_icon.png";
 
 const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
@@ -12,6 +17,27 @@ const AlbumEditor = () => {
 	const fileInputRef = useRef(null);
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
+	const validateTitle = (title) => {
+		if (!title || title.trim() === "") {
+			return "앨범 제목을 입력해주세요.";
+		}
+
+		if (title.length > 12) {
+			return "앨범 제목은 50자 이내로 작성해주세요.";
+		}
+
+		return ""; // 오류가 없으면 빈 문자열 반환
+	};
+
+	const handleTitleChange = (e) => {
+		const newTitle = e.target.value;
+		setAlbumTitle(newTitle);
+
+		// 입력 중에는 오류 메시지를 표시하지 않음
+		if (titleError) {
+			setTitleError("");
+		}
+	};
 
 	const handleFileAdded = (file) => {
 		if (!file) return;
@@ -26,30 +52,46 @@ const AlbumEditor = () => {
 	const handleCreateAlbum = async () => {
 		if (files.length === 0 || loading) return;
 		setLoading(true);
+
 		try {
-			const formData = new FormData();
-			formData.append("albumName", albumTitle);
-			files.forEach((fileItem) => {
-				formData.append("images", fileItem.file);
-			});
-			const response = await axios.post(
-				`${API_BASE_URL}/api/albums/people`,
-				formData,
-				{
+			// 1. 앨범 이름과 파일 메타데이터 준비
+			const pictures = files.map((fileItem) => ({
+				pictureName: fileItem.file.name,
+				pictureType: fileItem.file.type,
+			}));
+
+			// 2. presigned URL 요청
+			const response = await getPreSignedUrl(pictures);
+			const presignedFiles = response.data.presignedFiles;
+
+			// 3. 업로드
+			for (const fileItem of files) {
+				const file = fileItem.file;
+				const matched = presignedFiles.find(
+					(f) => f.pictureName === file.name
+				);
+				if (!matched) continue;
+
+				await axios.put(matched.presignedUrl, file, {
 					headers: {
-						"Content-Type": "multipart/form-data",
+						"Content-Type": file.type,
 					},
-				}
-			);
-			// 성공 시 앨범 상세 페이지로 이동 (albumId 필요)
-			const albumId = response.data?.albumId || response.data?.id;
-			if (albumId) {
-				navigate(`/album/${albumId}`);
-			} else {
-				alert("앨범 생성은 성공했으나 albumId를 찾을 수 없습니다.");
+				});
 			}
-		} catch (error) {
-			alert("앨범 생성에 실패했습니다.");
+
+			// 4. 업로드 완료 후 앨범 생성 요청
+			const pictureUrls = presignedFiles.map((f) => f.pictureURL);
+			const albumData = {
+				albumName: albumTitle,
+				pictureUrls: pictureUrls,
+			};
+
+			const res = await createAlbum(albumData);
+			const result = await res;
+			console.log(result);
+			navigate("/main");
+		} catch (err) {
+			console.error(err);
 		} finally {
 			setLoading(false);
 		}
@@ -73,10 +115,12 @@ const AlbumEditor = () => {
 					<img
 						src={fileItem.preview}
 						alt={`Preview ${index}`}
-						className="absolute inset-0 w-full h-full object-cover rounded-lg"
+
+						className="absolute inset-0 object-cover w-full h-full"
 					/>
 					{/* 삭제 버튼 */}
 					<button
+						className="absolute z-10 top-2 right-2"
 						onClick={() => {
 							// 파일 목록에서 해당 아이템 제거
 							setFiles(
@@ -85,7 +129,7 @@ const AlbumEditor = () => {
 							// 메모리 누수 방지를 위해 URL 해제
 							URL.revokeObjectURL(fileItem.preview);
 						}}>
-						×
+						<img className="w-4 h-4" src={crossIcon}></img>
 					</button>
 				</div>
 			),
@@ -94,7 +138,7 @@ const AlbumEditor = () => {
 	];
 
 	const onClickBtn = () => {
-		navigate(-1); // 바로 이전 페이지로 이동, '/main' 등 직접 지정도 당연히 가능
+		navigate(-1);
 	};
 	return (
 		<>
@@ -111,10 +155,8 @@ const AlbumEditor = () => {
 					<div className="w-16 mx-4 text-gray"> 제목</div>
 					<input
 						className="w-full text-lg focus:outline-none"
-						value="이름 없는 앨범"
-						onChange={(e) => {
-							/* 값 변경 처리 */
-						}}
+						value={albumTitle}
+						onChange={handleTitleChange}
 					/>
 				</div>
 			</div>
