@@ -21,14 +21,12 @@ const KakaoCallback = () => {
 			try {
 				const response = await kakaoLogin(code);
 
-				if (!response.ok) {
-					throw new Error(`HTTP error! Status: ${response.status}`);
+				if (response) {
+					console.log("로그인 과정 완료");
+					navigate("/main");
+				} else {
+					console.log("로그인 실패");
 				}
-
-				const result = await response.json();
-				console.log(result.data);
-				login(result.data);
-				navigate("/main");
 			} catch (error) {
 				console.error("카카오 로그인 에러:", error);
 				setError("로그인 처리 중 오류가 발생했습니다.");
