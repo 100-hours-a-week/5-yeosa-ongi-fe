@@ -1,22 +1,8 @@
 // KakaoCallback.js - 리다이렉트 처리 컴포넌트
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../../api/config";
-import useUserStore from "../../stores/store";
-
-const MockResponse = {
-	code: "USER_ALREADY_REGISTERED",
-	message: "로그인을 완료했습니다.",
-	accessToken: "access_token_value",
-	refreshTokenExpiresIn: 1209600,
-	refreshToken: "refresh_token_value",
-	user: {
-		userId: 1,
-		nickname: "gray_123!",
-		profileImageURL: "https://ongi.s3.ap-northeast-2.amazonaws.com/1.jpg",
-		cacheTtl: 300,
-	},
-};
+import { kakaoLogin } from "../../api/auth/login";
+import useUserStore from "../../stores/userStore";
 
 const KakaoCallback = () => {
 	console.log("카카오 콜백");
@@ -25,8 +11,7 @@ const KakaoCallback = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	const user = useUserStore((state) => state);
-	const setUserData = useUserStore((state) => state.setUserData);
+	const login = useUserStore((state) => state.login);
 
 	useEffect(() => {
 		const code = new URLSearchParams(location.search).get("code");
@@ -34,30 +19,16 @@ const KakaoCallback = () => {
 
 		const getKakaoToken = async (code) => {
 			try {
-				const response = await fetch(
-					`${API_BASE_URL}/auth/login/kakao?code=${code}`,
-					{
-						method: "GET",
-						headers: {
-							"Content-Type": "application/json",
-							Accept: "application/json",
-						},
-					}
-				);
+				const response = await kakaoLogin(code);
 
 				if (!response.ok) {
 					throw new Error(`HTTP error! Status: ${response.status}`);
 				}
 
-				const data = await response.json(); // fetch API에서는 이렇게 데이터에 접근해야 함
-
-				if (data.accessToken) {
-					setUserData(data);
-					console.log("로그인에 성공했습니다.", user);
-					navigate("/main");
-				} else {
-					setError("로그인에 실패했습니다.");
-				}
+				const result = await response.json();
+				console.log(result.data);
+				login(result.data);
+				navigate("/main");
 			} catch (error) {
 				console.error("카카오 로그인 에러:", error);
 				setError("로그인 처리 중 오류가 발생했습니다.");

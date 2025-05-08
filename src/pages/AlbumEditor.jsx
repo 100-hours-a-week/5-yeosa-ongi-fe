@@ -77,7 +77,6 @@ const AlbumEditor = () => {
 					/>
 					{/* 삭제 버튼 */}
 					<button
-						className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
 						onClick={() => {
 							// 파일 목록에서 해당 아이템 제거
 							setFiles(
