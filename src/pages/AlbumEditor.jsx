@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Grid from "../components/Grid";
 import Input from "../components/Input";
 import CreateAlbumButton from "../components/album/CreateAlbumButton";
@@ -16,7 +17,6 @@ const AlbumEditor = () => {
 	const fileInputRef = useRef(null);
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
-
 	const validateTitle = (title) => {
 		if (!title || title.trim() === "") {
 			return "앨범 제목을 입력해주세요.";
@@ -115,6 +115,7 @@ const AlbumEditor = () => {
 					<img
 						src={fileItem.preview}
 						alt={`Preview ${index}`}
+
 						className="absolute inset-0 object-cover w-full h-full"
 					/>
 					{/* 삭제 버튼 */}

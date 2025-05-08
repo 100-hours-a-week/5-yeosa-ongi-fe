@@ -8,7 +8,6 @@ const Input = ({ onFileSelect }) => {
 	const handleClick = () => {
 		fileInputRef.current.click();
 	};
-
 	const isHEICFile = (file) => {
 		return (
 			file.type === "image/heic" ||
