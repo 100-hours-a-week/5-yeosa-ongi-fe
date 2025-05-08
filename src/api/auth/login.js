@@ -1,3 +1,4 @@
+import useAuthStore from "../../stores/userStore";
 import { API_BASE_URL } from "../config";
 
 const getKakaoOauthLink = async () => {
@@ -34,9 +35,13 @@ const kakaoLogin = async (code) => {
             }
         );
 
-        return response;
+        const result = await response.json();
+        console.log(result);
+        useAuthStore.getState().login(result.data);
+        return true;
     } catch (error) {
-        console.error('kakaoLogin 에러 :', error.message);
+        console.error('kakaoLogin 에러 :', error);
+        return false;
     }
 
 }
