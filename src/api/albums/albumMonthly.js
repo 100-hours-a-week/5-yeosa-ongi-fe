@@ -1,31 +1,14 @@
-import useAuthStore from "../../stores/userStore";
+import { authenticatedFetch } from "../auth/authUtils";
 import { API_BASE_URL } from "../config";
 
 const fetchAlbumData = async (yearMonth) => {
-    const accessToken = useAuthStore.getState().getAccessToken();
-    console.log(accessToken);
     try {
-
         const apiUrl = API_BASE_URL + `/api/album/monthly${yearMonth ? '?yearMonth=' + yearMonth : ''}`;
-        console.log(apiUrl);
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            }
-        };
-        const response = await fetch(apiUrl, requestOptions);
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP 에러! 상태: ${response.status}`);
-        }
-        return await response.json();
+        return await authenticatedFetch(apiUrl, { method: 'GET' });
     } catch (error) {
         console.error('앨범 데이터 Fetch 실패:', error.message);
+        throw error;
     }
-}
+};
 
 export { fetchAlbumData };
