@@ -6,7 +6,7 @@ const createAlbum = async (data) => {
     //console.log(accessToken);
     try {
 
-        const apiUrl = API_BASE_URL + `/api/album/monthly${yearMonth ? '?yearMonth=' + yearMonth : ''}`;
+        const apiUrl = API_BASE_URL + `/api/album`;
         //console.log(apiUrl);
 
         const requestOptions = {
@@ -15,7 +15,7 @@ const createAlbum = async (data) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
             },
-            body: { data }
+            body: JSON.stringify(data)
         };
         const response = await fetch(apiUrl, requestOptions);
 

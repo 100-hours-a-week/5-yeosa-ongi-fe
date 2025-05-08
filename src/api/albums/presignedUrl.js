@@ -13,7 +13,7 @@ const getPreSignedUrl = async (pictures) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
             },
-            body: { "pictures": pictures }
+            body: JSON.stringify({ "pictures": pictures })
         };
 
         console.log(requestOptions);
