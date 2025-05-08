@@ -5,6 +5,8 @@ import Input from "../components/Input";
 import CreateAlbumButton from "../components/album/CreateAlbumButton";
 
 // Assets
+import axios from "axios";
+import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
 
@@ -50,43 +52,46 @@ const AlbumEditor = () => {
 	const handleCreateAlbum = async () => {
 		if (files.length === 0 || loading) return;
 		setLoading(true);
+
 		try {
-			const formData = {};
-			formData.albumName = albumTitle;
-			const pictures = [];
-			files.forEach((fileItem) => {
-				pictures.push({
-					pictureName: fileItem.file.name,
-					pictureType: fileItem.file.type,
-				});
-			});
-			console.log(pictures);
+			// 1. 앨범 이름과 파일 메타데이터 준비
+			const pictures = files.map((fileItem) => ({
+				pictureName: fileItem.file.name,
+				pictureType: fileItem.file.type,
+			}));
 
+			// 2. presigned URL 요청
 			const response = await getPreSignedUrl(pictures);
+			const presignedFiles = response.data.presignedFiles;
 
-			const result = await response.json();
+			// 3. 업로드
+			for (const fileItem of files) {
+				const file = fileItem.file;
+				const matched = presignedFiles.find(
+					(f) => f.pictureName === file.name
+				);
+				if (!matched) continue;
 
-			// const response = await axios.post(
-			// 	`${API_BASE_URL}/api/albums/people`,
-			// 	formData,
-			// 	{
-			// 		headers: {
-			// 			"Content-Type": "multipart/form-data",
-			// 		},
-			// 	}
-			// );
+				await axios.put(matched.presignedUrl, file, {
+					headers: {
+						"Content-Type": file.type,
+					},
+				});
+			}
 
-			// // 성공 시 앨범 상세 페이지로 이동 (albumId 필요)
-			// const albumId = response.data?.albumId || response.data?.id;
-			// if (albumId) {
-			// 	navigate(`/album/${albumId}`);
-			// } else {
-			// 	console.log(
-			// 		"앨범 생성은 성공했으나 albumId를 찾을 수 없습니다."
-			// 	);
-			// }
-		} catch (error) {
-			console.log("앨범 생성에 실패했습니다.", error);
+			// 4. 업로드 완료 후 앨범 생성 요청
+			const pictureUrls = presignedFiles.map((f) => f.pictureURL);
+			const albumData = {
+				albumName: albumTitle,
+				pictureUrls: pictureUrls,
+			};
+
+			const res = await createAlbum(albumData);
+			const result = await res;
+			console.log(result);
+			navigate("/main");
+		} catch (err) {
+			console.error(err);
 		} finally {
 			setLoading(false);
 		}
