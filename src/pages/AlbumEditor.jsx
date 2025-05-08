@@ -1,11 +1,13 @@
+import axios from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { API_BASE_URL } from "../api/config";
 import Grid from "../components/Grid";
 import Input from "../components/Input";
 import CreateAlbumButton from "../components/album/CreateAlbumButton";
-import { API_BASE_URL } from "../api/config";
 
+// Assets
+import crossIcon from "../assets/cross_icon.png";
 const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
 	const [files, setFiles] = useState([]);
@@ -73,10 +75,11 @@ const AlbumEditor = () => {
 					<img
 						src={fileItem.preview}
 						alt={`Preview ${index}`}
-						className="absolute inset-0 w-full h-full object-cover rounded-lg"
+						className="absolute inset-0 object-cover w-full h-full rounded-lg"
 					/>
 					{/* 삭제 버튼 */}
 					<button
+						className="absolute z-10 top-2 right-2"
 						onClick={() => {
 							// 파일 목록에서 해당 아이템 제거
 							setFiles(
@@ -85,7 +88,7 @@ const AlbumEditor = () => {
 							// 메모리 누수 방지를 위해 URL 해제
 							URL.revokeObjectURL(fileItem.preview);
 						}}>
-						×
+						<img className="w-4 h-4" src={crossIcon}></img>
 					</button>
 				</div>
 			),
