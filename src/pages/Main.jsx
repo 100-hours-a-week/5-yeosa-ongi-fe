@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchAlbumData } from "../api/mock/album";
-import AlbumListHeader from "../components/\bAlbumListHeader";
+import { fetchAlbumData } from "../api/albums/albumMonthly";
+import AlbumListHeader from "../components/AlbumListHeader";
 import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
 import KaKaoMap from "../components/Map";
@@ -10,31 +10,89 @@ import { useAlbumStore } from "../stores/mainPageStore";
 
 const Main = () => {
 	const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore();
-
 	const [page, setPage] = useState(1); // 현재 페이지 번호
-
 	const [nextYearMonth, setNextYearMonth] = useState(null);
-
+	const [isInitialLoading, setIsInitialLoading] = useState(false);
+	const [initialLoadFailed, setInitialLoadFailed] = useState(false);
 	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
 
 	// Mount
 	useEffect(() => {
+		let isMounted = true;
 		const loadInitialData = async () => {
-			const response = fetchAlbumData(null);
-			setAlbums(response.data.albums);
-			setNextYearMonth(response.data.nextYearMonth);
-			setHasNext(response.data.hasNext == "true");
-		};
+			try {
+				setIsInitialLoading(true);
+				setInitialLoadFailed(false);
+				const result = await fetchAlbumData();
 
+				if (isMounted && result && result.data) {
+					console.log("초기 데이터 로드:", result);
+					setAlbums(result.data.albumInfo);
+					setNextYearMonth(result.data.nextYearMonth);
+				}
+			} catch (error) {
+				console.error("초기 데이터 로딩 오류:", error);
+				if (isMounted) {
+					setInitialLoadFailed(true); // 초기 로드 실패 플래그 설정
+				}
+			} finally {
+				if (isMounted) {
+					setIsInitialLoading(false);
+				}
+			}
+		};
 		loadInitialData();
-	}, []);
+
+		return () => {
+			isMounted = false;
+		};
+	}, [setAlbums]);
 
 	const fetchMoreAlbums = useCallback(async () => {
-		const response = fetchAlbumData(nextYearMonth);
-		addAlbums(response.data.albums);
-		setNextYearMonth(response.data.nextYearMonth);
-		return response.data.hasNext === "true";
-	}, [nextYearMonth, addAlbums]);
+		// 초기 로드에 실패했거나 nextYearMonth가 없으면 더 로드하지 않음
+		if (initialLoadFailed || !nextYearMonth) return false;
+
+		// 이미 시도했던 yearMonth와 동일하면 재시도하지 않음
+		if (lastAttemptedYearMonth.current === nextYearMonth) {
+			return false;
+		}
+
+		// 현재 시도하는 yearMonth 저장
+		lastAttemptedYearMonth.current = nextYearMonth;
+
+		try {
+			const response = await fetchAlbumData(nextYearMonth);
+
+			// 응답 유효성 검사
+			if (!response || !response.data) {
+				console.error("Invalid response from fetchAlbumData");
+				return false;
+			}
+
+			console.log("추가 데이터 로드:", response);
+			addAlbums(response.data.albums);
+
+			// 새로운 nextYearMonth 값이 있으면 업데이트
+			if (
+				response.data.nextYearMonth &&
+				response.data.nextYearMonth !== nextYearMonth
+			) {
+				setNextYearMonth(response.data.nextYearMonth);
+				lastAttemptedYearMonth.current = null; // 새 yearMonth가 설정되었으므로 리셋
+			} else {
+				// 같은 nextYearMonth가 반환되면 더 이상 데이터가 없는 것으로 처리
+				return false;
+			}
+
+			setPage((prevPage) => prevPage + 1);
+
+			// 더 로드할 데이터가 있는지 반환
+			return response.data.hasNext === "true";
+		} catch (error) {
+			console.error("추가 앨범 로딩 오류:", error);
+			return false; // 오류 발생 시 더 이상 로드하지 않음
+		}
+	}, [nextYearMonth, addAlbums, initialLoadFailed]);
 
 	const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(
 		fetchMoreAlbums,

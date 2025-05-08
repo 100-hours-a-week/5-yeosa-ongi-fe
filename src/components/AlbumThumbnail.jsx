@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { albumSummary } from "../../mock/getAlbumSummary";
 import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
 
 const AlbumThumbnail = ({ id }) => {
+	const navigate = useNavigate();
 	const hasCoworkers = false;
 	const { albums } = useAlbumStore();
 	const album = albums[id];
@@ -14,6 +16,7 @@ const AlbumThumbnail = ({ id }) => {
 	const handleSelect = () => {
 		if (isSelected) {
 			console.log("앨범 상세페이지로 이동 : ", id);
+			navigate(`/album/${id}`);
 		} else {
 			selectItem(id);
 			setSelectedAlbumSummary(albumSummary);

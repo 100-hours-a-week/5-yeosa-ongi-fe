@@ -5,6 +5,9 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      sans: ['Pretendard', 'sans-serif'],
+    },
     extend: {
       colors: {
         primary: 'var(--color-primary)',

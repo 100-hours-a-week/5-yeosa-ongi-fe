@@ -1,10 +1,14 @@
 import { API_BASE_URL } from "../config";
 
-export const kakaoLogin = async () => {
+const getKakaoOauthLink = async () => {
     try {
-        const apiUrl = API_BASE_URL + "/api/auth";
+        const apiUrl = "/api/auth";
         const requestOptions = {
             method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
         };
         const response = await fetch(apiUrl, requestOptions);
 
@@ -16,3 +20,25 @@ export const kakaoLogin = async () => {
         console.error('로그인 실패:', error.message);
     }
 }
+
+const kakaoLogin = async (code) => {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/auth/login/kakao?code=${code}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            }
+        );
+
+        return response;
+    } catch (error) {
+        console.error('kakaoLogin 에러 :', error.message);
+    }
+
+}
+
+export { getKakaoOauthLink, kakaoLogin };

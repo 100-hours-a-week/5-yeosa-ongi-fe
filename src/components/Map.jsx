@@ -28,7 +28,6 @@ const KakaoMap = () => {
 			document.head.appendChild(script);
 		}
 
-		// 컴포넌트 언마운트 시 필요한 정리 작업
 		return () => {
 			// 필요한 정리 작업 수행
 		};
