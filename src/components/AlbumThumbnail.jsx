@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { albumSummary } from "../../mock/getAlbumSummary";
+import { getAlubmSummary } from "../api/albums/albumSummaryApi";
 import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
 
 const AlbumThumbnail = ({ id }) => {
@@ -13,13 +14,16 @@ const AlbumThumbnail = ({ id }) => {
 	const setSelectedAlbumSummary = useMainPageStore(
 		(state) => state.setSelectedAlbumSummary
 	);
-	const handleSelect = () => {
+	const handleSelect = async () => {
 		if (isSelected) {
 			console.log("앨범 상세페이지로 이동 : ", id);
 			navigate(`/album/${id}`);
 		} else {
 			selectItem(id);
 			setSelectedAlbumSummary(albumSummary);
+			const response = await getAlubmSummary(id);
+
+			console.log(response);
 		}
 	};
 

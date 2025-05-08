@@ -1,12 +1,11 @@
+import axios from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Grid from "../components/Grid";
 import Input from "../components/Input";
 import CreateAlbumButton from "../components/album/CreateAlbumButton";
 
 // Assets
-import axios from "axios";
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
@@ -115,7 +114,6 @@ const AlbumEditor = () => {
 					<img
 						src={fileItem.preview}
 						alt={`Preview ${index}`}
-
 						className="absolute inset-0 object-cover w-full h-full"
 					/>
 					{/* 삭제 버튼 */}
