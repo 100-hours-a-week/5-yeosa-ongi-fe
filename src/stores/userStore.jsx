@@ -1,21 +1,56 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { API_BASE_URL } from "../api/config";
 
-// 개발 환경 여부 확인 (추후 프로덕션 환경 분기 처리를 위해)
-const isDevelopment = process.env.NODE_ENV === "development";
+const ACCESS_TOKEN_EXPIRY_TIME = 300 * 1000;
 
-// 액세스 토큰도 영속적으로 관리 (개발 편의를 위해)
-const useAuthStore = create(
+const useMemoryAuthStore = create((set, get) => ({
+	accessToken: null,
+	accessTokenExpiresAt: null,
+
+	// 토큰을 인자로 받아서 액세스 토큰으로 설정하고, 토큰이 존재한다면 현재 시간 + 만료 시간 = 토큰 만료 시각을 설정한다.
+	setAccessToken: (token) =>
+		set({
+			accessToken: token,
+			accessTokenExpiresAt: token
+				? Date.now() + ACCESS_TOKEN_EXPIRY_TIME
+				: null,
+		}),
+
+	// 액세스 토큰이 있고, 만료되지 않았다면 반환하고 없다면 null을 반환한다.
+	getAccessToken: () => {
+		const { accessToken, accessTokenExpiresAt } = get();
+		if (
+			accessToken &&
+			accessTokenExpiresAt &&
+			Date.now() < accessTokenExpiresAt
+		) {
+			return accessToken;
+		}
+		return null;
+	},
+
+	//만료 시간이 지났다면 false를 반환한다.
+	isAccessTokenValid: () => {
+		const { accessTokenExpiresAt } = get();
+		return accessTokenExpiresAt && Date.now() < accessTokenExpiresAt;
+	},
+
+	// 액세스 토큰 초기화
+	clearAccessToken: () =>
+		set({
+			accessToken: null,
+			accessTokenExpiresAt: null,
+		}),
+}));
+
+const usePersistAuthStore = create(
 	persist(
 		(set, get) => ({
 			// 토큰 관련 정보 (액세스 토큰 포함)
-			tokens: {
-				accessToken: null,
-				refreshToken: null,
-				refreshTokenExpiresIn: null,
-			},
+			refreshToken: null,
+			refreshTokenExpiresIn: null,
 
-			// 사용자 정보
 			user: {
 				userId: null,
 				nickname: null,
@@ -25,28 +60,12 @@ const useAuthStore = create(
 
 			isAuthenticated: false,
 
-			// 액세스 토큰 설정 (상태에 저장)
-			setAccessToken: (token) =>
+			setRefreshToken: (token, expiresIn) =>
 				set({
-					tokens: {
-						...get().tokens,
-						accessToken: token,
-					},
+					refreshToken: token,
+					refreshTokenExpiresIn: expiresIn,
 				}),
 
-			// 액세스 토큰 가져오기 (상태에서 가져옴)
-			getAccessToken: () => get().tokens.accessToken,
-
-			// 토큰 정보만 업데이트
-			setTokens: (tokenData) =>
-				set({
-					tokens: {
-						...get().tokens,
-						...tokenData,
-					},
-				}),
-
-			// 사용자 정보만 업데이트
 			setUser: (userData) =>
 				set({
 					user: {
@@ -55,7 +74,7 @@ const useAuthStore = create(
 					},
 				}),
 
-			// 로그인 처리 (액세스 토큰도 상태에 저장)
+			// authData를 받아서 구조할당 분해로 선언해주고, 메모리에 엑세스 토큰을 저장한다. 나머지는 영속적으로 저장한다.
 			login: (authData) => {
 				const {
 					accessToken,
@@ -63,33 +82,22 @@ const useAuthStore = create(
 					refreshTokenExpiresIn,
 					user,
 				} = authData;
-
-				// 개발 환경에서는 모든 토큰 정보를 영속적으로 저장
+				useMemoryAuthStore.getState().setAccessToken(accessToken);
 				set({
-					tokens: {
-						accessToken, // 액세스 토큰도 저장
-						refreshToken,
-						refreshTokenExpiresIn,
-					},
+					refreshToken,
+					refreshTokenExpiresIn,
 					user,
 					isAuthenticated: true,
 				});
-
-				console.log("로그인 성공:", {
-					accessToken,
-					refreshToken,
-					user,
-				});
+				console.log("로그인 성공");
 			},
 
-			// 로그아웃 처리
 			logout: () => {
+				useMemoryAuthStore.getState().clearAccessToken();
+
 				set({
-					tokens: {
-						accessToken: null,
-						refreshToken: null,
-						refreshTokenExpiresIn: null,
-					},
+					refreshToken: null,
+					refreshTokenExpiresIn: null,
 					user: {
 						userId: null,
 						nickname: null,
@@ -98,38 +106,92 @@ const useAuthStore = create(
 					},
 					isAuthenticated: false,
 				});
-
 				console.log("로그아웃 완료");
 			},
 
-			// 기타 getter 함수들
-			getRefreshToken: () => get().tokens.refreshToken,
+			getRefreshToken: () => get().refreshToken,
 			getUserId: () => get().user.userId,
 			getNickname: () => get().user.nickname,
-
-			// 개발용 디버깅 함수
-			_debugState: () => {
-				if (isDevelopment) {
-					console.log("현재 인증 상태:", {
-						tokens: get().tokens,
-						user: get().user,
-						isAuthenticated: get().isAuthenticated,
-					});
-				}
-			},
 		}),
+
 		{
 			name: "auth-storage",
 			storage: createJSONStorage(() => sessionStorage),
-			// 개발 모드에서는 더 상세한 로깅 사용
-			debug: isDevelopment,
+			partialize: (state) => ({
+				refreshToken: state.refreshToken,
+				refreshTokenExpiresIn: state.refreshTokenExpiresIn,
+				user: state.user,
+				isAuthenticated: state.isAuthenticated,
+			}),
 		}
 	)
 );
 
-// 개발 환경에서는 전역 객체에 스토어 추가 (콘솔에서 디버깅 용이)
-if (isDevelopment && typeof window !== "undefined") {
-	window.authStore = useAuthStore;
-}
+const useAuthStore = create((set, get) => ({
+	getAccessToken: () => useMemoryAuthStore.getState().getAccessToken(),
+	setAccessToken: (token) =>
+		useMemoryAuthStore.getState().setAccessToken(token),
+	isAccessTokenValid: () =>
+		useMemoryAuthStore.getState().isAccessTokenValid(),
+
+	getRefreshToken: () => usePersistAuthStore.getState().getRefreshToken(),
+
+	getUser: () => usePersistAuthStore.getState().user,
+	setUser: (userData) => usePersistAuthStore.getState().setUser(userData),
+	getUserId: () => usePersistAuthStore.getState().getUserId(),
+	getNickname: () => usePersistAuthStore.getState().getNickname(),
+
+	isAuthenticated: () => usePersistAuthStore.getState().isAuthenticated,
+
+	login: (authData) => {
+		usePersistAuthStore.getState().login(authData);
+	},
+
+	logout: () => {
+		usePersistAuthStore.getState().logout();
+	},
+
+	// 액세스 토큰 갱신 함수
+	// 리프레시 토큰을 가져온 후 없다면 로그아웃 한다.. 있다면, 가져와서 API 호출을 한다.
+	refreshAccessToken: async () => {
+		const refreshToken = usePersistAuthStore.getState().getRefreshToken();
+		if (!refreshToken) {
+			console.error("리프레시 토큰이 없습니다.");
+			usePersistAuthStore.getState().logout();
+			return false;
+		}
+
+		try {
+			const response = await fetch(API_BASE_URL + `/api/auth/refresh`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					refreshToken: refreshToken,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("토큰 갱신 실패");
+			}
+
+			const result = await response.json();
+			console.log(result);
+			useMemoryAuthStore
+				.getState()
+				.setAccessToken(result.data.accessToken);
+			console.log(
+				"액세스 토큰 갱신 성공",
+				useMemoryAuthStore.getState().getAccessToken()
+			);
+			return true;
+		} catch (error) {
+			console.error("액세스 토큰 갱신 실패:", error);
+			usePersistAuthStore.getState().logout();
+			return false;
+		}
+	},
+}));
 
 export default useAuthStore;
