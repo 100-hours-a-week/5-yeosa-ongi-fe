@@ -48,7 +48,7 @@ const AlbumThumbnail = ({ id }) => {
 					{album.memberProfileImageURL.map((url, index) => (
 						<div
 							key={index}
-							className="overflow-hidden border-2 border-black rounded-full"
+							className="overflow-hidden rounded-full"
 							style={{
 								width: "24px",
 								height: "24px",
