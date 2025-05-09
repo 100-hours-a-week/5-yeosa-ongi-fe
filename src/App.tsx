@@ -28,7 +28,8 @@ export default function App() {
 
 
   return (
-    <BrowserRouter>
+    <div className="app-wrapper">
+    <BrowserRouter >
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth/callback/kakao" element={<KakaoCallback />} />
@@ -39,5 +40,6 @@ export default function App() {
          <Route path="/album/:albumId" element={<Album />} />
       </Routes>
     </BrowserRouter>
+    </div>
   )
 }

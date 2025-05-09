@@ -99,18 +99,18 @@ const Main = () => {
 		true
 	);
 	return (
-		<div className="h-screen overflow-hidden">
+		<div className="relative h-screen overflow-hidden">
 			<Header />
 			<div className="flex-col content">
 				<div
 					className="border-t border-solid"
-					style={{ height: "calc(80vw)" }}>
+					style={{ height: "min(80vw, 560px)" }}>
 					<KaKaoMap />
 				</div>
 				<AlbumListHeader />
 				<div
 					className="overflow-y-auto"
-					style={{ height: "calc(100vh - 80vw - 160px)" }}>
+					style={{ height: "calc(100vh - min(80vw,560px) - 160px)" }}>
 					{Object.keys(albumsByMonth).map((month, index) => (
 						<Month
 							key={month}
