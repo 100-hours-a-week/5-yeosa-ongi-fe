@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getAlbumDetail } from "../api/albums/albumDetail";
 import Card from "../components/Card";
 import Category from "../components/Category";
@@ -9,21 +9,23 @@ import Header from "../components/Header";
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
+import useCollectionStore from "../stores/collectionStore";
 
 const Album = () => {
+	const navigate = useNavigate();
 	const { albumId } = useParams();
 	const [albumData, setAlbumData] = useState();
 	const [isLoading, setIsLoading] = useState(true);
 
 	const [category, setCategory] = useState({});
 
-	// 모든 카테고리를 하나의 배열로 관리
-	const [allCategories, setAllCategories] = useState([]);
-	const [shakyCollection, setShakyCollection] = useState();
-	const [duplicatedCollection, setDuplicatedCollection] = useState();
-
-	// 현재 선택된 카테고리
-	const [selectedCategory, setSelectedCategory] = useState("전체");
+	const {
+		setAllCollection,
+		setShakyCollection,
+		setDuplicatedCollection,
+		setTagCollections,
+		tagCollections,
+	} = useCollectionStore();
 	// 전체 사진 목록
 	const [allPhotos, setAllPhotos] = useState([]);
 
@@ -121,32 +123,30 @@ const Album = () => {
 			count: pictures.length,
 		};
 
-		const shakyCollection = {
+		const duplicatedCollection = {
 			name: "중복",
 			pictures: pictures.filter((pic) => pic.isDuplicated),
 			count: pictures.filter((pic) => pic.isDuplicated).length,
 		};
 
-		const duplicatedCollection = {
+		const shakyCollection = {
 			name: "흔들림",
 			pictures: pictures.filter((pic) => pic.isShaky),
 			count: pictures.filter((pic) => pic.isShaky).length,
 		};
 
-		// 카테고리 배열 생성
-		const categories = [];
+		// 태그별 컬렉션 생성
+		const tagCollections = uniqueTags.map((tag) => ({
+			name: tag,
+			pictures: pictures.filter((pic) => pic.tag === tag),
+			count: pictures.filter((pic) => pic.tag === tag).length,
+		}));
 
-		uniqueTags.forEach((tag) => {
-			categories.push({
-				name: tag,
-				pictures: pictures.filter((pic) => pic.tag === tag),
-				count: pictures.filter((pic) => pic.tag === tag).length,
-			});
-		});
-
-		setAllCategories(categories);
+		setAllCollection(allCollection);
 		setDuplicatedCollection(duplicatedCollection);
 		setShakyCollection(shakyCollection);
+		setTagCollections(tagCollections);
+		console.log(tagCollections);
 	};
 
 	const [showRightIndicator, setShowRightIndicator] = useState(true);
@@ -183,12 +183,14 @@ const Album = () => {
 					<div
 						className="flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light"
 						onScroll={handleScroll}>
-						{allCategories.map((category, index) => (
-							<Category
-								title={category.name}
-								pictures={category.pictures}
-							/>
-						))}
+						{tagCollections &&
+							tagCollections.map((category, index) => (
+								<Category
+									title={category.name}
+									pictures={category.pictures}
+									albumId={albumId}
+								/>
+							))}
 					</div>
 					{showRightIndicator && (
 						<div className="absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent">
@@ -218,7 +220,9 @@ const Album = () => {
 				<div className="ml-4 font-sans text-xl">검토해줘 </div>
 
 				<div className="m-4">
-					<button className="flex items-center justify-between w-full border-0 border-b border-gray-200 bg-gray-50 focus:outline-none">
+					<button
+						className="flex items-center justify-between w-full border-0 border-b border-gray-200 bg-gray-50 focus:outline-none"
+						onClick={() => navigate(`/album/${albumId}/중복`)}>
 						<div className="flex items-center">
 							<div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mr-4 rounded-lg bg-gray-50">
 								<img src={iconDuplicated}></img>
@@ -232,7 +236,9 @@ const Album = () => {
 				</div>
 
 				<div className="m-4">
-					<button className="flex items-center justify-between w-full border-0 border-b border-gray-200 bg-gray-50 focus:outline-none">
+					<button
+						className="flex items-center justify-between w-full border-0 border-b border-gray-200 bg-gray-50 focus:outline-none"
+						onClick={() => navigate(`/album/${albumId}/흔들림`)}>
 						<div className="flex items-center">
 							<div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mr-4 rounded-lg bg-gray-50">
 								<img src={iconShaky}></img>
