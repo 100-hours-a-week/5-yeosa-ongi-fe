@@ -1,7 +1,7 @@
 const Grid = ({ col = 4, items = [] }) => {
 	const chunkArrayByCol = (array, chunkSize) => {
 		if (!array || array.length === 0) {
-			return <div>데이터가 없습니다.</div>;
+			return [];
 		} else {
 			return Array(Math.ceil(array.length / chunkSize))
 				.fill()
