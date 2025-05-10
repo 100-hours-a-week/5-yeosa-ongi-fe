@@ -19,6 +19,9 @@ const Album = () => {
 
 	// 모든 카테고리를 하나의 배열로 관리
 	const [allCategories, setAllCategories] = useState([]);
+	const [shakyCollection, setShakyCollection] = useState();
+	const [duplicatedCollection, setDuplicatedCollection] = useState();
+
 	// 현재 선택된 카테고리
 	const [selectedCategory, setSelectedCategory] = useState("전체");
 	// 전체 사진 목록
@@ -105,35 +108,34 @@ const Album = () => {
 		fetchData();
 	}, [albumId]);
 
-	// 사진들을 카테고리로 분류하는 함수
 	const categorizePhotos = (pictures) => {
 		if (!pictures || pictures.length === 0) return;
 
-		// 태그 목록 추출 (중복 제거)
 		const uniqueTags = [
 			...new Set(pictures.map((pic) => pic.tag).filter(Boolean)),
 		];
 
-		// 카테고리 배열 생성
-		const categories = [
-			{
-				name: "전체",
-				pictures: pictures,
-				count: pictures.length,
-			},
-			{
-				name: "중복",
-				pictures: pictures.filter((pic) => pic.isDuplicated),
-				count: pictures.filter((pic) => pic.isDuplicated).length,
-			},
-			{
-				name: "흔들림",
-				pictures: pictures.filter((pic) => pic.isShaky),
-				count: pictures.filter((pic) => pic.isShaky).length,
-			},
-		];
+		const allCollection = {
+			name: "전체",
+			pictures: pictures,
+			count: pictures.length,
+		};
 
-		// 태그별 카테고리 추가
+		const shakyCollection = {
+			name: "중복",
+			pictures: pictures.filter((pic) => pic.isDuplicated),
+			count: pictures.filter((pic) => pic.isDuplicated).length,
+		};
+
+		const duplicatedCollection = {
+			name: "흔들림",
+			pictures: pictures.filter((pic) => pic.isShaky),
+			count: pictures.filter((pic) => pic.isShaky).length,
+		};
+
+		// 카테고리 배열 생성
+		const categories = [];
+
 		uniqueTags.forEach((tag) => {
 			categories.push({
 				name: tag,
@@ -143,7 +145,8 @@ const Album = () => {
 		});
 
 		setAllCategories(categories);
-		console.log("분류된 카테고리:", categories);
+		setDuplicatedCollection(duplicatedCollection);
+		setShakyCollection(shakyCollection);
 	};
 
 	const [showRightIndicator, setShowRightIndicator] = useState(true);
