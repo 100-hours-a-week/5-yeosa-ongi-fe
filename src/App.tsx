@@ -5,6 +5,7 @@ import './App.css';
 import Album from './pages/Album';
 import AlbumEditor from './pages/AlbumEditor';
 import KakaoCallback from './pages/auth/KakaoCallback';
+import Collection from './pages/Collection';
 import Home from './pages/Home';
 import Main from './pages/Main';
 import useAuthStore from './stores/userStore';
@@ -38,6 +39,7 @@ export default function App() {
          <Route path="/album-editor/:albumId" element={<AlbumEditor />} />
          <Route path="/album-editor/new" element={<AlbumEditor />} />
          <Route path="/album/:albumId" element={<Album />} />
+         <Route path="/album/:albumId/:collectionName" element={<Collection/>} />
       </Routes>
     </BrowserRouter>
     </div>
