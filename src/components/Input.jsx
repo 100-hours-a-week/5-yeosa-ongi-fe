@@ -49,7 +49,7 @@ const Input = ({ onFileSelect }) => {
 	const handleFileChange = async (e) => {
 		console.log("handleFileChange 호출!");
 		const selectedFiles = Array.from(e.target.files);
-
+		console.log(selectedFiles);
 		if (selectedFiles.length > 0) {
 			// 각 파일을 처리
 			for (const file of selectedFiles) {
