@@ -9,7 +9,7 @@ import CreateAlbumButton from "../components/album/CreateAlbumButton";
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
-import { Arrow_Left } from "../assets/icons/Arrow Left.png";
+import Arrow_Left from "../assets/icons/Arrow Left.png";
 
 //import extractLocation from "../hooks/useExtractor";
 
