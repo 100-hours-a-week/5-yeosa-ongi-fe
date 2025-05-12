@@ -1,7 +1,9 @@
 import { useState } from "react";
+import useCollectionStore from "../stores/collectionStore";
 
 const Card = () => {
 	const [isFlipped, setIsFlipped] = useState(false);
+	const { allCollection } = useCollectionStore();
 
 	const handleClick = () => {
 		setIsFlipped(!isFlipped);
@@ -24,6 +26,7 @@ const Card = () => {
 						transform: "rotateY(0deg)",
 					}}>
 					<div className="flex flex-col items-center justify-center h-full">
+						<img src={allCollection.pictures[0].pictureURL}></img>
 						<h3 className="text-xl font-bold text-black-light">
 							Card 앞면
 						</h3>

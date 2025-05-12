@@ -98,12 +98,13 @@ const Album = () => {
 
 			setAlbumData(result.data);
 
+			console.log(result.data);
 			// 모든 사진 목록 저장
-			if (result.data && result.data[0] && result.data[0].picture) {
-				setAllPhotos(result.data[0].picture);
+			if (result.data && result.data.picture) {
+				setAllPhotos(result.data.picture);
 
 				// 사진 분류 작업 수행
-				categorizePhotos(result.data[0].picture);
+				categorizePhotos(result.data.picture);
 			}
 			setIsLoading(false);
 		};
@@ -111,6 +112,7 @@ const Album = () => {
 	}, [albumId]);
 
 	const categorizePhotos = (pictures) => {
+		console.log(pictures);
 		if (!pictures || pictures.length === 0) return;
 
 		const uniqueTags = [
@@ -146,6 +148,7 @@ const Album = () => {
 		setDuplicatedCollection(duplicatedCollection);
 		setShakyCollection(shakyCollection);
 		setTagCollections(tagCollections);
+		console.log(allCollection);
 		console.log(tagCollections);
 	};
 
