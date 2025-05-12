@@ -8,7 +8,6 @@ const AlbumThumbnail = ({ id }) => {
 	const hasCoworkers = false;
 	const { albums } = useAlbumStore();
 	const album = albums[id];
-	console.log(album);
 
 	const isSelected = useMainPageStore((state) => state.selectedId === id);
 	const selectItem = useMainPageStore((state) => state.selectItem);
