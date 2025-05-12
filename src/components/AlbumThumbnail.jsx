@@ -8,6 +8,7 @@ const AlbumThumbnail = ({ id }) => {
 	const hasCoworkers = false;
 	const { albums } = useAlbumStore();
 	const album = albums[id];
+	console.log(album);
 
 	const isSelected = useMainPageStore((state) => state.selectedId === id);
 	const selectItem = useMainPageStore((state) => state.selectItem);
@@ -32,7 +33,7 @@ const AlbumThumbnail = ({ id }) => {
 			className="relative w-full h-full border border-solid"
 			onClick={handleSelect}>
 			<img
-				className="object-cover w-full h-full"
+				className="absolute inset-0 object-cover w-full h-full"
 				src={`${album.thumbnailURL}`}
 				alt="Album thumbnail"
 			/>
