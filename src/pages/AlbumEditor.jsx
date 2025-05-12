@@ -78,19 +78,20 @@ const AlbumEditor = () => {
 					},
 				});
 			}
-
+			//extractLocation(f).latitude,
+			//extractLocation(f).longitude,
 			// 4. 업로드 완료 후 앨범 생성 요청
-			const pictureUrls = presignedFiles.map((f) => f.pictureURL);
-			// const pictureData = presignedFiles.map((f) => ({
-			// 	picture: f.pictureURL,
-			// 	latitude: extractLocation(f).latitude,
-			// 	longitude: extractLocation(f).longitude,
-			// }));
+			// const pictureUrls = presignedFiles.map((f) => f.pictureURL);
+			const pictureData = presignedFiles.map((f) => ({
+				pictureUrl: f.pictureURL,
+				latitude: 0.0,
+				longitude: 0.0,
+			}));
 			const albumData = {
 				albumName: albumTitle,
-				pictureUrls: pictureUrls,
+				pictureUrls: pictureData,
 			};
-
+			console.log(albumData);
 			const res = await createAlbum(albumData);
 			const result = await res;
 			console.log(result);
