@@ -16,7 +16,6 @@ const Main = () => {
 	const [initialLoadFailed, setInitialLoadFailed] = useState(false);
 	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
 
-	// Mount
 	useEffect(() => {
 		let isMounted = true;
 		const loadInitialData = async () => {
