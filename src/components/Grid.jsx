@@ -17,8 +17,11 @@ const Grid = ({ col = 4, items = [] }) => {
 		<>
 			{chunkArray.map((array, index) => (
 				<div
-					className={`grid grid-cols-4`}
-					style={{ height: `calc(min(100vw,560px) / ${col})` }}>
+					className={`grid`}
+					style={{
+						gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
+						height: `calc(min(100vw,560px) / ${col})`,
+					}}>
 					{array.map((item, index) => (
 						<div className="border-[1px] border-solid">
 							<item.ElementType

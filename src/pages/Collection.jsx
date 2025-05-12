@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Grid from "../components/Grid";
 import Header from "../components/Header";
-import Image from "../components/Imgae";
 import useCollectionStore from "../stores/collectionStore";
 
 // Assets
@@ -74,7 +73,15 @@ const Collection = () => {
 	// 사진 배열이 있는지 확인
 	const pictures = currentCollection.pictures || [];
 	const formattedPictures = pictures.map((picture) => ({
-		ElementType: Image,
+		ElementType: () => (
+			<div className="relative w-full h-full">
+				{/* 이미지 미리보기 */}
+				<img
+					src={picture.pictureURL}
+					className="absolute inset-0 object-cover w-full h-full"
+				/>
+			</div>
+		),
 		element: picture,
 		props: {
 			alt: `Photo ${picture.pictureId || ""}`,
