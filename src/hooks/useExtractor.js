@@ -1,4 +1,4 @@
-import * as exifr from 'exifr';
+
 
 const extractLocation = async (file) => {
     try {
