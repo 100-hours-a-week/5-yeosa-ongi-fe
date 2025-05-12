@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useCollectionStore from "../stores/collectionStore";
+import KakaoMap from "./Map";
 
 const Card = () => {
 	const [isFlipped, setIsFlipped] = useState(false);
@@ -20,16 +21,15 @@ const Card = () => {
 				onClick={handleClick}>
 				{/* 카드 앞면 */}
 				<div
-					className="absolute w-full h-full p-5 rounded-3xl bg-gray-light"
+					className="absolute w-full h-full p-5 "
 					style={{
 						backfaceVisibility: "hidden",
 						transform: "rotateY(0deg)",
 					}}>
 					<div className="flex flex-col items-center justify-center h-full">
-						<img src={allCollection.pictures[0].pictureURL}></img>
-						<h3 className="text-xl font-bold text-black-light">
-							Card 앞면
-						</h3>
+						<img
+							className="absolute inset-0 object-cover w-full h-full rounded-3xl"
+							src={allCollection.pictures[0].pictureURL}></img>
 					</div>
 				</div>
 
@@ -42,10 +42,8 @@ const Card = () => {
 						top: 0,
 						left: 0,
 					}}>
-					<div className="flex flex-col items-center justify-center h-full">
-						<h3 className="text-xl font-bold text-black-light">
-							Card 뒷면
-						</h3>
+					<div className="absolute inset-0 object-cover w-full h-full rounded-3xl">
+						<KakaoMap />
 					</div>
 				</div>
 			</div>
