@@ -37,62 +37,7 @@ const Album = () => {
 				result = response;
 				console.log(response);
 			} catch (error) {
-				// 실패 시 목(mock) 데이터 사용
-				result = {
-					code: "ALBUM_ACCESS_SUCCESS",
-					message: "앨범 조회 성공",
-					data: [
-						{
-							title: "제주도 여행",
-							picture: [
-								{
-									pictureId: 501,
-									PictureURL:
-										"https://ongi.s3.ap-northeast-2.amazonaws.com/pic-502.jpg",
-									latitude: 35.1586,
-									longitude: 129.1604,
-									tag: "여행",
-									isDuplicated: false,
-									isShaky: false,
-									createdAt: "2025-05-04T12:12:12",
-								},
-								{
-									pictureId: 502,
-									PictureURL:
-										"https://ongi.s3.ap-northeast-2.amazonaws.com/pic-502.jpg",
-									latitude: 35.1586,
-									longitude: 129.1604,
-									tag: "여행",
-									isDuplicated: false,
-									isShaky: false,
-									createdAt: "2025-05-04T12:12:12",
-								},
-								{
-									pictureId: 503,
-									PictureURL:
-										"https://ongi.s3.ap-northeast-2.amazonaws.com/pic-503.jpg",
-									latitude: 33.5097,
-									longitude: 126.5219,
-									tag: "풍경",
-									isDuplicated: true,
-									isShaky: false,
-									createdAt: "2025-05-05T10:30:15",
-								},
-								{
-									pictureId: 504,
-									PictureURL:
-										"https://ongi.s3.ap-northeast-2.amazonaws.com/pic-504.jpg",
-									latitude: 33.4996,
-									longitude: 126.5312,
-									tag: "음식",
-									isDuplicated: false,
-									isShaky: true,
-									createdAt: "2025-05-05T13:45:22",
-								},
-							],
-						},
-					],
-				};
+				navigate("/main");
 			} finally {
 			}
 
