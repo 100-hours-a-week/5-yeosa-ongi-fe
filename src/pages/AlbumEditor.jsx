@@ -9,6 +9,7 @@ import CreateAlbumButton from "../components/album/CreateAlbumButton";
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
+//import extractLocation from "../hooks/useExtractor";
 
 const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
@@ -80,6 +81,11 @@ const AlbumEditor = () => {
 
 			// 4. 업로드 완료 후 앨범 생성 요청
 			const pictureUrls = presignedFiles.map((f) => f.pictureURL);
+			// const pictureData = presignedFiles.map((f) => ({
+			// 	picture: f.pictureURL,
+			// 	latitude: extractLocation(f).latitude,
+			// 	longitude: extractLocation(f).longitude,
+			// }));
 			const albumData = {
 				albumName: albumTitle,
 				pictureUrls: pictureUrls,
