@@ -9,6 +9,8 @@ import CreateAlbumButton from "../components/album/CreateAlbumButton";
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
+import { Arrow_Left } from "../assets/icons/Arrow Left.png";
+
 //import extractLocation from "../hooks/useExtractor";
 
 const AlbumEditor = () => {
@@ -150,7 +152,7 @@ const AlbumEditor = () => {
 			<div className="h-[52px] relative flex items-center justify-center">
 				<img
 					className="absolute h-1/2 left-4 top-1/4"
-					src="../src/assets/icons/Arrow Left.png"
+					src={Arrow_Left}
 					onClick={onClickBtn}
 				/>
 				<div className="text-center">앨범 생성</div>
