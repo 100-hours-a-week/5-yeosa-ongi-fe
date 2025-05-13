@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchAlbumData } from "../api/albums/albumMonthly";
 import AlbumListHeader from "../components/AlbumListHeader";
-import FlottingButton from "../components/FlottingButton";
-import Header from "../components/Header";
+import Header from "../components/common/Header";
+import FlottingButton from "../components/Main/FlottingButton";
 import KaKaoMap from "../components/Map";
 import Month from "../components/Month";
 import useInfiniteScroll from "../hooks/infiniteScroll";

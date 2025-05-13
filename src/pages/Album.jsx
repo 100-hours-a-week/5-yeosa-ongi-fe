@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAlbumDetail } from "../api/albums/albumDetail";
-import Card from "../components/Card";
-import Category from "../components/Category";
-import Header from "../components/Header";
+import Card from "../components/Album/Card";
+import Category from "../components/Album/Category";
+import Header from "../components/common/Header";
 
 //Assets
 import Arrow_Right from "../assets/icons/Arrow Right.png";

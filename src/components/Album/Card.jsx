@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useCollectionStore from "../stores/collectionStore";
+import useCollectionStore from "../../stores/collectionStore";
 import KakaoMap from "./Map";
 
 const Card = () => {
