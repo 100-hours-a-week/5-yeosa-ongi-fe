@@ -10,6 +10,7 @@ import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
 import Arrow_Left from "../assets/icons/Arrow Left.png";
+import AlbumTitleForm from "../components/album/albumTitleForm";
 
 //import extractLocation from "../hooks/useExtractor";
 
@@ -19,27 +20,6 @@ const AlbumEditor = () => {
 	const fileInputRef = useRef(null);
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
-	const validateTitle = (title) => {
-		if (!title || title.trim() === "") {
-			return "앨범 제목을 입력해주세요.";
-		}
-
-		if (title.length > 12) {
-			return "앨범 제목은 50자 이내로 작성해주세요.";
-		}
-
-		return ""; // 오류가 없으면 빈 문자열 반환
-	};
-
-	const handleTitleChange = (e) => {
-		const newTitle = e.target.value;
-		setAlbumTitle(newTitle);
-
-		// 입력 중에는 오류 메시지를 표시하지 않음
-		if (titleError) {
-			setTitleError("");
-		}
-	};
 
 	const handleFileAdded = (file) => {
 		if (!file) return;
@@ -143,6 +123,9 @@ const AlbumEditor = () => {
 			element: index + 1,
 		})),
 	];
+	const handleTitleChange = (newTitle) => {
+		setAlbumTitle(newTitle);
+	};
 
 	const onClickBtn = () => {
 		navigate(-1);
@@ -157,19 +140,15 @@ const AlbumEditor = () => {
 				/>
 				<div className="text-center">앨범 생성</div>
 			</div>
-			<div className="flex flex-col w-full mt-4 mb-6">
-				<div className="flex items-center pb-2 mx-4 border-b border-gray-300">
-					<div className="w-16 mx-4 text-gray"> 제목</div>
-					<input
-						className="w-full text-lg focus:outline-none"
-						value={albumTitle}
-						onChange={handleTitleChange}
-					/>
-				</div>
-			</div>
+			<AlbumTitleForm
+				initialTitle={albumTitle}
+				onTitleChange={handleTitleChange}
+			/>
 
 			<div>
-				<div className="m-2 mt-8">현재 {files.length}장 업로드 중</div>
+				<div className="m-2 mt-8">
+					현재 {files.length}장 업로드 중. (최대 10장)
+				</div>
 				<Grid items={gridItems} />
 			</div>
 			<CreateAlbumButton
