@@ -84,7 +84,7 @@ const Album = () => {
 
 		// 태그별 컬렉션 생성
 		const tagCollections = uniqueTags.map((tag) => ({
-			name: tag,
+			name: tag.trim(),
 			pictures: pictures.filter((pic) => pic.tag === tag),
 			count: pictures.filter((pic) => pic.tag === tag).length,
 		}));
