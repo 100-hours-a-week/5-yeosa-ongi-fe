@@ -11,6 +11,7 @@ export default {
     extend: {
       colors: {
         primary: 'var(--color-primary)',
+        primaryBold: 'var(--color-primaryBold)',
         secondary: 'var(--color-secondary)',
         'white-bage': 'var(--white-bage)',
         'white-blue': 'var(--white-blue)',

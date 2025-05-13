@@ -8,6 +8,7 @@
 	/* 기본, 테마 1 (pastel pink) */
 	:root {
 		--color-primary: #f3d0d7;
+		--color-primaryBold: #feb4b8;
 		--color-secondary: #ffefef;
 		--color-background: #f6f5f2;
 		--color-background-alt: #f6f7fa;
