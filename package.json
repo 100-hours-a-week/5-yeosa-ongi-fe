@@ -16,6 +16,7 @@
     "@fontsource/pretendard": "^5.2.5",
     "axios": "^1.9.0",
     "heic2any": "^0.0.4",
+    "loglevel": "^1.9.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-parallax-tilt": "^1.7.294",
