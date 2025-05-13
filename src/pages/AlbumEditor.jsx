@@ -1,35 +1,27 @@
 import axios from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Grid from "../components/Grid";
+import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
+import Grid from "../components/common/Grid";
 import Input from "../components/Input";
-import CreateAlbumButton from "../components/album/CreateAlbumButton";
 
 // Assets
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
 import Arrow_Left from "../assets/icons/Arrow Left.png";
-import AlbumTitleForm from "../components/album/albumTitleForm";
+import AlbumTitleForm from "../components/AlbumEditor/AlbumTitleForm";
 
+// Custom Hooks and Services
+import useFileUpload from "../hooks/useFileUpload";
 //import extractLocation from "../hooks/useExtractor";
 
 const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
-	const [files, setFiles] = useState([]);
 	const fileInputRef = useRef(null);
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
-
-	const handleFileAdded = (file) => {
-		if (!file) return;
-		const newFileItem = {
-			file,
-			preview: URL.createObjectURL(file),
-			id: Math.random().toString(36).substr(2, 9),
-		};
-		setFiles((prevFiles) => [...prevFiles, newFileItem]);
-	};
+	const { files, addFile, removeFile } = useFileUpload();
 
 	const handleCreateAlbum = async () => {
 		if (files.length === 0 || loading) return;
