@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
+import { useAlbumStore, useMainPageStore } from "../../stores/mainPageStore";
 
 const KakaoMap = () => {
 	const mapContainer = useRef(null);
