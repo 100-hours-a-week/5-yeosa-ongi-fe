@@ -9,6 +9,8 @@ import Header from "../components/common/Header";
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
+import { Modal } from "../components/common/Modal";
+import useModal from "../hooks/useModal";
 import useCollectionStore from "../stores/collectionStore";
 
 const Album = () => {
@@ -16,7 +18,7 @@ const Album = () => {
 	const { albumId } = useParams();
 	const [albumData, setAlbumData] = useState();
 	const [isLoading, setIsLoading] = useState(true);
-
+	const { isOpen, modalData, openModal, closeModal } = useModal();
 	const [category, setCategory] = useState({});
 
 	const {
@@ -121,6 +123,11 @@ const Album = () => {
 			</>
 		);
 	}
+
+	const handleClick = () => {
+		console.log("click");
+		openModal("뉴뉴");
+	};
 	return (
 		<>
 			<Header />
@@ -198,7 +205,15 @@ const Album = () => {
 						<img className="m-2 size-3" src={Arrow_Right} />
 					</button>
 				</div>
+				<div className="m-4 cursor-pointer" onClick={handleClick}>
+					앨범 삭제하기
+				</div>
 			</div>
+			<Modal
+				isOpen={isOpen}
+				onClose={closeModal}
+				title={modalData?.name}
+			/>
 		</>
 	);
 };
