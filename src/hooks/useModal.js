@@ -2,19 +2,19 @@ import { useState } from 'react';
 
 const useModal = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [modalContent, setModalContent] = useState(null);
+    const [modalData, setModalData] = useState(null);
 
     const openModal = (content) => {
         setIsOpen(true);
-        setModalContent(content);
+        setModalData(content);
     };
 
     const closeModal = () => {
         setIsOpen(false);
-        setModalContent(null);
+        setModalData(null);
     };
 
-    return { isOpen, modalContent, openModal, closeModal };
+    return { isOpen, modalData, openModal, closeModal };
 }
 
 export default useModal;

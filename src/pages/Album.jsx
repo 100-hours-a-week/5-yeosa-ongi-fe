@@ -209,11 +209,22 @@ const Album = () => {
 					앨범 삭제하기
 				</div>
 			</div>
-			<Modal
-				isOpen={isOpen}
-				onClose={closeModal}
-				title={modalData?.name}
-			/>
+			{/*Modal*/}
+			<Modal isOpen={isOpen} onClose={closeModal} title={modalData?.name}>
+				{modalData && (
+					<div>
+						<p>{modalData.description}</p>
+						<p>가격: {modalData.price}원</p>
+						<button
+							onClick={() => {
+								// 장바구니 추가 로직
+								closeModal();
+							}}>
+							장바구니에 추가
+						</button>
+					</div>
+				)}
+			</Modal>
 		</>
 	);
 };
