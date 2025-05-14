@@ -12,7 +12,7 @@ import { validateImageFile } from "../services/validateImageFile";
 
 // Assets
 import { createAlbum } from "../api/albums/albumCreateApi";
-import { getPreSignedUrl } from "../api/albums/presignedUrl"; // 추가: presignedUrl import
+import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
 import Arrow_Left from "../assets/icons/Arrow Left.png";
 
