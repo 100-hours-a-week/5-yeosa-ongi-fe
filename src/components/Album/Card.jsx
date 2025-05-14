@@ -1,6 +1,6 @@
+import KakaoMap from "@/components/common/Map";
+import useCollectionStore from "@/stores/collectionStore";
 import { useState } from "react";
-import useCollectionStore from "../../stores/collectionStore";
-import KakaoMap from "./Map";
 
 const Card = () => {
 	const [isFlipped, setIsFlipped] = useState(false);

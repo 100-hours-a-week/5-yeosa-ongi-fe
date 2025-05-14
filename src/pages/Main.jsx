@@ -1,12 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchAlbumData } from "../api/albums/albumMonthly";
-import AlbumListHeader from "../components/AlbumListHeader";
+
+// Components
+import AlbumListHeader from "@/components/Main/AlbumListHeader";
 import Header from "../components/common/Header";
+import KaKaoMap from "../components/common/Map";
 import FlottingButton from "../components/Main/FlottingButton";
-import KaKaoMap from "../components/Map";
-import Month from "../components/Month";
+import Month from "../components/Main/Month";
+
+// Stores
+import { useAlbumStore } from "@/stores/mainPageStore";
+
+import { fetchAlbumData } from "../api/albums/albumMonthly";
 import useInfiniteScroll from "../hooks/infiniteScroll";
-import { useAlbumStore } from "../stores/mainPageStore";
 
 const Main = () => {
 	const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore();

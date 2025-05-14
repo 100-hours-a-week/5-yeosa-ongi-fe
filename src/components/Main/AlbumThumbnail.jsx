@@ -1,7 +1,6 @@
+import { getAlubmSummary } from "@/api/albums/albumSummaryApi";
+import { useAlbumStore, useMainPageStore } from "@/stores/mainPageStore";
 import { useNavigate } from "react-router-dom";
-import { albumSummary } from "../../mock/getAlbumSummary";
-import { getAlubmSummary } from "../api/albums/albumSummaryApi";
-import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
 
 const AlbumThumbnail = ({ id }) => {
 	const navigate = useNavigate();
@@ -20,9 +19,8 @@ const AlbumThumbnail = ({ id }) => {
 			navigate(`/album/${id}`);
 		} else {
 			selectItem(id);
-			setSelectedAlbumSummary(albumSummary);
 			const response = await getAlubmSummary(id);
-
+			setSelectedAlbumSummary(response.data);
 			console.log(response);
 		}
 	};

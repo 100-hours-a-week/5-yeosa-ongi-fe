@@ -2,8 +2,8 @@ import axios from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
+import Input from "../components/AlbumEditor/Input";
 import Grid from "../components/common/Grid";
-import Input from "../components/Input";
 
 // Assets
 import { createAlbum } from "../api/albums/albumCreateApi";
@@ -14,6 +14,7 @@ import AlbumTitleForm from "../components/AlbumEditor/AlbumTitleForm";
 
 // Custom Hooks and Services
 import useFileUpload from "../hooks/useFileUpload";
+import { validateFile } from "../services/validateImageFile";
 //import extractLocation from "../hooks/useExtractor";
 
 const AlbumEditor = () => {
@@ -76,6 +77,14 @@ const AlbumEditor = () => {
 			setLoading(false);
 		}
 	};
+	const handleFileAdded = useCallback(
+		async (file) => {
+			if (!file) return;
+			if (!validateFile(file, files)) return;
+			addFile(file);
+		},
+		[addFile]
+	);
 
 	const handleAddMoreClick = () => {
 		fileInputRef.current.click();
