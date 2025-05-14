@@ -1,8 +1,8 @@
+import getTotalData from "@/api/totalData";
+import communityIcon from "@/assets/icons/community_icon.png";
+import albumIcon from "@/assets/icons/images_icon.png";
+import locationIcon from "@/assets/icons/location_icon.png";
 import { useEffect, useState } from "react";
-import getTotalData from "../api/totalData";
-import communityIcon from "../assets/icons/community_icon.png";
-import albumIcon from "../assets/icons/images_icon.png";
-import locationIcon from "../assets/icons/location_icon.png";
 
 const AlbumListHeader = () => {
 	const [counts, setCounts] = useState({

@@ -19,7 +19,7 @@ body {
 .app-wrapper {
 	max-width: 560px;
 	width: 100%;
-	position: relative; /* 'postition'에서 'position'으로 수정 */
+	position: relative;
 	min-height: 100vh;
 	background-color: white; /* 내부 컨텐츠 배경색 */
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 선택적: 그림자 효과 */

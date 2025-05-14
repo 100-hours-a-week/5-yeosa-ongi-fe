@@ -1,5 +1,5 @@
+import Grid from "@/components/common/Grid";
 import AlbumThumbnail from "./AlbumThumbnail";
-import Grid from "./Grid";
 
 const Month = ({ albumIds, title }) => {
 	let items = [];

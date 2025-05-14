@@ -5,9 +5,6 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    fontFamily: {
-      sans: ['Pretendard', 'sans-serif'],
-    },
     extend: {
       colors: {
         primary: 'var(--color-primary)',
@@ -18,7 +15,10 @@ export default {
         'gray-light': 'var(--gray-light)',
         'gray-dark': 'var(--gray-dark)',
         'black-light': 'var(--black-light)',
-      }
+      },
+      fontFamily: {
+        sans: ['Pretendard', 'sans-serif'],
+      },
     },
   },
   plugins: [],

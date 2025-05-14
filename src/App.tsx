@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
 import Album from './pages/Album';
@@ -9,8 +9,13 @@ import Home from './pages/Home';
 import Main from './pages/Main';
 import useAuthStore from './stores/userStore';
 
+interface ProtectedRouteProps {
+  children: ReactNode;
+  isAuthenticated: boolean;
+}
+
 // 보호된 라우트 컴포넌트
-const ProtectedRoute = ({ children, isAuthenticated }) => {
+const ProtectedRoute = ({ children, isAuthenticated }: ProtectedRouteProps) => {
   return isAuthenticated ? children : <Navigate to="/" replace />;
 };
 

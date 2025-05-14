@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Grid from "../components/Grid";
-import Header from "../components/Header";
+import Grid from "../components/common/Grid";
+import Header from "../components/common/Header";
 import useCollectionStore from "../stores/collectionStore";
 
 // Assets
