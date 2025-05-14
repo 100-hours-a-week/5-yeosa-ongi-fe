@@ -1,32 +1,133 @@
-import axios from "axios";
-import { useRef, useState } from "react";
+import AlbumTitleForm from "@/components/AlbumEditor/AlbumTitleForm";
+import Grid from "@/components/common/Grid";
+import axios from "axios"; // 추가: axios import
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
-import Input from "../components/AlbumEditor/Input";
-import Grid from "../components/common/Grid";
+
+// 커스텀 컴포넌트와 훅
+import Input from "../components/AlbumEditor/Input"; // 수정된 Input 컴포넌트
+import useFileUpload from "../hooks/useFileUpload";
+import { validateImageFile } from "../services/validateImageFile";
 
 // Assets
 import { createAlbum } from "../api/albums/albumCreateApi";
-import { getPreSignedUrl } from "../api/albums/presignedUrl";
+import { getPreSignedUrl } from "../api/albums/presignedUrl"; // 추가: presignedUrl import
 import crossIcon from "../assets/cross_icon.png";
 import Arrow_Left from "../assets/icons/Arrow Left.png";
-import AlbumTitleForm from "../components/AlbumEditor/AlbumTitleForm";
 
-// Custom Hooks and Services
-import useFileUpload from "../hooks/useFileUpload";
-import { validateFile } from "../services/validateImageFile";
-//import extractLocation from "../hooks/useExtractor";
+// 파일 미리보기 컴포넌트
+const FilePreview = ({ file, onDelete }) => (
+	<div className="relative w-full h-full">
+		<img
+			src={file.preview}
+			alt={`Preview ${file.id}`}
+			className="absolute inset-0 object-cover w-full h-full"
+		/>
+		<button
+			className="absolute z-10 top-2 right-2"
+			onClick={() => onDelete(file.id)}>
+			<img className="w-4 h-4" src={crossIcon} alt="삭제" />
+		</button>
+	</div>
+);
+
+// 알림 컴포넌트
+const Alert = ({ message, type = "error", onAction, actionText }) => {
+	if (!message) return null;
+
+	const bgColor = type === "error" ? "bg-red-100" : "bg-yellow-100";
+	const textColor = type === "error" ? "text-red-800" : "text-yellow-800";
+
+	return (
+		<div className={`p-4 mb-4 rounded-md ${bgColor} ${textColor}`}>
+			<div className="flex items-center justify-between">
+				<p>{message}</p>
+				{onAction && actionText && (
+					<button
+						className="px-3 py-1 ml-4 text-sm font-medium bg-white rounded-md"
+						onClick={onAction}>
+						{actionText}
+					</button>
+				)}
+			</div>
+		</div>
+	);
+};
 
 const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
-	const fileInputRef = useRef(null);
-	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
-	const { files, addFile, removeFile } = useFileUpload();
+	const [customError, setCustomError] = useState(null);
 
+	// useFileUpload 훅 사용 (최대 10장 제한)
+	const {
+		files,
+		addFile,
+		removeFile,
+		error: fileError,
+		overflowFiles,
+		addOverflowFiles,
+		isProcessing,
+		setProcessing,
+		isFull,
+		count,
+		maxFiles,
+	} = useFileUpload({ maxFiles: 10 });
+
+	const navigate = useNavigate();
+
+	// 오류 처리 핸들러
+	const handleError = useCallback((errorMessage) => {
+		setCustomError(errorMessage);
+	}, []);
+
+	// 파일 추가 핸들러
+	const handleFileAdded = useCallback(
+		(newFiles) => {
+			// 배열이 아닌 경우 배열로 변환
+			const filesToProcess = Array.isArray(newFiles)
+				? newFiles
+				: [newFiles];
+
+			// 각 파일을 검증하고 추가
+			const validFiles = [];
+			let validationError = null;
+
+			// 모든 파일 검증
+			for (const file of filesToProcess) {
+				const validationResult = validateImageFile(file, [
+					...files,
+					...validFiles,
+				]);
+
+				if (validationResult.isValid) {
+					validFiles.push(file);
+				} else {
+					validationError = validationResult.error;
+					break;
+				}
+			}
+
+			// 검증 결과에 따라 처리
+			if (validationError) {
+				setCustomError(validationError);
+				return;
+			}
+
+			// 파일 추가 (제한 처리는 useFileUpload 내부에서 처리됨)
+			setCustomError(null);
+			addFile(validFiles);
+		},
+		[addFile, files]
+	);
+
+	// 앨범 생성 핸들러 - Presigned URL 사용하도록 수정
 	const handleCreateAlbum = async () => {
-		if (files.length === 0 || loading) return;
+		if (files.length === 0 || loading || isProcessing) return;
+
 		setLoading(true);
+		setCustomError(null);
 
 		try {
 			// 1. 앨범 이름과 파일 메타데이터 준비
@@ -39,7 +140,7 @@ const AlbumEditor = () => {
 			const response = await getPreSignedUrl(pictures);
 			const presignedFiles = response.data.presignedFiles;
 
-			// 3. 업로드
+			// 3. 각 파일을 presigned URL을 사용하여 업로드
 			for (const fileItem of files) {
 				const file = fileItem.file;
 				const matched = presignedFiles.find(
@@ -53,110 +154,165 @@ const AlbumEditor = () => {
 					},
 				});
 			}
-			//extractLocation(f).latitude,
-			//extractLocation(f).longitude,
+
 			// 4. 업로드 완료 후 앨범 생성 요청
-			// const pictureUrls = presignedFiles.map((f) => f.pictureURL);
+			// 위치 정보 추가 (현재는 0.0, 0.0으로 기본값 설정)
 			const pictureData = presignedFiles.map((f) => ({
 				pictureUrl: f.pictureURL,
 				latitude: 0.0,
 				longitude: 0.0,
 			}));
+
 			const albumData = {
 				albumName: albumTitle,
 				pictureUrls: pictureData,
 			};
+
 			console.log(albumData);
-			const res = await createAlbum(albumData);
-			const result = await res;
+			const result = await createAlbum(albumData);
 			console.log(result);
+
 			navigate("/main");
 		} catch (err) {
 			console.error(err);
+			setCustomError("앨범 생성 중 오류가 발생했습니다.");
 		} finally {
 			setLoading(false);
 		}
 	};
-	const handleFileAdded = useCallback(
-		async (file) => {
-			if (!file) return;
-			if (!validateFile(file, files)) return;
-			addFile(file);
-		},
-		[addFile]
+
+	// 앨범 제목 변경 핸들러
+	const handleTitleChange = useCallback((newTitle) => {
+		setAlbumTitle(newTitle);
+	}, []);
+
+	// 뒤로 가기 핸들러
+	const handleBackClick = useCallback(() => {
+		navigate(-1);
+	}, [navigate]);
+
+	// 초과 파일 추가 핸들러
+	const handleAddOverflowFiles = useCallback(() => {
+		addOverflowFiles();
+	}, [addOverflowFiles]);
+
+	// 그리드 아이템 생성
+	const gridItems = useMemo(
+		() => [
+			{
+				ElementType: () => (
+					<Input
+						onFileSelect={handleFileAdded}
+						disabled={isFull}
+						setProcessing={setProcessing}
+						isProcessing={isProcessing}
+						onError={handleError}
+					/>
+				),
+				element: 0,
+			},
+			...files.map((fileItem, index) => ({
+				ElementType: () => (
+					<FilePreview file={fileItem} onDelete={removeFile} />
+				),
+				element: index + 1,
+			})),
+		],
+		[
+			files,
+			handleFileAdded,
+			removeFile,
+			isFull,
+			isProcessing,
+			setProcessing,
+			handleError,
+		]
 	);
 
-	const handleAddMoreClick = () => {
-		fileInputRef.current.click();
-	};
-	const gridItems = [
-		{
-			ElementType: Input,
-			element: 0,
-			props: {
-				onFileSelect: handleFileAdded,
-			},
-		},
-		...files.map((fileItem, index) => ({
-			ElementType: () => (
-				<div className="relative w-full h-full">
-					{/* 이미지 미리보기 */}
-					<img
-						src={fileItem.preview}
-						alt={`Preview ${index}`}
-						className="absolute inset-0 object-cover w-full h-full"
-					/>
-					{/* 삭제 버튼 */}
-					<button
-						className="absolute z-10 top-2 right-2"
-						onClick={() => {
-							// 파일 목록에서 해당 아이템 제거
-							setFiles(
-								files.filter((item) => item.id !== fileItem.id)
-							);
-							// 메모리 누수 방지를 위해 URL 해제
-							URL.revokeObjectURL(fileItem.preview);
-						}}>
-						<img className="w-4 h-4" src={crossIcon}></img>
-					</button>
-				</div>
-			),
-			element: index + 1,
-		})),
-	];
-	const handleTitleChange = (newTitle) => {
-		setAlbumTitle(newTitle);
-	};
+	// 버튼 비활성화 여부
+	const isButtonDisabled = files.length === 0 || loading || isProcessing;
 
-	const onClickBtn = () => {
-		navigate(-1);
-	};
 	return (
-		<>
-			<div className="h-[52px] relative flex items-center justify-center">
-				<img
-					className="absolute h-1/2 left-4 top-1/4"
-					src={Arrow_Left}
-					onClick={onClickBtn}
-				/>
-				<div className="text-center">앨범 생성</div>
-			</div>
+		<div className="flex flex-col min-h-screen">
+			{/* 헤더 */}
+			<header className="h-[52px] relative flex items-center justify-center">
+				<button
+					className="absolute left-4 top-1/4"
+					onClick={handleBackClick}>
+					<img className="h-1/2" src={Arrow_Left} alt="뒤로가기" />
+				</button>
+				<h1 className="text-center">앨범 생성</h1>
+			</header>
+
+			{/* 앨범 제목 폼 */}
 			<AlbumTitleForm
 				initialTitle={albumTitle}
 				onTitleChange={handleTitleChange}
 			/>
 
-			<div>
-				<div className="m-2 mt-8">
-					현재 {files.length}장 업로드 중. (최대 10장)
+			{/* 메인 콘텐츠 */}
+			<main className="flex-grow px-4">
+				{/* 오류 메시지 표시 */}
+				{customError && (
+					<Alert
+						message={customError}
+						onAction={() => setCustomError(null)}
+						actionText="닫기"
+					/>
+				)}
+
+				{/* 파일 업로드 오류 표시 */}
+				{fileError && (
+					<Alert
+						message={fileError}
+						onAction={
+							overflowFiles.length > 0
+								? handleAddOverflowFiles
+								: null
+						}
+						actionText={
+							overflowFiles.length > 0 ? "추가하기" : null
+						}
+					/>
+				)}
+
+				{/* 로딩 인디케이터 */}
+				{isProcessing && (
+					<div className="my-2 text-center text-blue-600">
+						이미지 파일 처리 중... HEIC 변환은 시간이 더 소요될 수
+						있습니다.
+					</div>
+				)}
+
+				<div className="flex items-center justify-between my-4">
+					<span
+						className={
+							count === maxFiles ? "text-red-500 font-bold" : ""
+						}>
+						현재 {count}장 업로드 중. (최대 {maxFiles}장)
+					</span>
 				</div>
+
+				{/* 이미지 그리드 */}
 				<Grid items={gridItems} />
-			</div>
-			<CreateAlbumButton
-				disabled={files.length === 0 || loading}
-				onClick={handleCreateAlbum}
-			/>
-		</>
+			</main>
+
+			{/* 푸터 (앨범 생성 버튼) */}
+			<footer className="px-4 py-4 mt-auto">
+				<CreateAlbumButton
+					disabled={isButtonDisabled}
+					onClick={handleCreateAlbum}>
+					{loading ? "생성 중..." : "앨범 생성"}
+				</CreateAlbumButton>
+
+				{/* 로딩 인디케이터 */}
+				{loading && (
+					<div className="mt-2 text-center text-gray-600">
+						이미지 업로드 중입니다. 잠시만 기다려주세요...
+					</div>
+				)}
+			</footer>
+		</div>
 	);
 };
 
