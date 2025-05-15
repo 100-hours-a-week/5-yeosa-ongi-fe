@@ -7,6 +7,7 @@ import KakaoCallback from './pages/auth/KakaoCallback';
 import Collection from './pages/Collection';
 import Home from './pages/Home';
 import Main from './pages/Main';
+import MyActivities from './pages/MyActivities';
 import MyPage from './pages/MyPage';
 import useAuthStore from './stores/userStore';
 
@@ -122,6 +123,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <MyPage />
+          </ProtectedRoute>
+        } 
+      />
+                  <Route 
+        path="/my-activities" 
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <MyActivities />
           </ProtectedRoute>
         } 
       />
