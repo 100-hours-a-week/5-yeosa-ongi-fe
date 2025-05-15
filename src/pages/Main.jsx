@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // Components
 import AlbumListHeader from "@/components/Main/AlbumListHeader";
 import Header from "../components/common/Header";
-import KaKaoMap from "../components/common/Map";
 import FlottingButton from "../components/Main/FlottingButton";
 import Month from "../components/Main/Month";
 
@@ -106,11 +105,11 @@ const Main = () => {
 		<div className="relative h-screen overflow-hidden">
 			<Header />
 			<div className="flex-col content">
-				<div
+				{/* <div
 					className="border-t border-solid"
 					style={{ height: "min(80vw, 560px)" }}>
 					<KaKaoMap />
-				</div>
+				</div> */}
 				<AlbumListHeader />
 				<div
 					className="overflow-y-auto"
