@@ -1,15 +1,61 @@
-//Assets
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../stores/userStore";
 import defaultProfileImage from "/src/assets/default_user_imgae.png";
 import bellIcon from "/src/assets/icons/bell_icon.png";
 import ongiLogoFlat from "/src/assets/ongi_logo_flat.png";
 
 const Header = () => {
 	const navigate = useNavigate();
+
+	// 사용자 정보 상태
+	const [userInfo, setUserInfo] = useState({
+		userId: null,
+		profileImageURL: null,
+	});
+
+	// Zustand 스토어에서 함수 가져오기
+	const getUserId = useAuthStore((state) => state.getUserId);
+	const getUser = useAuthStore((state) => state.getUser);
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+	useEffect(() => {
+		// 1. 먼저 스토어에서 인증 상태 확인
+		if (isAuthenticated()) {
+			const user = getUser();
+			setUserInfo({
+				userId: user.userId,
+				profileImageURL: user.profileImageURL,
+			});
+		} else {
+			// 2. 스토어에 없으면 세션 스토리지 확인
+			const userIdFromSession = sessionStorage.getItem("userId");
+			if (userIdFromSession) {
+				setUserInfo({
+					userId: userIdFromSession,
+					profileImageURL: null,
+				});
+			}
+		}
+	}, []);
+
+	const handleProfileClick = () => {
+		// userInfo.userId를 먼저 확인하고, 없으면 getUserId() 호출
+		if (userInfo.userId) {
+			navigate(`/mypage/${userInfo.userId}`);
+		} else if (isAuthenticated()) {
+			const userId = getUserId();
+			navigate(`/mypage/${userId}`);
+		} else {
+			// 로그인 상태가 아니면 로그인 페이지로 이동
+			navigate("/login");
+		}
+	};
+
 	return (
 		<header className="h-[80px] px-4 flex items-center justify-between shadow-sm">
 			<button onClick={() => navigate("/main")}>
-				<img className="h-[52px] " src={ongiLogoFlat}></img>
+				<img className="h-[52px]" src={ongiLogoFlat} alt="Logo" />
 			</button>
 			<div className="w-40"></div>
 			<div className="flex items-center space-x-0">
@@ -19,15 +65,18 @@ const Header = () => {
 					<img
 						className="h-6 md:h-7"
 						src={bellIcon}
-						alt="Notifications"></img>
+						alt="Notifications"
+					/>
 				</button>
 				<button
 					className="p-2 transition-colors rounded-full hover:bg-gray-100"
-					aria-label="Notifications">
+					aria-label="Profile"
+					onClick={handleProfileClick}>
 					<img
-						src={defaultProfileImage}
+						src={userInfo.profileImageURL || defaultProfileImage}
 						className="h-[40px] rounded-full"
-						alt="User Profile"></img>
+						alt="User Profile"
+					/>
 				</button>
 			</div>
 		</header>
