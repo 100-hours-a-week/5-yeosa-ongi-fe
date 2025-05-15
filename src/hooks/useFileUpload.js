@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 /**
- * 파일 업로드를 관리하는 커스텀 훅
+ * 파일 업로드를 관리하는 커스텀 훅 - 단순화 버전
  * @param {Object} options 파일 업로드 옵션
  * @param {number} options.maxFiles 최대 파일 수 (기본값: 10)
  * @returns {Object} 파일 관리 객체와 메서드
@@ -10,10 +10,10 @@ const useFileUpload = (options = {}) => {
     const { maxFiles = 10 } = options;
     const [files, setFiles] = useState([]);
     const [error, setError] = useState(null);
-    const [overflowFiles, setOverflowFiles] = useState([]);
+    const [isProcessing, setProcessing] = useState(false);
 
     /**
-     * 파일을 추가하는 함수
+     * 파일을 추가하는 함수 - 초과분은 무시하고 최대한도까지만 추가
      * @param {File|File[]} newFiles 추가할 파일(들)
      * @returns {boolean} 성공 여부
      */
@@ -37,10 +37,9 @@ const useFileUpload = (options = {}) => {
 
             setFiles(prevFiles => [...prevFiles, ...newFileItems]);
             setError(null);
-            setOverflowFiles([]);
             return true;
         } else {
-            // 최대 파일 수를 초과하는 경우
+            // 최대 파일 수를 초과하는 경우, 최대한도까지만 추가
             const remainingSlots = Math.max(0, maxFiles - files.length);
 
             if (remainingSlots > 0) {
@@ -54,16 +53,15 @@ const useFileUpload = (options = {}) => {
 
                 setFiles(prevFiles => [...prevFiles, ...newFileItems]);
 
-                // 초과하는 파일들은 overflow 배열에 저장
-                const overflowingFiles = filesToAdd.slice(remainingSlots);
-                setOverflowFiles(overflowingFiles);
-                setError(`최대 ${maxFiles}장까지만 업로드할 수 있습니다. ${overflowingFiles.length}장이 제외되었습니다.`);
+                // 초과분 정보만 오류 메시지로 표시
+                const excludedCount = filesToAdd.length - remainingSlots;
+                setError(`최대 ${maxFiles}장까지만 업로드할 수 있습니다. ${excludedCount}장이 제외되었습니다.`);
             } else {
-                // 슬롯이 없는 경우 모든 파일이 overflow
-                setOverflowFiles(filesToAdd);
+                // 슬롯이 없는 경우 모든 파일이 제외됨
                 setError(`이미 최대 파일 수(${maxFiles}장)에 도달했습니다. ${filesToAdd.length}장이 추가되지 않았습니다.`);
             }
-            return false;
+
+            return remainingSlots > 0; // 일부라도 추가되었으면 true 반환
         }
     };
 
@@ -78,9 +76,8 @@ const useFileUpload = (options = {}) => {
         }
         setFiles(files.filter(item => item.id !== fileId));
 
-        // 파일이 제거되면 error와 overflowFiles 초기화
+        // 파일이 제거되면 error 초기화
         setError(null);
-        setOverflowFiles([]);
     };
 
     /**
@@ -92,43 +89,6 @@ const useFileUpload = (options = {}) => {
         });
         setFiles([]);
         setError(null);
-        setOverflowFiles([]);
-    };
-
-    /**
-     * overflow된 파일을 추가하는 함수
-     * (파일을 제거한 후 overflow된 파일을 다시 추가하고 싶을 때 사용)
-     */
-    const addOverflowFiles = () => {
-        if (overflowFiles.length === 0) return;
-
-        // 현재 사용 가능한 슬롯 수 계산
-        const availableSlots = maxFiles - files.length;
-
-        if (availableSlots <= 0) {
-            setError(`이미 최대 파일 수(${maxFiles}장)에 도달했습니다.`);
-            return;
-        }
-
-        // 추가 가능한 overflow 파일만 선택
-        const filesToAdd = overflowFiles.slice(0, availableSlots);
-        const newFileItems = filesToAdd.map(file => ({
-            file,
-            preview: URL.createObjectURL(file),
-            id: Math.random().toString(36).substr(2, 9),
-        }));
-
-        setFiles(prevFiles => [...prevFiles, ...newFileItems]);
-
-        // 남은 overflow 파일 업데이트
-        const remainingOverflow = overflowFiles.slice(availableSlots);
-        setOverflowFiles(remainingOverflow);
-
-        if (remainingOverflow.length > 0) {
-            setError(`${filesToAdd.length}장이 추가되었습니다. 여전히 ${remainingOverflow.length}장이 제한을 초과합니다.`);
-        } else {
-            setError(null);
-        }
     };
 
     // 컴포넌트 언마운트 시 메모리 정리
@@ -146,11 +106,11 @@ const useFileUpload = (options = {}) => {
         removeFile,
         clearFiles,
         error,
-        overflowFiles,
-        addOverflowFiles,
         isFull: files.length >= maxFiles,
         count: files.length,
-        maxFiles
+        maxFiles,
+        isProcessing,
+        setProcessing
     };
 };
 
