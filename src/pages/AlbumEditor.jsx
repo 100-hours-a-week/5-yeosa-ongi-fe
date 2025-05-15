@@ -8,13 +8,13 @@ import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
 // 커스텀 컴포넌트와 훅
 import Input from "../components/AlbumEditor/Input"; // 수정된 Input 컴포넌트
 import useFileUpload from "../hooks/useFileUpload";
-import { validateImageFile } from "../services/validateImageFile";
 
 // Assets
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
 import Arrow_Left from "../assets/icons/Arrow Left.png";
+import { validateImageFiles } from "../services/validateImageFile";
 
 // 파일 미리보기 컴포넌트
 const FilePreview = ({ file, onDelete }) => (
@@ -90,41 +90,29 @@ const AlbumEditor = () => {
 				? newFiles
 				: [newFiles];
 
-			// 각 파일을 검증하고 추가
-			const validFiles = [];
-			let validationError = null;
+			// 먼저 기본적인 파일 유효성 검사 진행 (크기, 형식)
+			const validationResult = validateImageFiles(filesToProcess);
 
-			// 모든 파일 검증
-			for (const file of filesToProcess) {
-				const validationResult = validateImageFile(file, [
-					...files,
-					...validFiles,
-				]);
-
-				if (validationResult.isValid) {
-					validFiles.push(file);
-				} else {
-					validationError = validationResult.error;
-					break;
-				}
-			}
-
-			// 검증 결과에 따라 처리
-			if (validationError) {
-				setCustomError(validationError);
+			if (!validationResult.isValid) {
+				setCustomError(validationResult.error);
 				return;
 			}
 
-			// 파일 추가 (제한 처리는 useFileUpload 내부에서 처리됨)
+			// 검증된 파일을 useFileUpload에 추가 (개수 제한은 useFileUpload에서 처리)
 			setCustomError(null);
-			addFile(validFiles);
+			addFile(filesToProcess);
 		},
-		[addFile, files]
+		[addFile]
 	);
 
-	// 앨범 생성 핸들러 - Presigned URL 사용하도록 수정
 	const handleCreateAlbum = async () => {
 		if (files.length === 0 || loading || isProcessing) return;
+
+		const trimmedTitle = albumTitle.trim();
+		if (!trimmedTitle) {
+			setCustomError("앨범 제목을 입력해주세요.");
+			return;
+		}
 
 		setLoading(true);
 		setCustomError(null);
@@ -164,7 +152,7 @@ const AlbumEditor = () => {
 			}));
 
 			const albumData = {
-				albumName: albumTitle,
+				albumName: trimmedTitle,
 				pictureUrls: pictureData,
 			};
 
@@ -229,8 +217,15 @@ const AlbumEditor = () => {
 		]
 	);
 
-	// 버튼 비활성화 여부
-	const isButtonDisabled = files.length === 0 || loading || isProcessing;
+	// 버튼 비활성화 여부를 useMemo로 감싸기
+	const isButtonDisabled = useMemo(() => {
+		return (
+			albumTitle.trim() === "" ||
+			files.length === 0 ||
+			loading ||
+			isProcessing
+		);
+	}, [albumTitle, files.length, loading, isProcessing]);
 
 	return (
 		<div className="flex flex-col min-h-screen">
@@ -252,30 +247,6 @@ const AlbumEditor = () => {
 
 			{/* 메인 콘텐츠 */}
 			<main className="flex-grow px-4">
-				{/* 오류 메시지 표시 */}
-				{customError && (
-					<Alert
-						message={customError}
-						onAction={() => setCustomError(null)}
-						actionText="닫기"
-					/>
-				)}
-
-				{/* 파일 업로드 오류 표시 */}
-				{fileError && (
-					<Alert
-						message={fileError}
-						onAction={
-							overflowFiles.length > 0
-								? handleAddOverflowFiles
-								: null
-						}
-						actionText={
-							overflowFiles.length > 0 ? "추가하기" : null
-						}
-					/>
-				)}
-
 				{/* 로딩 인디케이터 */}
 				{isProcessing && (
 					<div className="my-2 text-center text-blue-600">
@@ -297,6 +268,25 @@ const AlbumEditor = () => {
 				<Grid items={gridItems} />
 			</main>
 
+			<div className="mb-12">
+				{/* 오류 메시지 표시 */}
+				{customError && (
+					<Alert
+						message={customError}
+						onAction={() => setCustomError(null)}
+						actionText="닫기"
+					/>
+				)}
+
+				{/* 파일 업로드 오류 표시 */}
+				{fileError && (
+					<Alert
+						message={fileError}
+						onAction={() => setCustomError(null)}
+						actionText="닫기"
+					/>
+				)}
+			</div>
 			{/* 푸터 (앨범 생성 버튼) */}
 			<footer className="px-4 py-4 mt-auto">
 				<CreateAlbumButton
