@@ -36,7 +36,10 @@ const AlbumTitleForm = ({ initialTitle, onTitleChange }) => {
 	};
 
 	const handleChange = (e) => {
-		setTitle(e.target.value);
+		const newTitle = e.target.value;
+		setTitle(newTitle);
+		onTitleChange(newTitle);
+
 		// 입력 중 유효성 메시지는 지우기
 		if (!isValid) {
 			setIsValid(true);
@@ -54,6 +57,7 @@ const AlbumTitleForm = ({ initialTitle, onTitleChange }) => {
 					value={title}
 					onChange={handleChange}
 					onBlur={handleBlur}
+					maxLength={12}
 				/>
 			</div>
 		</div>
