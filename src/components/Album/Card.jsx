@@ -17,8 +17,7 @@ const Card = () => {
 				style={{
 					transformStyle: "preserve-3d",
 					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-				}}
-				onClick={handleClick}>
+				}}>
 				{/* 카드 앞면 */}
 				<div
 					className="absolute w-full h-full p-5 "
