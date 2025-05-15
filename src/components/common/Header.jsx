@@ -5,7 +5,7 @@ import defaultProfileImage from "/src/assets/default_user_imgae.png";
 import bellIcon from "/src/assets/icons/bell_icon.png";
 import ongiLogoFlat from "/src/assets/ongi_logo_flat.png";
 
-const Header = () => {
+const Header = ({ showButtons = true }) => {
 	const navigate = useNavigate();
 
 	// 사용자 정보 상태
@@ -54,27 +54,31 @@ const Header = () => {
 				<img className="h-[52px]" src={ongiLogoFlat} alt="Logo" />
 			</button>
 			<div className="w-40"></div>
-			<div className="flex items-center space-x-0">
-				<button
-					className="p-2 transition-colors rounded-full hover:bg-gray-100 min-w-6"
-					aria-label="Notifications">
-					<img
-						className="h-6 md:h-7"
-						src={bellIcon}
-						alt="Notifications"
-					/>
-				</button>
-				<button
-					className="p-2 transition-colors rounded-full hover:bg-gray-100"
-					aria-label="Profile"
-					onClick={handleProfileClick}>
-					<img
-						src={userInfo.profileImageURL || defaultProfileImage}
-						className="h-[40px] rounded-full"
-						alt="User Profile"
-					/>
-				</button>
-			</div>
+			{showButtons && (
+				<div className="flex items-center space-x-0">
+					<button
+						className="p-2 transition-colors rounded-full hover:bg-gray-100 min-w-6"
+						aria-label="Notifications">
+						<img
+							className="h-6 md:h-7"
+							src={bellIcon}
+							alt="Notifications"
+						/>
+					</button>
+					<button
+						className="p-2 transition-colors rounded-full hover:bg-gray-100"
+						aria-label="Profile"
+						onClick={handleProfileClick}>
+						<img
+							src={
+								userInfo.profileImageURL || defaultProfileImage
+							}
+							className="h-[40px] rounded-full"
+							alt="User Profile"
+						/>
+					</button>
+				</div>
+			)}
 		</header>
 	);
 };

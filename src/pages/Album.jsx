@@ -126,7 +126,6 @@ const Album = () => {
 	}
 
 	const handleClick = () => {
-		console.log("click");
 		openModal("앨범 삭제");
 	};
 	return (
