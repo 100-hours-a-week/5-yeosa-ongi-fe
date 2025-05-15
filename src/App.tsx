@@ -118,7 +118,7 @@ function AppRoutes() {
         } 
       />
             <Route 
-        path="/mypage/:userId" 
+        path="/mypage" 
         element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <MyPage />
