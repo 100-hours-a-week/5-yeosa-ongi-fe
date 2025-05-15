@@ -6,6 +6,7 @@ import Category from "../components/Album/Category";
 import Header from "../components/common/Header";
 
 //Assets
+import { deleteAlbum } from "../api/albums/albumDeleteApi";
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
@@ -126,7 +127,7 @@ const Album = () => {
 
 	const handleClick = () => {
 		console.log("click");
-		openModal("뉴뉴");
+		openModal("앨범 삭제");
 	};
 	return (
 		<>
@@ -210,18 +211,28 @@ const Album = () => {
 				</div>
 			</div>
 			{/*Modal*/}
-			<Modal isOpen={isOpen} onClose={closeModal} title={modalData?.name}>
+			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
 				{modalData && (
 					<div>
-						<p>{modalData.description}</p>
-						<p>가격: {modalData.price}원</p>
-						<button
-							onClick={() => {
-								// 장바구니 추가 로직
-								closeModal();
-							}}>
-							장바구니에 추가
-						</button>
+						<p>앨범을 삭제하시겠습니까?</p>
+						<p>삭제된 앨범은 복구할 수 없습니다.</p>
+						<div className="flex justify-center gap-16 mt-8">
+							<button
+								className="w-20 border rounded-lg h-7"
+								onClick={() => {
+									closeModal();
+								}}>
+								아니오
+							</button>
+							<button
+								className="w-20 border rounded-lg h-7"
+								onClick={() => {
+									deleteAlbum(albumId);
+									closeModal();
+								}}>
+								예
+							</button>
+						</div>
 					</div>
 				)}
 			</Modal>
