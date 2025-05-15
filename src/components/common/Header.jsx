@@ -40,14 +40,10 @@ const Header = () => {
 	}, []);
 
 	const handleProfileClick = () => {
-		// userInfo.userId를 먼저 확인하고, 없으면 getUserId() 호출
-		if (userInfo.userId) {
-			navigate(`/mypage/${userInfo.userId}`);
-		} else if (isAuthenticated()) {
-			const userId = getUserId();
-			navigate(`/mypage/${userId}`);
+		console.log(isAuthenticated());
+		if (isAuthenticated()) {
+			navigate(`/mypage`);
 		} else {
-			// 로그인 상태가 아니면 로그인 페이지로 이동
 			navigate("/login");
 		}
 	};
