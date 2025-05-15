@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import { updateUserInfo } from "../api/user/userInfoUpdate";
 import Header from "../components/common/Header";
+import { Modal } from "../components/common/Modal";
 import ImageInput from "../components/MyPage/ImageInput";
+import useModal from "../hooks/useModal";
 import useAuthStore from "../stores/userStore";
 
 const MyPage = () => {
@@ -29,7 +31,7 @@ const MyPage = () => {
 	const getUser = useAuthStore((state) => state.getUser);
 	const setUser = useAuthStore((state) => state.setUser);
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
+	const { isOpen, modalData, openModal, closeModal } = useModal();
 	useEffect(() => {
 		setIsLoading(true);
 		try {
@@ -331,7 +333,7 @@ const MyPage = () => {
 
 	return (
 		<>
-			<Header />
+			<Header showButtons={false} />
 			<div className="p-4 mt-20">
 				{isLoading ? (
 					<div className="flex items-center justify-center">
@@ -494,8 +496,7 @@ const MyPage = () => {
 								<button
 									className="flex items-center justify-between w-full px-6 py-4 text-gray-700 hover:bg-gray-100"
 									onClick={() => {
-										useAuthStore.getState().logout();
-										navigate("/login");
+										openModal("로그아웃");
 									}}>
 									<div className="flex items-center">
 										<svg
@@ -520,6 +521,32 @@ const MyPage = () => {
 					</div>
 				)}
 			</div>
+			{/*Modal*/}
+			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+				{modalData && (
+					<div>
+						<p>로그아웃 하시겠습니까?</p>
+						<div className="flex justify-center gap-16 mt-8">
+							<button
+								className="w-20 border rounded-lg h-7"
+								onClick={() => {
+									closeModal();
+								}}>
+								아니오
+							</button>
+							<button
+								className="w-20 border rounded-lg h-7"
+								onClick={() => {
+									useAuthStore.getState().logout();
+									closeModal();
+									navigate("/login");
+								}}>
+								예
+							</button>
+						</div>
+					</div>
+				)}
+			</Modal>
 		</>
 	);
 };
