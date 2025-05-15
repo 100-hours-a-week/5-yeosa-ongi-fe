@@ -7,6 +7,7 @@ import KakaoCallback from './pages/auth/KakaoCallback';
 import Collection from './pages/Collection';
 import Home from './pages/Home';
 import Main from './pages/Main';
+import MyPage from './pages/MyPage';
 import useAuthStore from './stores/userStore';
 
 interface ProtectedRouteProps {
@@ -116,6 +117,15 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+            <Route 
+        path="/mypage/:userId" 
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <MyPage />
+          </ProtectedRoute>
+        } 
+      />
+      
       {/* 404 페이지 처리 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
