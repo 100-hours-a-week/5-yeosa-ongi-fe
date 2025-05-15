@@ -20,8 +20,11 @@ const Input = ({
 			return;
 		}
 
+		const batchStartTime = performance.now();
+
 		setProcessing(true);
 		try {
+			const processingStartTime = performance.now();
 			const { processedFiles, failedFiles } = await batchProcessImages(
 				selectedFiles,
 				{
@@ -33,6 +36,9 @@ const Input = ({
 				}
 			);
 
+			const processingEndTime = performance.now();
+			const processingDuration = processingEndTime - processingStartTime;
+
 			if (failedFiles.length > 0) {
 				const failedNames = failedFiles.map((f) => f.name).join(", ");
 				onError(
@@ -41,11 +47,27 @@ const Input = ({
 			}
 
 			if (processedFiles.length > 0) {
+				const uiRenderStartTime = performance.now();
+
 				if (processedFiles.length === 1) {
 					onFileSelect(processedFiles[0]);
 				} else {
 					onFileSelect(processedFiles);
 				}
+				setTimeout(() => {
+					const uiRenderEndTime = performance.now();
+					const uiRenderDuration =
+						uiRenderEndTime - uiRenderStartTime;
+					const totalBatchDuration = uiRenderEndTime - batchStartTime;
+
+					// 성능 데이터 콘솔 출력
+					console.log({
+						processingDuration,
+						timestamp: new Date().toISOString(),
+						totalBatchDuration,
+						uiRenderDuration,
+					});
+				}, 0);
 			} else if (failedFiles.length > 0) {
 				onError("모든 파일 처리에 실패했습니다.");
 			}
@@ -58,7 +80,11 @@ const Input = ({
 	};
 
 	const handleClick = () => {
-		if (!disabled && !isProcessing) {
+		if (!isProcessing) {
+			if (disabled) {
+				onError(`사진은 최대 10장 선택할 수 있습니다.`);
+				return;
+			}
 			fileInputRef.current.click();
 		}
 	};
