@@ -1,0 +1,36 @@
+name: Deploy Frontend on PR Merge
+
+on:
+  pull_request:
+    branches:
+      - test
+    types:
+      - closed
+
+jobs:
+  deploy-frontend:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Frontend Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build & Push Frontend Image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ongi-frontend:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ongi-frontend:latest
+
+      - name: SSH into GCP and Deploy Frontend
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_KEY }}
+          script: |
+            cd /opt/app/ongi
+            docker-compose pull frontend
+            docker-compose up -d frontend
