@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import { albumSummary } from "../../mock/getAlbumSummary";
 import { getAlubmSummary } from "../api/albums/albumSummaryApi";
@@ -5,6 +6,12 @@ import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
 
 const AlbumThumbnail = ({ id }) => {
 	const navigate = useNavigate();
+=======
+import { albumSummary } from "../../mock/getAlbumSummary";
+import { useAlbumStore, useMainPageStore } from "../stores/mainPageStore";
+
+const AlbumThumbnail = ({ id }) => {
+>>>>>>> dev
 	const hasCoworkers = false;
 	const { albums } = useAlbumStore();
 	const album = albums[id];
@@ -14,6 +21,7 @@ const AlbumThumbnail = ({ id }) => {
 	const setSelectedAlbumSummary = useMainPageStore(
 		(state) => state.setSelectedAlbumSummary
 	);
+<<<<<<< HEAD
 	const handleSelect = async () => {
 		if (isSelected) {
 			console.log("앨범 상세페이지로 이동 : ", id);
@@ -24,6 +32,14 @@ const AlbumThumbnail = ({ id }) => {
 			const response = await getAlubmSummary(id);
 
 			console.log(response);
+=======
+	const handleSelect = () => {
+		if (isSelected) {
+			console.log("앨범 상세페이지로 이동 : ", id);
+		} else {
+			selectItem(id);
+			setSelectedAlbumSummary(albumSummary);
+>>>>>>> dev
 		}
 	};
 
@@ -32,7 +48,11 @@ const AlbumThumbnail = ({ id }) => {
 			className="relative w-full h-full border border-solid"
 			onClick={handleSelect}>
 			<img
+<<<<<<< HEAD
 				className="absolute inset-0 object-cover w-full h-full"
+=======
+				className="object-cover w-full h-full"
+>>>>>>> dev
 				src={`${album.thumbnailURL}`}
 				alt="Album thumbnail"
 			/>
@@ -48,7 +68,11 @@ const AlbumThumbnail = ({ id }) => {
 					{album.memberProfileImageURL.map((url, index) => (
 						<div
 							key={index}
+<<<<<<< HEAD
 							className="overflow-hidden rounded-full"
+=======
+							className="overflow-hidden border-2 border-black rounded-full"
+>>>>>>> dev
 							style={{
 								width: "24px",
 								height: "24px",

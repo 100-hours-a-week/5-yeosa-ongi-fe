@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+<<<<<<< HEAD
 import { fetchAlbumData } from "../api/albums/albumMonthly";
 import AlbumListHeader from "../components/AlbumListHeader";
+=======
+import { fetchAlbumData } from "../api/mock/album";
+import AlbumListHeader from "../components/\bAlbumListHeader";
+>>>>>>> dev
 import FlottingButton from "../components/FlottingButton";
 import Header from "../components/Header";
 import KaKaoMap from "../components/Map";
@@ -10,6 +15,7 @@ import { useAlbumStore } from "../stores/mainPageStore";
 
 const Main = () => {
 	const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore();
+<<<<<<< HEAD
 	const [page, setPage] = useState(1); // 현재 페이지 번호
 	const [nextYearMonth, setNextYearMonth] = useState(null);
 	const [isInitialLoading, setIsInitialLoading] = useState(false);
@@ -92,24 +98,63 @@ const Main = () => {
 			return false; // 오류 발생 시 더 이상 로드하지 않음
 		}
 	}, [nextYearMonth, addAlbums, initialLoadFailed]);
+=======
+
+	const [page, setPage] = useState(1); // 현재 페이지 번호
+
+	const [nextYearMonth, setNextYearMonth] = useState(null);
+
+	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
+
+	// Mount
+	useEffect(() => {
+		const loadInitialData = async () => {
+			const response = fetchAlbumData(null);
+			setAlbums(response.data.albums);
+			setNextYearMonth(response.data.nextYearMonth);
+			setHasNext(response.data.hasNext == "true");
+		};
+
+		loadInitialData();
+	}, []);
+
+	const fetchMoreAlbums = useCallback(async () => {
+		const response = fetchAlbumData(nextYearMonth);
+		addAlbums(response.data.albums);
+		setNextYearMonth(response.data.nextYearMonth);
+		return response.data.hasNext === "true";
+	}, [nextYearMonth, addAlbums]);
+>>>>>>> dev
 
 	const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(
 		fetchMoreAlbums,
 		true
 	);
 	return (
+<<<<<<< HEAD
 		<div className="relative h-screen overflow-hidden">
+=======
+		<div className="h-screen overflow-hidden">
+>>>>>>> dev
 			<Header />
 			<div className="flex-col content">
 				<div
 					className="border-t border-solid"
+<<<<<<< HEAD
 					style={{ height: "min(80vw, 560px)" }}>
+=======
+					style={{ height: "calc(80vw)" }}>
+>>>>>>> dev
 					<KaKaoMap />
 				</div>
 				<AlbumListHeader />
 				<div
 					className="overflow-y-auto"
+<<<<<<< HEAD
 					style={{ height: "calc(100vh - min(80vw,560px) - 160px)" }}>
+=======
+					style={{ height: "calc(100vh - 80vw - 160px)" }}>
+>>>>>>> dev
 					{Object.keys(albumsByMonth).map((month, index) => (
 						<Month
 							key={month}

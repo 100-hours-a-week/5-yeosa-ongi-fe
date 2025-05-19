@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 const Grid = ({ col = 4, items = [] }) => {
 	const chunkArrayByCol = (array, chunkSize) => {
 		if (!array || array.length === 0) {
 			return [];
+=======
+import AlbumThumbnail from "./AlbumThumbnail";
+
+const Grid = ({ col = 4, items = [], ElementType = AlbumThumbnail }) => {
+	const chunkArrayByCol = (array, chunkSize) => {
+		if (!array || array.length === 0) {
+			return <div>데이터가 없습니다.</div>;
+>>>>>>> dev
 		} else {
 			return Array(Math.ceil(array.length / chunkSize))
 				.fill()
@@ -17,6 +26,7 @@ const Grid = ({ col = 4, items = [] }) => {
 		<>
 			{chunkArray.map((array, index) => (
 				<div
+<<<<<<< HEAD
 					className={`grid`}
 					style={{
 						gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
@@ -27,6 +37,13 @@ const Grid = ({ col = 4, items = [] }) => {
 							<item.ElementType
 								id={item.element}
 								{...item.props}></item.ElementType>
+=======
+					className={`grid grid-cols-4`}
+					style={{ height: `calc(100vw / ${col})` }}>
+					{array.map((item, index) => (
+						<div className="border-[1px] border-solid">
+							<ElementType id={item}></ElementType>
+>>>>>>> dev
 						</div>
 					))}
 				</div>

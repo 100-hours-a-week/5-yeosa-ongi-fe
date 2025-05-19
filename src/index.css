@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 @import "@fontsource/pretendard";
 
+=======
+>>>>>>> dev
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,13 +11,17 @@
 	/* 기본, 테마 1 (pastel pink) */
 	:root {
 		--color-primary: #f3d0d7;
+<<<<<<< HEAD
 		--color-primaryBold: #feb4b8;
+=======
+>>>>>>> dev
 		--color-secondary: #ffefef;
 		--color-background: #f6f5f2;
 		--color-background-alt: #f6f7fa;
 		--color-gray-100: #ebebeb;
 		--color-gray-500: #7d7d7d;
 		--color-black: #343a3f;
+<<<<<<< HEAD
 
 		/* 누락된 변수들 추가 */
 		--white-bage: #f6f5f2;
@@ -22,5 +29,7 @@
 		--gray-light: #ebebeb;
 		--gray-dark: #7d7d7d;
 		--black-light: #343a3f;
+=======
+>>>>>>> dev
 	}
 }
