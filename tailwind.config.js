@@ -5,6 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+<<<<<<< HEAD
     fontFamily: {
       sans: ['Pretendard', 'sans-serif'],
     },
@@ -12,6 +13,11 @@ export default {
       colors: {
         primary: 'var(--color-primary)',
         primaryBold: 'var(--color-primaryBold)',
+=======
+    extend: {
+      colors: {
+        primary: 'var(--color-primary)',
+>>>>>>> dev
         secondary: 'var(--color-secondary)',
         'white-bage': 'var(--white-bage)',
         'white-blue': 'var(--white-blue)',

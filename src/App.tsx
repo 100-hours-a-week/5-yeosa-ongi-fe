@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useCallback, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
@@ -126,4 +127,25 @@ export default function App() {
       </BrowserRouter>
     </div>
   );
+=======
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+// import KakaoCallback from './api/auth/kakao/callback';
+import './App.css';
+import KakaoCallback from './pages/auth/KakaoCallback';
+import Home from './pages/Home';
+import Main from './pages/Main';
+
+export default function App() {
+
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+         <Route path="/auth/login/kakao" element={<KakaoCallback />} />
+         <Route path="/main" element={<Main />} />
+      </Routes>
+    </BrowserRouter>
+  )
+>>>>>>> dev
 }

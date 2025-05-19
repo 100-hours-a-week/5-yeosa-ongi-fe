@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import useAuthStore from "../../stores/userStore";
 import { API_BASE_URL } from "../config";
 
@@ -10,6 +11,15 @@ const getKakaoOauthLink = async () => {
                 'Content-Type': 'application/json'
             },
             mode: 'cors'
+=======
+import { API_BASE_URL } from "../config";
+
+export const kakaoLogin = async () => {
+    try {
+        const apiUrl = API_BASE_URL + "/api/auth";
+        const requestOptions = {
+            method: 'GET',
+>>>>>>> dev
         };
         const response = await fetch(apiUrl, requestOptions);
 
@@ -20,6 +30,7 @@ const getKakaoOauthLink = async () => {
     } catch (error) {
         console.error('로그인 실패:', error.message);
     }
+<<<<<<< HEAD
 }
 
 const kakaoLogin = async (code) => {
@@ -47,3 +58,6 @@ const kakaoLogin = async (code) => {
 }
 
 export { getKakaoOauthLink, kakaoLogin };
+=======
+}
+>>>>>>> dev

@@ -29,7 +29,11 @@ const useAlbumStore = create((set, get) => ({
 			}
 			albums[album.albumId] = {
 				albumName: album.albumName,
+<<<<<<< HEAD
 				thumbnailURL: album.thumbnailPictureURL,
+=======
+				thumbnailURL: album.thumbnailURL,
+>>>>>>> dev
 				createdAt: album.createdAt,
 				memberProfileImageURL: album.memberProfileImageURL,
 			};
