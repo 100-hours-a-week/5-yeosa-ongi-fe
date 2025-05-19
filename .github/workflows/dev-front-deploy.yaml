@@ -3,7 +3,8 @@ name: Deploy Frontend on PR Merge
 on:
   pull_request:
     branches:
-      - test
+      - dev
+      - main
     types:
       - closed
 
@@ -27,7 +28,7 @@ jobs:
       - name: SSH into GCP and Deploy Frontend
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.GCP_HOST_DEV }}
+          host: ${{ secrets.GCP_HOST_PROD }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_KEY }}
           script: |
