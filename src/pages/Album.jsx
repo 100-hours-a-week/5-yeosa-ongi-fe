@@ -182,6 +182,7 @@ const Album = () => {
 								onClick={() => {
 									deleteAlbum(albumId);
 									closeModal();
+									navigate("/main");
 								}}>
 								예
 							</button>
