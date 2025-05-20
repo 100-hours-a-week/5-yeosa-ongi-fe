@@ -10,9 +10,9 @@ export default defineConfig({
     },
   },
   server: {
-    host: true, // 외부 접속 허용 (0.0.0.0)
-    port: 5173, // 기본 포트
-    allowedHosts: ['ongi.today'], // 🔥 여기 추가
+    host: true, 
+    port: 5173, 
+    allowedHosts: ['ongi.today', 'dev.ongi.today'], 
   },
   build: {
     minify: 'terser',
