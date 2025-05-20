@@ -8,6 +8,8 @@ import useCollectionStore from "../stores/collectionStore";
 import iconTrash from "@/assets/icons/icon_trash.png";
 import { deleteAlbumPicture } from "../api/pictures/deletePicture";
 import arrowLeft from "../assets/icons/Arrow Left.png";
+import { Modal } from "../components/common/Modal";
+import useModal from "../hooks/useModal";
 
 const Collection = () => {
 	const { albumId, collectionName } = useParams();
@@ -17,7 +19,7 @@ const Collection = () => {
 	const [loading, setLoading] = useState(true);
 	const [isDeleteMode, setIsDeleteMode] = useState(false);
 	const [selectedPictures, setSelectedPictures] = useState(new Set());
-
+	const { isOpen, modalData, openModal, closeModal } = useModal();
 	const getCollectionByName = useCollectionStore(
 		(state) => state.getCollectionByName
 	);
@@ -56,11 +58,6 @@ const Collection = () => {
 	}
 
 	const handleDelete = async () => {
-		if (selectedPictures.size === 0) {
-			setIsDeleteMode(false);
-			return;
-		}
-
 		try {
 			const pictureIds = Array.from(selectedPictures);
 
@@ -149,7 +146,13 @@ const Collection = () => {
 		pictures.length,
 		"pictures"
 	);
-
+	const handleClick = () => {
+		if (selectedPictures.size === 0) {
+			setIsDeleteMode(false);
+			return;
+		}
+		openModal("앨범 삭제");
+	};
 	// 각 컬렉션 유형에 따라 다른 UI 렌더링
 	return (
 		<>
@@ -170,7 +173,7 @@ const Collection = () => {
 					총 {currentCollection.count || pictures.length}개의 사진
 				</p>
 				{isDeleteMode ? (
-					<button onClick={handleDelete}>
+					<button onClick={handleClick}>
 						<div className="text-sm">완료</div>
 					</button>
 				) : (
@@ -185,6 +188,35 @@ const Collection = () => {
 			<div>
 				<Grid col={3} items={formattedPictures} />
 			</div>
+			{/* Modal */}
+			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+				{modalData && (
+					<div>
+						<p>
+							선택한 {selectedPictures.size}장의 사진을
+							삭제하시겠습니까?
+						</p>
+						<p>삭제된 사진은 복구할 수 없습니다.</p>
+						<div className="flex justify-center gap-16 mt-8">
+							<button
+								className="w-20 border rounded-lg h-7"
+								onClick={() => {
+									closeModal();
+								}}>
+								아니오
+							</button>
+							<button
+								className="w-20 border rounded-lg h-7"
+								onClick={() => {
+									handleDelete();
+									closeModal();
+								}}>
+								예
+							</button>
+						</div>
+					</div>
+				)}
+			</Modal>
 		</>
 	);
 };
