@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - dev
     types:
       - closed
 
@@ -32,6 +31,8 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_KEY_PROD }}
           script: |
+            set -e
             cd /opt/app/ongi
-            docker-compose pull frontend
-            docker-compose up -d frontend
+            docker-compose down
+            docker-compose pull
+            docker-compose up -d
