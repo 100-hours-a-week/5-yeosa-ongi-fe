@@ -5,6 +5,7 @@ import Header from "../components/common/Header";
 import useCollectionStore from "../stores/collectionStore";
 
 // Assets
+import iconTrash from "@/assets/icons/icon_trash.png";
 import arrowLeft from "../assets/icons/Arrow Left.png";
 
 const Collection = () => {
@@ -19,6 +20,9 @@ const Collection = () => {
 
 	const [currentCollection, setCurrentCollection] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [isDeleteMode, setIsDeleteMode] = useState(false);
+	const [selectedPictures, setSelectedPictures] = useState(new Set());
+
 	useEffect(() => {
 		// 컬렉션 이름에 따라 적절한 컬렉션 데이터 설정
 		setLoading(true);
@@ -69,19 +73,54 @@ const Collection = () => {
 			</>
 		);
 	}
-
+	const toggleSelect = (pictureId) => {
+		setSelectedPictures((prev) => {
+			const newSelected = new Set(prev);
+			if (newSelected.has(pictureId)) {
+				newSelected.delete(pictureId);
+			} else {
+				newSelected.add(pictureId);
+			}
+			return newSelected;
+		});
+	};
 	// 사진 배열이 있는지 확인
 	const pictures = currentCollection.pictures || [];
+
 	const formattedPictures = pictures.map((picture) => ({
-		ElementType: () => (
-			<div className="relative w-full h-full">
-				{/* 이미지 미리보기 */}
-				<img
-					src={picture.pictureURL}
-					className="absolute inset-0 object-cover w-full h-full"
-				/>
-			</div>
-		),
+		ElementType: () => {
+			// 이 컴포넌트는 isDeleteMode 상태가 변경될 때마다 다시 렌더링됩니다
+			const isSelected = selectedPictures.has(picture.pictureId);
+
+			return (
+				<div
+					className="relative w-full h-full"
+					onClick={() =>
+						isDeleteMode && toggleSelect(picture.pictureId)
+					}>
+					<img
+						src={picture.pictureURL}
+						className="absolute inset-0 object-cover w-full h-full"
+					/>
+					{isDeleteMode && (
+						<div className="absolute z-10 top-2 right-2">
+							<div
+								className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+									isSelected
+										? "bg-primary"
+										: "border-gray-light bg-transparent"
+								}`}>
+								{isSelected && (
+									<span className="text-xs text-white">
+										✓
+									</span>
+								)}
+							</div>
+						</div>
+					)}
+				</div>
+			);
+		},
 		element: picture,
 		props: {
 			alt: `Photo ${picture.pictureId || ""}`,
@@ -111,15 +150,25 @@ const Collection = () => {
 					{currentCollection.name || "컬렉션"}
 				</div>
 			</div>
-			<div className="p-4">
-				<h1 className="mb-4 text-2xl font-bold"></h1>
-				<p className="mb-6 text-gray-500">
+			<div className="flex items-center justify-between p-4">
+				<p className="text-sm text-gray-dark">
 					총 {currentCollection.count || pictures.length}개의 사진
 				</p>
-			</div>
-			<div>
-				{/* 이미지 태그는 src와 alt 속성이 없으면 경고가 발생합니다 */}
-				{/* <img src="..." alt="..." /> */}
+				{isDeleteMode ? (
+					<button
+						onClick={() => {
+							setIsDeleteMode(false);
+						}}>
+						<div className="text-sm">완료</div>
+					</button>
+				) : (
+					<button
+						onClick={() => {
+							setIsDeleteMode(true);
+						}}>
+						<img src={iconTrash} className="h-4"></img>
+					</button>
+				)}
 			</div>
 			<div>
 				<Grid col={3} items={formattedPictures} />
