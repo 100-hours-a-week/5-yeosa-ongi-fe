@@ -1,4 +1,4 @@
-name: Deploy Frontend on PR Merge
+name: Deploy Backend on PR Merge
 
 on:
   pull_request:
@@ -8,29 +8,43 @@ on:
       - closed
 
 jobs:
-  deploy-frontend:
+  deploy-backend:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout Frontend Code
+      - name: Checkout Backend Code
         uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Spring Boot JAR
+        run: ./gradlew clean build -x test
 
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build & Push Frontend Image
+      - name: Build & Push Backend Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ongi-frontend:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ongi-frontend:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ongi-backend:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ongi-backend:latest
 
-      - name: SSH into GCP and Deploy Frontend
+      - name: SSH into GCP and Redeploy Backend
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_HOST_DEV }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_KEY_DEV }}
           script: |
+            set -e
             cd /opt/app/ongi
-            docker-compose pull frontend
-            docker-compose up -d frontend
+            echo " Stop and remove existing containers..."
+            docker-compose down -v --remove-orphans
+            echo "Pull latest backend image..."
+            docker-compose pull backend
+            echo "Start backend container..."
+            docker-compose up -d backend

@@ -31,6 +31,11 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_KEY_PROD }}
           script: |
+            set -e
             cd /opt/app/ongi
-            docker-compose pull frontend
-            docker-compose up -d frontend
+            echo " Stop and remove existing containers..."
+            docker-compose down -v --remove-orphans
+            echo "Pull latest backend image..."
+            docker-compose pull backend
+            echo "Start backend container..."
+            docker-compose up -d backend
