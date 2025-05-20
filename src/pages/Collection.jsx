@@ -8,6 +8,7 @@ import useCollectionStore from "../stores/collectionStore";
 import iconRecovery from "@/assets/icons/icon_recovery.png";
 import iconTrash from "@/assets/icons/icon_trash.png";
 import { deleteAlbumPicture } from "../api/pictures/deletePicture";
+import { recoverAlbumPicture } from "../api/pictures/recoverPicture";
 import arrowLeft from "../assets/icons/Arrow Left.png";
 import { Modal } from "../components/common/Modal";
 import useModal from "../hooks/useModal";
@@ -17,7 +18,8 @@ const Collection = () => {
 
 	const [currentCollection, setCurrentCollection] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [isDeleteMode, setIsDeleteMode] = useState(false);
+	const [isSelectMode, setIsSelectMode] = useState(false);
+	const [isRecovery, setIsRecovery] = useState(false);
 	const [selectedPictures, setSelectedPictures] = useState(new Set());
 	const { isOpen, modalData, openModal, closeModal } = useModal();
 	const getCollectionByName = useCollectionStore(
@@ -72,7 +74,7 @@ const Collection = () => {
 			setCurrentCollection(updatedCollection);
 
 			// 삭제 모드 및 선택 상태 초기화
-			setIsDeleteMode(false);
+			setIsSelectMode(false);
 			setSelectedPictures(new Set());
 
 			// 컬렉션이 비어있으면 앨범 페이지로 이동
@@ -101,20 +103,19 @@ const Collection = () => {
 
 	const formattedPictures = pictures.map((picture) => ({
 		ElementType: () => {
-			// 이 컴포넌트는 isDeleteMode 상태가 변경될 때마다 다시 렌더링됩니다
 			const isSelected = selectedPictures.has(picture.pictureId);
 
 			return (
 				<div
 					className="relative w-full h-full"
 					onClick={() =>
-						isDeleteMode && toggleSelect(picture.pictureId)
+						isSelectMode && toggleSelect(picture.pictureId)
 					}>
 					<img
 						src={picture.pictureURL}
 						className="absolute inset-0 object-cover w-full h-full"
 					/>
-					{isDeleteMode && (
+					{isSelectMode && (
 						<div className="absolute z-10 top-2 right-2">
 							<div
 								className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -155,19 +156,44 @@ const Collection = () => {
 	};
 	const handleClick = () => {
 		if (selectedPictures.size === 0) {
-			setIsDeleteMode(false);
+			setIsSelectMode(false);
 			return;
 		}
-		openModal("앨범 삭제");
+		openModal("사진 삭제");
 	};
 
 	const handleRecoverClick = () => {
+		console.log("복원 모달 온");
 		if (selectedPictures.size === 0) {
-			setIsDeleteMode(false);
+			setIsSelectMode(false);
 			return;
 		}
-		openModal("앨범 삭제");
+		openModal("사진 복원");
 	};
+
+	const handleRecover = async () => {
+		try {
+			const pictureIds = Array.from(selectedPictures);
+			await recoverAlbumPicture(albumId, { pictureIds });
+			removePictures(pictureIds);
+
+			// 업데이트된 컬렉션 데이터 가져오기
+			const updatedCollection = getCollectionByName(collectionName);
+			setCurrentCollection(updatedCollection);
+
+			setIsSelectMode(false);
+			setIsRecovery(false);
+			setSelectedPictures(new Set());
+
+			// 컬렉션이 비어있으면 앨범 페이지로 이동
+			if (!updatedCollection || updatedCollection.pictures.length === 0) {
+				navigate(`/album/${albumId}`);
+			}
+		} catch (error) {
+			console.error("사진 복원 중 오류 발생:", error);
+		}
+	};
+
 	// 각 컬렉션 유형에 따라 다른 UI 렌더링
 	return (
 		<>
@@ -187,18 +213,23 @@ const Collection = () => {
 				<p className="text-sm text-gray-dark">
 					총 {currentCollection.count || pictures.length}개의 사진
 				</p>
-				{isDeleteMode ? (
-					<button onClick={handleClick}>
+				{isSelectMode ? (
+					<button
+						onClick={isRecovery ? handleRecoverClick : handleClick}>
 						<div className="text-sm">완료</div>
 					</button>
 				) : isCollectionShaky() ? (
 					<>
-						<button onClick={handleRecoverClick}>
+						<button
+							onClick={() => {
+								setIsRecovery(true);
+								setIsSelectMode(true);
+							}}>
 							<img src={iconRecovery} className="h-6"></img>
 						</button>
 						<button
 							onClick={() => {
-								setIsDeleteMode(true);
+								setIsSelectMode(true);
 							}}>
 							<img src={iconTrash} className="h-4"></img>
 						</button>
@@ -206,7 +237,7 @@ const Collection = () => {
 				) : (
 					<button
 						onClick={() => {
-							setIsDeleteMode(true);
+							setIsSelectMode(true);
 						}}>
 						<img src={iconTrash} className="h-4"></img>
 					</button>
@@ -216,34 +247,64 @@ const Collection = () => {
 				<Grid col={3} items={formattedPictures} />
 			</div>
 			{/* Modal */}
-			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
-				{modalData && (
-					<div>
-						<p>
-							선택한 {selectedPictures.size}장의 사진을
-							삭제하시겠습니까?
-						</p>
-						<p>삭제된 사진은 복구할 수 없습니다.</p>
-						<div className="flex justify-center gap-16 mt-8">
-							<button
-								className="w-20 border rounded-lg h-7"
-								onClick={() => {
-									closeModal();
-								}}>
-								아니오
-							</button>
-							<button
-								className="w-20 border rounded-lg h-7"
-								onClick={() => {
-									handleDelete();
-									closeModal();
-								}}>
-								예
-							</button>
+			{isRecovery ? (
+				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+					{modalData && (
+						<div>
+							<p>
+								선택한 {selectedPictures.size}장의 사진을
+								복원하시겠습니까?
+							</p>
+							<div className="flex justify-center gap-16 mt-8">
+								<button
+									className="w-20 border rounded-lg h-7"
+									onClick={() => {
+										closeModal();
+									}}>
+									아니오
+								</button>
+								<button
+									className="w-20 border rounded-lg h-7"
+									onClick={() => {
+										handleRecover();
+										closeModal();
+									}}>
+									예
+								</button>
+							</div>
 						</div>
-					</div>
-				)}
-			</Modal>
+					)}
+				</Modal>
+			) : (
+				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+					{modalData && (
+						<div>
+							<p>
+								선택한 {selectedPictures.size}장의 사진을
+								삭제하시겠습니까?
+							</p>
+							<p>삭제된 사진은 복구할 수 없습니다.</p>
+							<div className="flex justify-center gap-16 mt-8">
+								<button
+									className="w-20 border rounded-lg h-7"
+									onClick={() => {
+										closeModal();
+									}}>
+									아니오
+								</button>
+								<button
+									className="w-20 border rounded-lg h-7"
+									onClick={() => {
+										handleDelete();
+										closeModal();
+									}}>
+									예
+								</button>
+							</div>
+						</div>
+					)}
+				</Modal>
+			)}
 		</>
 	);
 };
