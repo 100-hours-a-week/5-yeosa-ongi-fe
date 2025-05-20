@@ -10,6 +10,7 @@ import Month from "../components/Main/Month";
 import { useAlbumStore } from "@/stores/mainPageStore";
 
 import { fetchAlbumData } from "../api/albums/albumMonthly";
+import OnboardingScreen from "../components/Main/OnboardingScreen";
 import useInfiniteScroll from "../hooks/infiniteScroll";
 
 const Main = () => {
@@ -19,6 +20,7 @@ const Main = () => {
 	const [isInitialLoading, setIsInitialLoading] = useState(false);
 	const [initialLoadFailed, setInitialLoadFailed] = useState(false);
 	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
+	const [hasData, setHasData] = useState(false);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -32,6 +34,7 @@ const Main = () => {
 					console.log("초기 데이터 로드:", result);
 					setAlbums(result.data.albumInfo);
 					setNextYearMonth(result.data.nextYearMonth);
+					setHasData(true);
 				}
 			} catch (error) {
 				console.error("초기 데이터 로딩 오류:", error);
@@ -110,20 +113,30 @@ const Main = () => {
 					style={{ height: "min(80vw, 560px)" }}>
 					<KaKaoMap />
 				</div> */}
-				<AlbumListHeader />
-				<div
-					className="overflow-y-auto"
-					style={{ height: "calc(100vh - min(80vw,560px) - 160px)" }}>
-					{Object.keys(albumsByMonth).map((month, index) => (
-						<Month
-							key={month}
-							title={month}
-							albumIds={albumsByMonth[month]}
-						/>
-					))}
-					{/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
-					<div ref={observerRef} style={{ height: "10px" }} />
-				</div>
+				{}
+				{hasData ? (
+					<>
+						{" "}
+						<AlbumListHeader />{" "}
+						<div
+							className="overflow-y-auto"
+							style={{
+								height: "calc(100vh - min(80vw,560px) - 160px)",
+							}}>
+							{Object.keys(albumsByMonth).map((month, index) => (
+								<Month
+									key={month}
+									title={month}
+									albumIds={albumsByMonth[month]}
+								/>
+							))}
+							{/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
+							<div ref={observerRef} style={{ height: "10px" }} />
+						</div>
+					</>
+				) : (
+					<OnboardingScreen />
+				)}
 			</div>
 			<FlottingButton />
 		</div>
