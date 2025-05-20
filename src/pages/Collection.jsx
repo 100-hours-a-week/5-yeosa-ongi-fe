@@ -12,61 +12,35 @@ import arrowLeft from "../assets/icons/Arrow Left.png";
 const Collection = () => {
 	const { albumId, collectionName } = useParams();
 	const navigate = useNavigate();
-	const {
-		allCollection,
-		shakyCollection,
-		duplicatedCollection,
-		tagCollections,
-	} = useCollectionStore();
 
 	const [currentCollection, setCurrentCollection] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [isDeleteMode, setIsDeleteMode] = useState(false);
 	const [selectedPictures, setSelectedPictures] = useState(new Set());
 
+	const getCollectionByName = useCollectionStore(
+		(state) => state.getCollectionByName
+	);
+	const removePictures = useCollectionStore((state) => state.removePictures);
+
 	useEffect(() => {
 		try {
-			// 컬렉션 이름에 따라 적절한 컬렉션 데이터 설정
 			setLoading(true);
+			const collection = getCollectionByName(collectionName);
 
-			if (collectionName === "전체") {
-				setCurrentCollection(allCollection);
-			} else if (collectionName === "흔들림") {
-				setCurrentCollection(shakyCollection);
-			} else if (collectionName === "중복") {
-				setCurrentCollection(duplicatedCollection);
-			} else {
-				// tagCollections가 배열인지 확인
-				const tagCollection =
-					tagCollections && Array.isArray(tagCollections)
-						? tagCollections.find(
-								(collection) =>
-									collection &&
-									collection.name === collectionName
-						  )
-						: null;
-				setCurrentCollection(tagCollection);
+			if (!collection) {
+				// 컬렉션이 없는 경우 앨범 페이지로 리다이렉트
+				navigate(`/album/${albumId}`);
+				return;
 			}
 
-			console.log("Collections:", {
-				allCollection,
-				shakyCollection,
-				duplicatedCollection,
-				tagCollections,
-			});
-
+			setCurrentCollection(collection);
 			setLoading(false);
 		} catch (error) {
 			navigate(`/album/${albumId}`);
 			console.log(error);
 		}
-	}, [
-		collectionName,
-		allCollection,
-		shakyCollection,
-		duplicatedCollection,
-		tagCollections,
-	]);
+	}, [collectionName, albumId]);
 
 	// 컬렉션이 없거나 로딩 중인 경우 처리
 	if (loading) {
@@ -80,6 +54,40 @@ const Collection = () => {
 			</>
 		);
 	}
+
+	const handleDelete = async () => {
+		if (selectedPictures.size === 0) {
+			setIsDeleteMode(false);
+			return;
+		}
+
+		try {
+			const pictureIds = Array.from(selectedPictures);
+
+			// API 호출로 서버에서 사진 삭제
+			await deleteAlbumPicture(albumId, { pictureIds });
+
+			// 스토어 업데이트 (모든 컬렉션에서 해당 사진 제거)
+			removePictures(pictureIds);
+
+			// 업데이트된 컬렉션 데이터 가져오기
+			const updatedCollection = getCollectionByName(collectionName);
+			setCurrentCollection(updatedCollection);
+
+			// 삭제 모드 및 선택 상태 초기화
+			setIsDeleteMode(false);
+			setSelectedPictures(new Set());
+
+			// 컬렉션이 비어있으면 앨범 페이지로 이동
+			if (!updatedCollection || updatedCollection.pictures.length === 0) {
+				navigate(`/album/${albumId}`);
+			}
+		} catch (error) {
+			console.error("사진 삭제 중 오류 발생:", error);
+			// 오류 처리 추가 (예: 사용자에게 알림)
+		}
+	};
+
 	const toggleSelect = (pictureId) => {
 		setSelectedPictures((prev) => {
 			const newSelected = new Set(prev);
@@ -162,19 +170,7 @@ const Collection = () => {
 					총 {currentCollection.count || pictures.length}개의 사진
 				</p>
 				{isDeleteMode ? (
-					<button
-						onClick={() => {
-							try {
-								const pictureIds = Array.from(selectedPictures);
-								deleteAlbumPicture(albumId, {
-									pictureIds,
-								});
-							} catch (error) {
-								console.error("사진 삭제 중 오류 발생:", error);
-							}
-							setIsDeleteMode(false);
-							setSelectedPictures(new Set());
-						}}>
+					<button onClick={handleDelete}>
 						<div className="text-sm">완료</div>
 					</button>
 				) : (
