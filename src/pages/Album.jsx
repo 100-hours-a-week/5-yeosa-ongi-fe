@@ -23,82 +23,36 @@ const Album = () => {
 	const [category, setCategory] = useState({});
 
 	const {
-		setAllCollection,
-		setShakyCollection,
-		setDuplicatedCollection,
-		setTagCollections,
+		setPicturesAndCategorize,
 		tagCollections,
+		duplicatedCollection,
+		shakyCollection,
 	} = useCollectionStore();
+
 	// 전체 사진 목록
 	const [allPhotos, setAllPhotos] = useState([]);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			let result;
 			try {
 				const response = await getAlbumDetail(albumId);
-				result = response;
-				console.log(response);
+				setAlbumData(response.data);
+
+				// 사진 데이터를 스토어에 전달하고 자동 카테고라이징
+				if (response.data && response.data.picture) {
+					// 스토어에 원본 사진 데이터 전달 - 내부적으로 카테고라이징 실행
+					setPicturesAndCategorize(albumId, response.data.picture);
+					setAllPhotos(response.data.picture);
+				}
+
+				setIsLoading(false);
 			} catch (error) {
 				navigate("/main");
-			} finally {
 			}
-
-			setAlbumData(result.data);
-
-			console.log(result.data);
-			// 모든 사진 목록 저장
-			if (result.data && result.data.picture) {
-				setAllPhotos(result.data.picture);
-
-				// 사진 분류 작업 수행
-				categorizePhotos(result.data.picture);
-			}
-			setIsLoading(false);
 		};
+
 		fetchData();
 	}, [albumId]);
-
-	const categorizePhotos = (pictures) => {
-		console.log(pictures);
-		if (!pictures || pictures.length === 0) return;
-
-		const uniqueTags = [
-			...new Set(pictures.map((pic) => pic.tag).filter(Boolean)),
-		];
-
-		const allCollection = {
-			name: "전체",
-			pictures: pictures,
-			count: pictures.length,
-		};
-
-		const duplicatedCollection = {
-			name: "중복",
-			pictures: pictures.filter((pic) => pic.isDuplicated),
-			count: pictures.filter((pic) => pic.isDuplicated).length,
-		};
-
-		const shakyCollection = {
-			name: "흔들림",
-			pictures: pictures.filter((pic) => pic.isShaky),
-			count: pictures.filter((pic) => pic.isShaky).length,
-		};
-
-		// 태그별 컬렉션 생성
-		const tagCollections = uniqueTags.map((tag) => ({
-			name: tag.trim(),
-			pictures: pictures.filter((pic) => pic.tag === tag),
-			count: pictures.filter((pic) => pic.tag === tag).length,
-		}));
-
-		setAllCollection(allCollection);
-		setDuplicatedCollection(duplicatedCollection);
-		setShakyCollection(shakyCollection);
-		setTagCollections(tagCollections);
-		console.log(allCollection);
-		console.log(tagCollections);
-	};
 
 	const [showRightIndicator, setShowRightIndicator] = useState(true);
 
