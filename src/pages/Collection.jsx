@@ -6,10 +6,11 @@ import useCollectionStore from "../stores/collectionStore";
 
 // Assets
 import iconTrash from "@/assets/icons/icon_trash.png";
+import { deleteAlbumPicture } from "../api/pictures/deletePicture";
 import arrowLeft from "../assets/icons/Arrow Left.png";
 
 const Collection = () => {
-	const { collectionName } = useParams();
+	const { albumId, collectionName } = useParams();
 	const navigate = useNavigate();
 	const {
 		allCollection,
@@ -24,35 +25,41 @@ const Collection = () => {
 	const [selectedPictures, setSelectedPictures] = useState(new Set());
 
 	useEffect(() => {
-		// 컬렉션 이름에 따라 적절한 컬렉션 데이터 설정
-		setLoading(true);
+		try {
+			// 컬렉션 이름에 따라 적절한 컬렉션 데이터 설정
+			setLoading(true);
 
-		if (collectionName === "전체") {
-			setCurrentCollection(allCollection);
-		} else if (collectionName === "흔들림") {
-			setCurrentCollection(shakyCollection);
-		} else if (collectionName === "중복") {
-			setCurrentCollection(duplicatedCollection);
-		} else {
-			// tagCollections가 배열인지 확인
-			const tagCollection =
-				tagCollections && Array.isArray(tagCollections)
-					? tagCollections.find(
-							(collection) =>
-								collection && collection.name === collectionName
-					  )
-					: null;
-			setCurrentCollection(tagCollection);
+			if (collectionName === "전체") {
+				setCurrentCollection(allCollection);
+			} else if (collectionName === "흔들림") {
+				setCurrentCollection(shakyCollection);
+			} else if (collectionName === "중복") {
+				setCurrentCollection(duplicatedCollection);
+			} else {
+				// tagCollections가 배열인지 확인
+				const tagCollection =
+					tagCollections && Array.isArray(tagCollections)
+						? tagCollections.find(
+								(collection) =>
+									collection &&
+									collection.name === collectionName
+						  )
+						: null;
+				setCurrentCollection(tagCollection);
+			}
+
+			console.log("Collections:", {
+				allCollection,
+				shakyCollection,
+				duplicatedCollection,
+				tagCollections,
+			});
+
+			setLoading(false);
+		} catch (error) {
+			navigate(`/album/${albumId}`);
+			console.log(error);
 		}
-
-		console.log("Collections:", {
-			allCollection,
-			shakyCollection,
-			duplicatedCollection,
-			tagCollections,
-		});
-
-		setLoading(false);
 	}, [
 		collectionName,
 		allCollection,
@@ -157,7 +164,16 @@ const Collection = () => {
 				{isDeleteMode ? (
 					<button
 						onClick={() => {
+							try {
+								const pictureIds = Array.from(selectedPictures);
+								deleteAlbumPicture(albumId, {
+									pictureIds,
+								});
+							} catch (error) {
+								console.error("사진 삭제 중 오류 발생:", error);
+							}
 							setIsDeleteMode(false);
+							setSelectedPictures(new Set());
 						}}>
 						<div className="text-sm">완료</div>
 					</button>
