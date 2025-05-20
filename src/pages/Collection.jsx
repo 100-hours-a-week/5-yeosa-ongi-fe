@@ -5,12 +5,12 @@ import Header from "../components/common/Header";
 import useCollectionStore from "../stores/collectionStore";
 
 // Assets
+import iconRecovery from "@/assets/icons/icon_recovery.png";
 import iconTrash from "@/assets/icons/icon_trash.png";
 import { deleteAlbumPicture } from "../api/pictures/deletePicture";
 import arrowLeft from "../assets/icons/Arrow Left.png";
 import { Modal } from "../components/common/Modal";
 import useModal from "../hooks/useModal";
-
 const Collection = () => {
 	const { albumId, collectionName } = useParams();
 	const navigate = useNavigate();
@@ -146,7 +146,22 @@ const Collection = () => {
 		pictures.length,
 		"pictures"
 	);
+
+	const isCollectionShaky = () => {
+		if (collectionName == "흔들림" || collectionName == "중복") {
+			return true;
+		}
+		return false;
+	};
 	const handleClick = () => {
+		if (selectedPictures.size === 0) {
+			setIsDeleteMode(false);
+			return;
+		}
+		openModal("앨범 삭제");
+	};
+
+	const handleRecoverClick = () => {
 		if (selectedPictures.size === 0) {
 			setIsDeleteMode(false);
 			return;
@@ -176,6 +191,18 @@ const Collection = () => {
 					<button onClick={handleClick}>
 						<div className="text-sm">완료</div>
 					</button>
+				) : isCollectionShaky() ? (
+					<>
+						<button onClick={handleRecoverClick}>
+							<img src={iconRecovery} className="h-6"></img>
+						</button>
+						<button
+							onClick={() => {
+								setIsDeleteMode(true);
+							}}>
+							<img src={iconTrash} className="h-4"></img>
+						</button>
+					</>
 				) : (
 					<button
 						onClick={() => {
