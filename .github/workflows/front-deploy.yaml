@@ -3,6 +3,7 @@ name: Deploy Frontend on PR Merge
 on:
   pull_request:
     branches:
+      - main
       - dev
     types:
       - closed
