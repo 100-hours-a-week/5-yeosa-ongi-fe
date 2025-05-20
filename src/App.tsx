@@ -81,9 +81,9 @@ function AppRoutes() {
       <Route 
         path="/main" 
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <Main />
-          </ProtectedRoute>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Main />
+            </ProtectedRoute>
         } 
       />
       <Route 

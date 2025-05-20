@@ -116,8 +116,8 @@ const Main = () => {
 				{}
 				{hasData ? (
 					<>
-						{" "}
-						<AlbumListHeader />{" "}
+						<AlbumListHeader />
+
 						<div
 							className="overflow-y-auto"
 							style={{
