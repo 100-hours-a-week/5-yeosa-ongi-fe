@@ -33,9 +33,6 @@ jobs:
           script: |
             set -e
             cd /opt/app/ongi
-            echo " Stop and remove existing containers..."
             docker-compose down
-            echo "Pull latest backend image..."
-            docker-compose pull backend
-            echo "Start backend container..."
-            docker-compose up -d backend
+            docker-compose pull
+            docker-compose up -d
