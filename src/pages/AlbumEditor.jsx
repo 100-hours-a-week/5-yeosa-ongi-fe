@@ -124,8 +124,9 @@ const AlbumEditor = () => {
 				pictureType: fileItem.file.type,
 			}));
 
+			console.log(pictures);
 			// 2. presigned URL 요청
-			const response = await getPreSignedUrl(pictures);
+			const response = await getPreSignedUrl({ pictures });
 			const presignedFiles = response.data.presignedFiles;
 
 			// 3. 각 파일을 presigned URL을 사용하여 업로드
