@@ -147,7 +147,7 @@ const AlbumEditor = () => {
 			// 4. 업로드 완료 후 앨범 생성 요청
 			// 위치 정보 추가 (현재는 0.0, 0.0으로 기본값 설정)
 			const pictureData = presignedFiles.map((f) => ({
-				pictureUrl: f.pictureUrl,
+				pictureUrl: f.presignedUrl,
 				latitude: 0.0,
 				longitude: 0.0,
 			}));
