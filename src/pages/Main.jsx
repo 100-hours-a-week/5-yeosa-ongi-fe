@@ -34,7 +34,9 @@ const Main = () => {
 					console.log("초기 데이터 로드:", result);
 					setAlbums(result.data.albumInfo);
 					setNextYearMonth(result.data.nextYearMonth);
-					setHasData(true);
+					if (result.data.albumInfo.length !== 0) {
+						setHasData(true);
+					}
 				}
 			} catch (error) {
 				console.error("초기 데이터 로딩 오류:", error);
@@ -104,6 +106,15 @@ const Main = () => {
 		fetchMoreAlbums,
 		true
 	);
+
+	if (isInitialLoading) {
+		return (
+			<>
+				<div>로딩 중 입니다. . </div>
+			</>
+		);
+	}
+
 	return (
 		<div className="relative h-screen overflow-hidden">
 			<Header />
@@ -113,7 +124,7 @@ const Main = () => {
 					style={{ height: "min(80vw, 560px)" }}>
 					<KaKaoMap />
 				</div> */}
-				{}
+
 				{hasData ? (
 					<>
 						<AlbumListHeader />
