@@ -132,7 +132,8 @@ const Main = () => {
 						<div
 							className="overflow-y-auto"
 							style={{
-								height: "calc(100vh - min(80vw,560px) - 160px)",
+								/*height: "calc(100vh - min(80vw,560px) - 160px)",*/
+								height: "calc(100vh - 96px)",
 							}}>
 							{Object.keys(albumsByMonth).map((month, index) => (
 								<Month

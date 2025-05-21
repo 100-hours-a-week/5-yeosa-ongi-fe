@@ -30,28 +30,24 @@ const AlbumListHeader = () => {
 	}, []);
 
 	return (
-		<div className="h-[48px] relative border-t-2 border-solid mb-8">
-			<div className="p-4">
-				<div className="absolute flex flex-row gap-2">
-					<img
-						className="size-[24px]"
-						src={albumIcon}
-						alt="Album icon"
-					/>
-					<div>{counts.albums}</div>
+		<div className="h-[48px] relative border-t-2 border-solid  items-center ">
+			<div className="p-2">
+				<div className="absolute flex flex-row items-center gap-2 ">
+					<img className="size-4" src={albumIcon} alt="Album icon" />
+					<div className="text-sm">{counts.albums}</div>
 				</div>
-				<div className="absolute flex flex-row gap-2 left-1/4">
+				<div className="absolute flex flex-row items-center gap-2 left-1/4">
 					<img
-						className="size-[24px]"
+						className="size-4"
 						src={locationIcon}
 						alt="Location icon"
 					/>
-					<div>{counts.locations}</div>
+					<div className="text-sm ">{counts.locations}</div>
 				</div>
-				<div className="absolute flex flex-row gap-2 right-4">
-					<div>community</div>
+				<div className="absolute flex flex-row items-center gap-1 right-4 ">
+					<div className="text-sm text-primary">community</div>
 					<img
-						className="size-[24px]"
+						className="size-4"
 						src={communityIcon}
 						alt="Community icon"
 					/>

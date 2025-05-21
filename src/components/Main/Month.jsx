@@ -8,7 +8,7 @@ const Month = ({ albumIds, title }) => {
 	});
 	return (
 		<>
-			<div className="h-10 p-1">{title}</div>
+			<div className="h-8 p-1 ml-2 text-md">{title}</div>
 			<Grid items={items}></Grid>
 		</>
 	);

@@ -49,32 +49,31 @@ const Header = ({ showButtons = true }) => {
 	};
 
 	return (
-		<header className="h-[80px] px-4 flex items-center justify-between shadow-sm">
+		<header className="flex items-center justify-between px-4 shadow-sm h-14">
 			<button onClick={() => navigate("/main")}>
-				<img className="h-[52px]" src={ongiLogoFlat} alt="Logo" />
+				<img className="h-8" src={ongiLogoFlat} alt="Logo" />
 			</button>
 			<div className="w-40"></div>
 			{showButtons && (
 				<div className="flex items-center space-x-0">
 					<button
-						className="p-2 transition-colors rounded-full hover:bg-gray-100 min-w-6"
+						className="flex items-center justify-center p-1 mt-2 transition-colors rounded-full size-8 hover:bg-gray-100 min-w-6"
 						aria-label="Notifications">
 						<img
-							className="h-6 md:h-7"
+							className="h-4 md:h-7"
 							src={bellIcon}
 							alt="Notifications"
 						/>
 					</button>
 					<button
-						className="p-2 transition-colors rounded-full hover:bg-gray-100"
+						className="p-1 transition-colors rounded-full size-8 hover:bg-gray-100"
 						aria-label="Profile"
 						onClick={handleProfileClick}>
 						<img
 							src={
 								userInfo.profileImageURL || defaultProfileImage
 							}
-							className="h-[40px] rounded-full"
-							alt="User Profile"
+							className="rounded-full size-full"
 						/>
 					</button>
 				</div>
