@@ -87,7 +87,7 @@ const Album = () => {
 			<Header />
 			<Card />
 			<div className="m-4 mt-6">
-				<div className="ml-4 font-sans text-xl">카테고리 </div>
+				<div className="ml-4 font-sans text-md">카테고리 </div>
 				<div className="relative">
 					<div
 						className="flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light"
@@ -122,44 +122,46 @@ const Album = () => {
 					)}
 				</div>
 			</div>
+			{/* <div className="m-4 mt-6">
+				<div className="ml-4 font-sans text-md">하이라이트 </div>
+			</div> */}
 			<div className="m-4 mt-6">
-				<div className="ml-4 font-sans text-xl">하이라이트 </div>
-			</div>
-			<div className="m-4 mt-6">
-				<div className="ml-4 font-sans text-xl">검토해줘 </div>
+				<div className="ml-4 font-sans text-md">검토해줘 </div>
 
 				<div className="m-4">
 					<button
-						className="flex items-center justify-between w-full border-0 border-b border-gray-200 bg-gray-50 focus:outline-none"
+						className="flex items-center justify-between w-full bg-gray-100 border-0 border-b border-gray-200 focus:outline-none"
 						onClick={() => navigate(`/album/${albumId}/중복`)}>
 						<div className="flex items-center">
-							<div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mr-4 rounded-lg bg-gray-50">
+							<div className="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50">
 								<img src={iconDuplicated}></img>
 							</div>
-							<div className="text-lg text-gray-dark">
+							<div className="text-sm text-gray-dark">
 								중복된 사진
 							</div>
 						</div>
-						<img className="m-2 size-3" src={Arrow_Right} />
+						<img className="m-2 size-2" src={Arrow_Right} />
 					</button>
 				</div>
 
 				<div className="m-4">
 					<button
-						className="flex items-center justify-between w-full border-0 border-b border-gray-200 bg-gray-50 focus:outline-none"
+						className="flex items-center justify-between w-full bg-gray-100 border-0 border-b border-gray-200 focus:outline-none"
 						onClick={() => navigate(`/album/${albumId}/흔들림`)}>
 						<div className="flex items-center">
-							<div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mr-4 rounded-lg bg-gray-50">
+							<div className="flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50">
 								<img src={iconShaky}></img>
 							</div>
-							<div className="text-lg text-gray-dark">
+							<div className="text-sm text-gray-dark">
 								흔들린 사진
 							</div>
 						</div>
-						<img className="m-2 size-3" src={Arrow_Right} />
+						<img className="m-2 size-2" src={Arrow_Right} />
 					</button>
 				</div>
-				<div className="m-4 cursor-pointer" onClick={handleClick}>
+				<div
+					className="m-4 text-red-600 cursor-pointer text-md"
+					onClick={handleClick}>
 					앨범 삭제하기
 				</div>
 			</div>

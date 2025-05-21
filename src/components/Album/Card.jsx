@@ -13,7 +13,7 @@ const Card = () => {
 	return (
 		<div className="m-4" style={{ perspective: "1000px" }}>
 			<div
-				className={`rounded-3xl h-[300px] shadow-lg cursor-pointer transition-all duration-500`}
+				className={`rounded-3xl h-60 shadow-lg cursor-pointer transition-all duration-500`}
 				style={{
 					transformStyle: "preserve-3d",
 					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
