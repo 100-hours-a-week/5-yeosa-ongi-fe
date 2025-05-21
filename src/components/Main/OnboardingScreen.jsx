@@ -3,7 +3,7 @@ const OnboardingScreen = () => {
 		<div
 			className="relative flex flex-col items-center justify-center h-full text-center bg-gray-100"
 			style={{
-				height: "calc(100vh  - 80px)",
+				height: "calc(100vh  - 56px)",
 			}}>
 			{/* 메인 메시지 */}
 			<div className="px-8 mb-32">
