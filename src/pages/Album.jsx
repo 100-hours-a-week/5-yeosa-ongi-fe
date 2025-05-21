@@ -10,6 +10,7 @@ import { deleteAlbum } from "../api/albums/albumDeleteApi";
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
+import AlbumSetting from "../components/Album/AlbumSetting";
 import { Modal } from "../components/common/Modal";
 import useModal from "../hooks/useModal";
 import useCollectionStore from "../stores/collectionStore";
@@ -20,6 +21,7 @@ const Album = () => {
 	const [albumData, setAlbumData] = useState();
 	const [isLoading, setIsLoading] = useState(true);
 	const { isOpen, modalData, openModal, closeModal } = useModal();
+	const [isSetting, setIsSetting] = useState(false);
 	const [category, setCategory] = useState({});
 
 	const {
@@ -81,6 +83,11 @@ const Album = () => {
 
 	const handleClick = () => {
 		openModal("앨범 삭제");
+	};
+
+	const handleSettingClick = () => {
+		setIsSetting(true);
+		openModal("설정");
 	};
 	return (
 		<>
@@ -164,34 +171,45 @@ const Album = () => {
 					onClick={handleClick}>
 					앨범 삭제하기
 				</div>
+				<div
+					className="m-4 cursor-pointer text-md"
+					onClick={handleSettingClick}>
+					앨범 설정
+				</div>
 			</div>
 			{/*Modal*/}
-			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
-				{modalData && (
-					<div>
-						<p>앨범을 삭제하시겠습니까?</p>
-						<p>삭제된 앨범은 복구할 수 없습니다.</p>
-						<div className="flex justify-center gap-16 mt-8">
-							<button
-								className="w-20 border rounded-lg h-7"
-								onClick={() => {
-									closeModal();
-								}}>
-								아니오
-							</button>
-							<button
-								className="w-20 border rounded-lg h-7"
-								onClick={() => {
-									deleteAlbum(albumId);
-									closeModal();
-									navigate("/main");
-								}}>
-								예
-							</button>
+			{isSetting ? (
+				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+					{modalData && <AlbumSetting />}
+				</Modal>
+			) : (
+				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+					{modalData && (
+						<div>
+							<p>앨범을 삭제하시겠습니까?</p>
+							<p>삭제된 앨범은 복구할 수 없습니다.</p>
+							<div className="flex justify-center gap-16 mt-8">
+								<button
+									className="w-20 border rounded-lg h-7"
+									onClick={() => {
+										closeModal();
+									}}>
+									아니오
+								</button>
+								<button
+									className="w-20 border rounded-lg h-7"
+									onClick={() => {
+										deleteAlbum(albumId);
+										closeModal();
+										navigate("/main");
+									}}>
+									예
+								</button>
+							</div>
 						</div>
-					</div>
-				)}
-			</Modal>
+					)}
+				</Modal>
+			)}
 		</>
 	);
 };
