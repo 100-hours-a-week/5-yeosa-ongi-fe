@@ -1,167 +1,67 @@
 import { useState } from "react";
+import AlbumShare from "./AlbumShare";
 
-const AlbumSetting = () => {
-	const [activeSection, setActiveSection] = useState("general");
+const AlbumSetting = ({ albumName, handleDelete, sharingLink }) => {
+	const [activeSection, setActiveSection] = useState("sharing");
 
-	// Define sections with their content
 	const sections = {
-		general: {
-			title: "기본 설정",
-			content: (
-				<div className="p-4">
-					<h3 className="mb-4 text-lg font-medium">앨범 기본 정보</h3>
-					<div className="space-y-4">
-						<div>
-							<label className="block mb-1 text-sm font-medium">
-								앨범 이름
-							</label>
-							<input
-								type="text"
-								className="w-full p-2 border rounded-md"
-								placeholder="앨범 이름을 입력하세요"
-							/>
-						</div>
-						<div>
-							<label className="block mb-1 text-sm font-medium">
-								설명
-							</label>
-							<textarea
-								className="w-full p-2 border rounded-md"
-								rows={3}
-								placeholder="앨범에 대한 설명을 입력하세요"
-							/>
-						</div>
-					</div>
-				</div>
-			),
-		},
-		privacy: {
-			title: "공개 설정",
-			content: (
-				<div className="p-4">
-					<h3 className="mb-4 text-lg font-medium">앨범 공개 설정</h3>
-					<div className="space-y-4">
-						<div className="flex items-center">
-							<input
-								id="public"
-								type="radio"
-								name="privacy"
-								className="mr-2"
-							/>
-							<label htmlFor="public">공개</label>
-						</div>
-						<div className="flex items-center">
-							<input
-								id="private"
-								type="radio"
-								name="privacy"
-								className="mr-2"
-							/>
-							<label htmlFor="private">비공개</label>
-						</div>
-						<div className="flex items-center">
-							<input
-								id="shared"
-								type="radio"
-								name="privacy"
-								className="mr-2"
-							/>
-							<label htmlFor="shared">
-								특정 사용자에게만 공개
-							</label>
-						</div>
-					</div>
-				</div>
-			),
-		},
 		sharing: {
-			title: "공유 설정",
+			title: "공유하기",
+			content: <AlbumShare sharingLink={sharingLink} />,
+		},
+		deletion: {
+			title: "앨범 삭제",
 			content: (
-				<div className="p-4">
-					<h3 className="mb-4 text-lg font-medium">앨범 공유 옵션</h3>
-					<div className="space-y-4">
-						<div>
-							<label className="block mb-1 text-sm font-medium">
-								사용자 초대
+				<div className="relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
+					<div className="p-5 border-b">
+						<h3 className="text-lg font-medium text-gray-800">
+							앨범 삭제
+						</h3>
+					</div>
+
+					<div className="flex-grow p-5">
+						<div className="mb-4">
+							<label
+								htmlFor="albumName"
+								className="block mb-1 text-sm font-medium text-gray-700">
+								삭제할 앨범 이름
 							</label>
 							<input
-								type="text"
-								className="w-full p-2 border rounded-md"
-								placeholder="이메일 또는 사용자명 입력"
+								id="albumName"
+								className="w-full px-2 py-1 my-2 transition-colors border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 "
+								placeholder={
+									albumName || "앨범 이름을 입력해주세요."
+								}
 							/>
 						</div>
-						<div className="mt-4">
-							<h4 className="mb-2 text-sm font-medium">
-								현재 공유된 사용자
-							</h4>
-							<div className="p-2 border rounded-md">
-								<div className="flex items-center justify-between py-2">
-									<span>user@example.com</span>
-									<button className="text-sm text-red-500">
-										삭제
-									</button>
-								</div>
-							</div>
-						</div>
+
+						<p className="flex items-center mt-2 text-xs text-red-600">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="w-4 h-4 mr-1"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor">
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+								/>
+							</svg>
+							앨범을 삭제하시려면 앨범 명을 정확히 입력해 주세요.
+						</p>
 					</div>
-				</div>
-			),
-		},
-		layout: {
-			title: "레이아웃",
-			content: (
-				<div className="p-4">
-					<h3 className="mb-4 text-lg font-medium">
-						앨범 레이아웃 옵션
-					</h3>
-					<div className="grid grid-cols-2 gap-4">
-						<div className="flex flex-col items-center p-2 border rounded-md cursor-pointer hover:bg-gray-50">
-							<div className="flex items-center justify-center w-full h-20 mb-2 bg-gray-200">
-								그리드
-							</div>
-							<span>그리드 뷰</span>
-						</div>
-						<div className="flex flex-col items-center p-2 border rounded-md cursor-pointer hover:bg-gray-50">
-							<div className="flex items-center justify-center w-full h-20 mb-2 bg-gray-200">
-								리스트
-							</div>
-							<span>리스트 뷰</span>
-						</div>
-					</div>
-				</div>
-			),
-		},
-		advanced: {
-			title: "고급 설정",
-			content: (
-				<div className="p-4">
-					<h3 className="mb-4 text-lg font-medium">고급 설정</h3>
-					<div className="space-y-4">
-						<div className="flex items-center">
-							<input
-								id="download"
-								type="checkbox"
-								className="mr-2"
-							/>
-							<label htmlFor="download">다운로드 허용</label>
-						</div>
-						<div className="flex items-center">
-							<input
-								id="comments"
-								type="checkbox"
-								className="mr-2"
-							/>
-							<label htmlFor="comments">댓글 허용</label>
-						</div>
-						<div>
-							<label className="block mb-1 text-sm font-medium">
-								만료 날짜 설정
-							</label>
-							<input
-								type="date"
-								className="p-2 border rounded-md"
-							/>
-						</div>
+
+					<div className="flex justify-end p-4 space-x-3 border-t">
+						<button className="px-4 py-2 font-medium text-gray-700 transition-colors border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400">
+							취소
+						</button>
+						<button
+							onClick={handleDelete}
+							className="px-4 py-2 font-medium text-white transition-colors rounded-md bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+							삭제
+						</button>
 					</div>
 				</div>
 			),
@@ -169,21 +69,21 @@ const AlbumSetting = () => {
 	};
 
 	return (
-		<div className="max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg">
+		<div className="max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-lg h-[400px]">
 			<div className="flex h-full">
 				{/* Sidebar for section selection */}
-				<div className="w-1/4 border-r bg-gray-50">
-					<div className="px-2 py-4">
-						<h2 className="px-3 mb-4 text-xl font-bold">
+				<div className="w-1/3 border-r bg-gray-50">
+					<div className="py-4 ">
+						<h2 className="px-5 font-bold mb-7 text-md">
 							앨범 설정
 						</h2>
 						<nav className="space-y-1">
 							{Object.entries(sections).map(([key, section]) => (
 								<button
 									key={key}
-									className={`w-full text-left px-3 py-2 rounded-md transition ${
+									className={`w-full text-center text-sm px-5 py-2  transition ${
 										activeSection === key
-											? "bg-blue-100 text-blue-700 font-medium"
+											? "bg-gray-300 text-white font-bold"
 											: "hover:bg-gray-100"
 									}`}
 									onClick={() => setActiveSection(key)}>
@@ -199,14 +99,6 @@ const AlbumSetting = () => {
 					{sections[activeSection].content}
 
 					{/* Footer with action buttons */}
-					<div className="flex justify-end p-4 space-x-2 border-t">
-						<button className="px-4 py-2 border rounded-md hover:bg-gray-50">
-							취소
-						</button>
-						<button className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
-							저장
-						</button>
-					</div>
 				</div>
 			</div>
 		</div>
