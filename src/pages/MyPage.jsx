@@ -297,17 +297,17 @@ const MyPage = () => {
 				);
 			}
 
-			// 사용자 정보 업데이트 (영구 URL 사용)
-			const updatedUserInfo = {
-				...userInfo,
-				profileImageURL: permanentImageUrl,
-			};
-
 			// API 호출하여 사용자 정보 업데이트
-			await updateUserInfo(userInfo.userId, {
+			const result = await updateUserInfo(userInfo.userId, {
 				nickname: userInfo.nickname,
 				profileImageURL: permanentImageUrl,
 			});
+
+			// 사용자 정보 업데이트 (영구 URL 사용)
+			const updatedUserInfo = {
+				...userInfo,
+				profileImageURL: result.data.profileImageURL,
+			};
 
 			// 상태 업데이트
 			setUserInfo(updatedUserInfo);
