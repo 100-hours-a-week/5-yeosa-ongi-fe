@@ -104,7 +104,6 @@ const AlbumEditor = () => {
 		},
 		[addFile]
 	);
-
 	const handleCreateAlbum = async () => {
 		if (files.length === 0 || loading || isProcessing) return;
 
@@ -118,36 +117,65 @@ const AlbumEditor = () => {
 		setCustomError(null);
 
 		try {
-			// 1. 앨범 이름과 파일 메타데이터 준비
-			const pictures = files.map((fileItem) => ({
-				pictureName: uuidv4() + "." + fileItem.file.type.split("/")[1],
-				pictureType: fileItem.file.type,
+			// 1. 앨범 이름과 파일 메타데이터 준비 - 각 파일에 새 이름 할당
+			const filesWithNewNames = files.map((fileItem) => {
+				const newName =
+					uuidv4() + "." + fileItem.file.type.split("/")[1];
+				return {
+					...fileItem,
+					newName,
+					originalFile: fileItem.file,
+				};
+			});
+
+			const pictures = filesWithNewNames.map((fileItem) => ({
+				pictureName: fileItem.newName,
+				pictureType: fileItem.originalFile.type,
 			}));
 
-			console.log(pictures);
+			console.log("생성된 pictures:", pictures);
+
 			// 2. presigned URL 요청
 			const response = await getPreSignedUrl({ pictures });
 			const presignedFiles = response.data.presignedFiles;
 
-			// 3. 각 파일을 presigned URL을 사용하여 업로드
-			for (const fileItem of files) {
-				const file = fileItem.file;
-				const matched = presignedFiles.find(
-					(f) => f.pictureName === file.name
-				);
-				if (!matched) continue;
+			console.log("서버에서 받은 presignedFiles:", presignedFiles);
 
-				await axios.put(matched.presignedUrl, file, {
-					headers: {
-						"Content-Type": file.type,
-					},
-				});
+			// 3. 각 파일을 presigned URL을 사용하여 업로드
+			for (const fileItem of filesWithNewNames) {
+				const file = fileItem.originalFile;
+				const newName = fileItem.newName;
+
+				const matched = presignedFiles.find(
+					(f) => f.pictureName === newName
+				);
+
+				if (!matched) {
+					console.error(
+						`${newName}에 대한 매칭되는 presigned URL을 찾을 수 없습니다.`
+					);
+					continue;
+				}
+
+				console.log(`${newName} 파일 업로드 시작...`);
+
+				try {
+					await axios.put(matched.presignedUrl, file, {
+						headers: {
+							"Content-Type": file.type,
+						},
+					});
+					console.log(`${newName} 파일 업로드 완료!`);
+				} catch (error) {
+					console.error(`${newName} 파일 업로드 중 오류:`, error);
+					throw error; // 오류를 상위로 전파
+				}
 			}
 
 			// 4. 업로드 완료 후 앨범 생성 요청
-			// 위치 정보 추가 (현재는 0.0, 0.0으로 기본값 설정)
+			// pictureUrl은 S3의 URL로 수정해야 함, presignedUrl은 업로드용이지 액세스용이 아님
 			const pictureData = presignedFiles.map((f) => ({
-				pictureUrl: f.presignedUrl,
+				pictureUrl: f.pictureUrl || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
 				latitude: 0.0,
 				longitude: 0.0,
 			}));
@@ -157,13 +185,13 @@ const AlbumEditor = () => {
 				pictureUrls: pictureData,
 			};
 
-			console.log(albumData);
+			console.log("생성할 앨범 데이터:", albumData);
 			const result = await createAlbum(albumData);
-			console.log(result);
+			console.log("앨범 생성 결과:", result);
 
 			navigate("/main");
 		} catch (err) {
-			console.error(err);
+			console.error("전체 오류:", err);
 			setCustomError("앨범 생성 중 오류가 발생했습니다.");
 		} finally {
 			setLoading(false);
