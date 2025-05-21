@@ -26,7 +26,9 @@ const Collection = () => {
 		(state) => state.getCollectionByName
 	);
 	const removePictures = useCollectionStore((state) => state.removePictures);
-
+	const recoverPictures = useCollectionStore(
+		(state) => state.recoverPictures
+	);
 	useEffect(() => {
 		try {
 			setLoading(true);
@@ -175,7 +177,7 @@ const Collection = () => {
 		try {
 			const pictureIds = Array.from(selectedPictures);
 			await recoverAlbumPicture(albumId, { pictureIds });
-			removePictures(pictureIds);
+			recoverPictures(pictureIds);
 
 			// 업데이트된 컬렉션 데이터 가져오기
 			const updatedCollection = getCollectionByName(collectionName);
