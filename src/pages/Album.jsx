@@ -7,6 +7,7 @@ import Header from "../components/common/Header";
 
 //Assets
 import { deleteAlbum } from "../api/albums/albumDeleteApi";
+import { getSharingLink } from "../api/albums/albumShareLink";
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
@@ -23,7 +24,7 @@ const Album = () => {
 	const { isOpen, modalData, openModal, closeModal } = useModal();
 	const [isSetting, setIsSetting] = useState(false);
 	const [category, setCategory] = useState({});
-
+	const [sharingLink, setSharingLink] = useState("");
 	const {
 		setPicturesAndCategorize,
 		tagCollections,
@@ -46,7 +47,9 @@ const Album = () => {
 					setPicturesAndCategorize(albumId, response.data.picture);
 					setAllPhotos(response.data.picture);
 				}
+				const result = await getSharingLink(albumId);
 
+				setSharingLink(result.data);
 				setIsLoading(false);
 			} catch (error) {
 				navigate("/main");
@@ -89,6 +92,7 @@ const Album = () => {
 		setIsSetting(true);
 		openModal("설정");
 	};
+
 	return (
 		<>
 			<Header />
@@ -180,7 +184,13 @@ const Album = () => {
 			{/*Modal*/}
 			{isSetting ? (
 				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
-					{modalData && <AlbumSetting />}
+					{modalData && (
+						<AlbumSetting
+							albumName={albumData.title}
+							handleDelete={() => deleteAlbum(albumId)}
+							sharingLink={sharingLink}
+						/>
+					)}
 				</Modal>
 			) : (
 				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
