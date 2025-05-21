@@ -52,11 +52,17 @@ const useCollectionStore = create((set, get) => ({
 		};
 
 		// 태그별 컬렉션
-		const tagCollections = uniqueTags.map((tag) => ({
-			name: tag.trim(),
-			pictures: rawPictures.filter((pic) => pic.tag === tag),
-			count: rawPictures.filter((pic) => pic.tag === tag).length,
-		}));
+		const tagCollections = uniqueTags.map((tag) => {
+			const filteredPictures = rawPictures.filter(
+				(pic) => pic.tag === tag && !pic.isShaky && !pic.isDuplicated
+			);
+
+			return {
+				name: tag.trim(),
+				pictures: filteredPictures,
+				count: filteredPictures.length,
+			};
+		});
 
 		// 상태 업데이트
 		set({
@@ -80,6 +86,85 @@ const useCollectionStore = create((set, get) => ({
 		});
 
 		// 카테고라이징 다시 실행하여 모든 컬렉션 업데이트
+		get().categorizePhotos();
+	},
+
+	recoverPictures: (pictureIds) => {
+		set((state) => {
+			// 원본 사진 배열 복사
+
+			const updatedRawPictures = [...state.rawPictures];
+			console.log(updatedRawPictures);
+			// 복구할 사진들의 속성 변경
+			pictureIds.forEach((pictureId) => {
+				const pictureIndex = updatedRawPictures.findIndex(
+					(p) => p.pictureId === pictureId
+				);
+
+				if (pictureIndex !== -1) {
+					// 해당 사진의 isDuplicated와 isShaky 속성을 false로 설정
+					updatedRawPictures[pictureIndex] = {
+						...updatedRawPictures[pictureIndex],
+						isDuplicated: false,
+						isShaky: false,
+					};
+				}
+				console.log(updatedRawPictures[pictureIndex]);
+			});
+
+			return { rawPictures: updatedRawPictures };
+		});
+
+		// 카테고라이징 다시 실행하여 모든 컬렉션 업데이트
+		get().categorizePhotos();
+	},
+
+	// 특정 속성만 복구하는 함수들 (옵션)
+	recoverFromShaky: (pictureIds) => {
+		set((state) => {
+			const updatedRawPictures = [...state.rawPictures];
+
+			pictureIds.forEach((pictureId) => {
+				const pictureIndex = updatedRawPictures.findIndex(
+					(p) => p.pictureId === pictureId
+				);
+
+				if (pictureIndex !== -1) {
+					// isShaky 속성만 false로 설정
+					updatedRawPictures[pictureIndex] = {
+						...updatedRawPictures[pictureIndex],
+						isShaky: false,
+					};
+				}
+			});
+
+			return { rawPictures: updatedRawPictures };
+		});
+
+		get().categorizePhotos();
+	},
+
+	recoverFromDuplicated: (pictureIds) => {
+		set((state) => {
+			const updatedRawPictures = [...state.rawPictures];
+
+			pictureIds.forEach((pictureId) => {
+				const pictureIndex = updatedRawPictures.findIndex(
+					(p) => p.pictureId === pictureId
+				);
+
+				if (pictureIndex !== -1) {
+					// isDuplicated 속성만 false로 설정
+					updatedRawPictures[pictureIndex] = {
+						...updatedRawPictures[pictureIndex],
+						isDuplicated: false,
+					};
+				}
+			});
+
+			return { rawPictures: updatedRawPictures };
+		});
+
 		get().categorizePhotos();
 	},
 
