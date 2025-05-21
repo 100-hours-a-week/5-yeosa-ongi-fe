@@ -3,8 +3,8 @@ import Grid from "@/components/common/Grid";
 import axios from "axios"; // 추가: axios import
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
-
 // 커스텀 컴포넌트와 훅
 import Input from "../components/AlbumEditor/Input"; // 수정된 Input 컴포넌트
 import useFileUpload from "../hooks/useFileUpload";
@@ -120,7 +120,7 @@ const AlbumEditor = () => {
 		try {
 			// 1. 앨범 이름과 파일 메타데이터 준비
 			const pictures = files.map((fileItem) => ({
-				pictureName: fileItem.file.name,
+				pictureName: uuidv4() + "." + fileItem.file.type.split("/")[1],
 				pictureType: fileItem.file.type,
 			}));
 
