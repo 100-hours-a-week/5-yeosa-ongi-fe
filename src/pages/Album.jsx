@@ -171,55 +171,22 @@ const Album = () => {
 					</button>
 				</div>
 				<div
-					className="m-4 text-red-600 cursor-pointer text-md"
-					onClick={handleClick}>
-					앨범 삭제하기
-				</div>
-				<div
 					className="m-4 cursor-pointer text-md"
 					onClick={handleSettingClick}>
 					앨범 설정
 				</div>
 			</div>
 			{/*Modal*/}
-			{isSetting ? (
-				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
-					{modalData && (
-						<AlbumSetting
-							albumName={albumData.title}
-							handleDelete={() => deleteAlbum(albumId)}
-							sharingLink={sharingLink}
-						/>
-					)}
-				</Modal>
-			) : (
-				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
-					{modalData && (
-						<div>
-							<p>앨범을 삭제하시겠습니까?</p>
-							<p>삭제된 앨범은 복구할 수 없습니다.</p>
-							<div className="flex justify-center gap-16 mt-8">
-								<button
-									className="w-20 border rounded-lg h-7"
-									onClick={() => {
-										closeModal();
-									}}>
-									아니오
-								</button>
-								<button
-									className="w-20 border rounded-lg h-7"
-									onClick={() => {
-										deleteAlbum(albumId);
-										closeModal();
-										navigate("/main");
-									}}>
-									예
-								</button>
-							</div>
-						</div>
-					)}
-				</Modal>
-			)}
+
+			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
+				{modalData && (
+					<AlbumSetting
+						albumName={albumData.title}
+						handleDelete={() => deleteAlbum(albumId)}
+						sharingLink={sharingLink}
+					/>
+				)}
+			</Modal>
 		</>
 	);
 };
