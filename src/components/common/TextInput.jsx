@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TextInput = ({
 	value,
@@ -10,21 +10,24 @@ const TextInput = ({
 	variant = "borderless",
 	fullWidth = false,
 	className = "",
+	reserveHelperSpace = true,
 
 	label,
 	helperText,
 
 	showCharacterCount = false,
 	validation = {},
+	validationFunction,
 	onChange,
 	onBlur,
 	onFocus,
+	onValidationChange,
 	...rest
 }) => {
 	const [internalValue, setInternalValue] = useState(defaultValue);
 	const [isFocused, setIsFocused] = useState(false);
 	const [validationState, setValidationState] = useState({
-		isValid: true,
+		isValid: false,
 		errorMessage: null,
 		hasBeenValidated: false,
 	});
@@ -32,6 +35,86 @@ const TextInput = ({
 	const isControlled = value !== undefined;
 	const inputValue = isControlled ? value : internalValue;
 	const characterCount = inputValue.length;
+	const [debouncedValidation, setDebouncedValidation] = useState(null);
+
+	useEffect(() => {
+		// 값이 없거나 아직 검증된 적이 없으면 스킵
+		if (!inputValue || !validationState.hasBeenValidated) {
+			return;
+		}
+
+		const timer = setTimeout(() => {
+			const validation = validateInput(inputValue);
+			setValidationState({
+				...validation,
+				hasBeenValidated: true,
+			});
+		}, 300); // 300ms 딜레이
+
+		// 클린업: 새로운 입력이 들어오면 이전 타이머 취소
+		return () => clearTimeout(timer);
+	}, [inputValue, validationState.hasBeenValidated]);
+
+	useEffect(() => {
+		if (onValidationChange) {
+			onValidationChange({
+				isValid: validationState.isValid,
+				value: inputValue,
+				errorMessage: validationState.errorMessage,
+				hasBeenValidated: validationState.hasBeenValidated,
+			});
+		}
+	}, [
+		validationState.isValid,
+		inputValue,
+		validationState.errorMessage,
+		validationState.hasBeenValidated,
+		onValidationChange,
+	]);
+
+	const validateWithFunction = (inputValue) => {
+		if (!validationFunction) {
+			return {
+				isValid: true,
+				errorMessage: null,
+				helperText: helperText || "",
+			};
+		}
+
+		const result = validationFunction(inputValue);
+		console.log(result);
+		// 결과가 객체 형태인 경우
+		if (result && typeof result === "object") {
+			return {
+				isValid: result.isValid,
+				errorMessage: result.isValid ? null : result.message,
+				helperText: result.message || "",
+			};
+		}
+
+		// 결과가 문자열인 경우 (에러 메시지)
+		if (typeof result === "string") {
+			return {
+				isValid: false,
+				errorMessage: result,
+				helperText: result,
+			};
+		}
+
+		// 결과가 없거나 null/undefined인 경우 (유효함)
+		return {
+			isValid: true,
+			errorMessage: null,
+			helperText: helperText || "",
+		};
+	};
+
+	const validateInput = (inputValue) => {
+		if (validationFunction) {
+			return validateWithFunction(inputValue);
+		}
+		return "!!";
+	};
 
 	const handleChange = (event) => {
 		const newValue = event.target.value;
@@ -44,18 +127,10 @@ const TextInput = ({
 			setInternalValue(newValue);
 		}
 
-		// 검증 실행 (검증된 적이 있다면)
-		if (validationState.hasBeenValidated) {
-			const validation = validateInput(newValue);
-			setValidationState({
-				...validation,
-				hasBeenValidated: true,
-			});
-		}
-
 		// 부모 onChange 호출
 		if (onChange) {
-			onChange(newValue, event);
+			console.log(validationState);
+			onChange(newValue, event, validationState.isValid);
 		}
 	};
 
@@ -132,16 +207,18 @@ const TextInput = ({
 			</div>
 
 			{/* 도움말 텍스트 또는 에러 메시지 */}
-			{(helperText || !validationState.isValid) && (
-				<div
-					className={`text-input-helper ${
-						!validationState.isValid ? "error" : ""
-					}`}>
-					{!validationState.isValid
-						? validationState.errorMessage
-						: helperText}
-				</div>
-			)}
+			<div className={reserveHelperSpace ? "h-7" : ""}>
+				{(helperText || !validationState.isValid) && (
+					<div
+						className={`text-xs pt-1 ${
+							!validationState.isValid ? "text-red-400" : ""
+						}`}>
+						{!validationState.isValid
+							? validationState.errorMessage
+							: helperText || " "}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };
