@@ -1,4 +1,5 @@
 import defaultProfileImage from "@/assets/default_user_imgae.png";
+import iconCheck from "@/assets/icons/icon_check.png";
 import icon_pencil from "@/assets/icons/icon_pencil.png";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,10 +7,10 @@ import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import { updateUserInfo } from "../api/user/userInfoUpdate";
 import Header from "../components/common/Header";
 import { Modal } from "../components/common/Modal";
+import TextInput from "../components/common/TextInput";
 import ImageInput from "../components/MyPage/ImageInput";
 import useModal from "../hooks/useModal";
 import useAuthStore from "../stores/userStore";
-
 const MyPage = () => {
 	const navigate = useNavigate();
 
@@ -31,6 +32,8 @@ const MyPage = () => {
 	const getUser = useAuthStore((state) => state.getUser);
 	const setUser = useAuthStore((state) => state.setUser);
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+	const [inputValue, setInputValue] = useState(userInfo.nickname);
+
 	const { isOpen, modalData, openModal, closeModal } = useModal();
 	useEffect(() => {
 		setIsLoading(true);
@@ -173,8 +176,8 @@ const MyPage = () => {
 	};
 
 	// 닉네임 변경 핸들러
-	const handleChange = (e) => {
-		setNickname(e.target.value);
+	const handleChange = (newValue, e) => {
+		setNickname(newValue);
 	};
 
 	// 엔터 키 처리
@@ -383,24 +386,27 @@ const MyPage = () => {
 
 						<div className="relative flex items-center justify-center mt-4">
 							{isEditing ? (
-								<div className="flex items-center">
-									<input
-										type="text"
+								<div className="flex items-center ">
+									<TextInput
 										value={nickname}
 										onChange={handleChange}
 										onKeyDown={handleKeyDown}
-										className="px-2 py-1 text-xl font-bold text-center border border-gray-300 rounded"
+										className="text-xl font-bold text-center border-0 border-b rounded-none border-gray-light w-28 focus:border-b-1 focus:outline-none"
 										autoFocus
 									/>
 									<button
 										onClick={handleSave}
-										className="px-2 py-1 ml-2 text-sm text-white bg-blue-500 rounded">
-										저장
+										className="absolute p-1 px-2 py-1 ml-2 text-sm text-white transform -translate-y-1/2 rounded -right-8 top-1/2">
+										<img
+											className="w-3 h-3"
+											src={iconCheck}
+											alt="편집"
+										/>
 									</button>
 								</div>
 							) : (
 								<>
-									<h2 className="text-xl font-bold text-center">
+									<h2 className="text-xl font-bold text-center w-28">
 										{nickname}
 									</h2>
 									<button
