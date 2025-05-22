@@ -33,7 +33,7 @@ const MyPage = () => {
 	const setUser = useAuthStore((state) => state.setUser);
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 	const [inputValue, setInputValue] = useState(userInfo.nickname);
-
+	const [isValid, setIsValid] = useState(false);
 	const { isOpen, modalData, openModal, closeModal } = useModal();
 	useEffect(() => {
 		setIsLoading(true);
@@ -139,7 +139,8 @@ const MyPage = () => {
 			alert("닉네임을 입력해주세요.");
 			return;
 		}
-
+		console.log(isValid);
+		if (!isValid) return;
 		try {
 			const userInfoBody = {
 				nickname: nickname,
@@ -176,17 +177,52 @@ const MyPage = () => {
 	};
 
 	// 닉네임 변경 핸들러
-	const handleChange = (newValue, e) => {
+	const handleChange = (newValue, e, isValid) => {
+		setIsValid(isValid);
 		setNickname(newValue);
 	};
 
 	// 엔터 키 처리
 	const handleKeyDown = (e) => {
+		if (!isValid) return;
 		if (e.key === "Enter") {
 			handleSave();
 		}
 	};
 
+	const nicknameValidation = (nickname) => {
+		// 빈 값 체크
+		if (!nickname || nickname.trim() === "") {
+			return { isValid: false, message: "닉네임을 입력해주세요." };
+		}
+
+		// 길이 체크 (2자 ~ 12자)
+		if (nickname.length < 2) {
+			return {
+				isValid: false,
+				message: "닉네임은 최소 2자 이상이어야 합니다.",
+			};
+		}
+
+		if (nickname.length > 12) {
+			return {
+				isValid: false,
+				message: "닉네임은 최대 12자까지 가능합니다.",
+			};
+		}
+
+		// 허용된 문자만 사용했는지 체크 (영어, 숫자, 언더바, 한글)
+		const allowedPattern = /^[a-zA-Z0-9_가-힣]+$/;
+		if (!allowedPattern.test(nickname)) {
+			return {
+				isValid: false,
+				message: "영어, 숫자, 언더바(_), 한글만 사용 가능합니다.",
+			};
+		}
+
+		// 모든 검사 통과
+		return { isValid: true, message: "사용 가능한 닉네임입니다." };
+	};
 	// 파일명 정리 함수
 	const sanitizeFileName = (fileName) => {
 		// 현재 타임스탬프를 파일명에 추가하여 고유성 보장
@@ -391,8 +427,14 @@ const MyPage = () => {
 										value={nickname}
 										onChange={handleChange}
 										onKeyDown={handleKeyDown}
-										className="text-xl font-bold text-center border-0 border-b rounded-none border-gray-light w-28 focus:border-b-1 focus:outline-none"
+										className="font-bold text-center border-0 border-b rounded-none text-md border-gray-light w-60 focus:border-b-1 focus:outline-none"
 										autoFocus
+										maxLength={12}
+										showCharacterCount={false}
+										validationFunction={nicknameValidation}
+										onValidationChange={(state) =>
+											setIsValid(state.isValid)
+										}
 									/>
 									<button
 										onClick={handleSave}
@@ -406,7 +448,7 @@ const MyPage = () => {
 								</div>
 							) : (
 								<>
-									<h2 className="text-xl font-bold text-center w-28">
+									<h2 className="font-bold text-center text-md w-60">
 										{nickname}
 									</h2>
 									<button
