@@ -10,6 +10,7 @@ import iconTrash from "@/assets/icons/icon_trash.png";
 import { deleteAlbumPicture } from "../api/pictures/deletePicture";
 import { recoverAlbumPicture } from "../api/pictures/recoverPicture";
 import arrowLeft from "../assets/icons/Arrow Left.png";
+import ConfirmModal from "../components/common/ConfirmModal";
 import { Modal } from "../components/common/Modal";
 import useModal from "../hooks/useModal";
 const Collection = () => {
@@ -253,58 +254,26 @@ const Collection = () => {
 			{isRecovery ? (
 				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
 					{modalData && (
-						<div>
-							<p>
-								선택한 {selectedPictures.size}장의 사진을
-								복원하시겠습니까?
-							</p>
-							<div className="flex justify-center gap-16 mt-8">
-								<button
-									className="w-20 border rounded-lg h-7"
-									onClick={() => {
-										closeModal();
-									}}>
-									아니오
-								</button>
-								<button
-									className="w-20 border rounded-lg h-7"
-									onClick={() => {
-										handleRecover();
-										closeModal();
-									}}>
-									예
-								</button>
-							</div>
-						</div>
+						<ConfirmModal
+							title={modalData}
+							content={`선택한 ${selectedPictures.size}장의 사진을	복원하시겠습니까?`}
+							handleConfirm={() => handleRecover()}
+							closeModal={closeModal}
+						/>
 					)}
 				</Modal>
 			) : (
 				<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
 					{modalData && (
-						<div>
-							<p>
-								선택한 {selectedPictures.size}장의 사진을
-								삭제하시겠습니까?
-							</p>
-							<p>삭제된 사진은 복구할 수 없습니다.</p>
-							<div className="flex justify-center gap-16 mt-8">
-								<button
-									className="w-20 border rounded-lg h-7"
-									onClick={() => {
-										closeModal();
-									}}>
-									아니오
-								</button>
-								<button
-									className="w-20 border rounded-lg h-7"
-									onClick={() => {
-										handleDelete();
-										closeModal();
-									}}>
-									예
-								</button>
-							</div>
-						</div>
+						<ConfirmModal
+							title={modalData}
+							content={[
+								`선택한 ${selectedPictures.size}장의 사진을 삭제하시겠습니까?`,
+								"삭제된 사진은 복구할 수 없습니다.",
+							]}
+							handleConfirm={() => handleDelete()}
+							closeModal={closeModal}
+						/>
 					)}
 				</Modal>
 			)}
