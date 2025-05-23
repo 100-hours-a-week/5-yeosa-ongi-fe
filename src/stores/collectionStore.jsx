@@ -52,17 +52,20 @@ const useCollectionStore = create((set, get) => ({
 		};
 
 		// 태그별 컬렉션
-		const tagCollections = uniqueTags.map((tag) => {
-			const filteredPictures = rawPictures.filter(
-				(pic) => pic.tag === tag && !pic.isShaky && !pic.isDuplicated
-			);
+		const tagCollections = uniqueTags
+			.map((tag) => {
+				const filteredPictures = rawPictures.filter(
+					(pic) =>
+						pic.tag === tag && !pic.isShaky && !pic.isDuplicated
+				);
 
-			return {
-				name: tag.trim(),
-				pictures: filteredPictures,
-				count: filteredPictures.length,
-			};
-		});
+				return {
+					name: tag.trim(),
+					pictures: filteredPictures,
+					count: filteredPictures.length,
+				};
+			})
+			.filter((collection) => collection.count > 0);
 
 		// 상태 업데이트
 		set({
