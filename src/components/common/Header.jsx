@@ -58,7 +58,8 @@ const Header = ({ showButtons = true }) => {
 				<div className="flex items-center space-x-0">
 					<button
 						className="flex items-center justify-center p-1 mt-2 transition-colors rounded-full size-8 hover:bg-gray-100 min-w-6"
-						aria-label="Notifications">
+						aria-label="Notifications"
+						onClick={() => navigate("/notification")}>
 						<img
 							className="h-4 md:h-7"
 							src={bellIcon}
