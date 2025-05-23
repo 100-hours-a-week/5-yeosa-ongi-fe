@@ -1,12 +1,27 @@
 
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getAlbumAccess } from "../api/albums/albumAccessApi";
+
 import { comfirmInvite } from "../api/albums/inviteUser";
 
 const Invite = () => {
 	const [searchParams] = useSearchParams();
 	const token = searchParams.get("token");
+
+	const navigate = useNavigate();
+
 	const handleClick = () => {
-		comfirmInvite(token);
+		const proccessInvite = async () => {
+			const response = await comfirmInvite(token);
+
+			const albumId = response.data.albumId;
+			const result = await getAlbumAccess(albumId);
+			if (result.data.role) {
+				navigate(`/album/${albumId}`);
+			}
+		};
+		proccessInvite();
+
 	};
 
 	return (
@@ -20,7 +35,6 @@ const Invite = () => {
           rounded-xl
           shadow-lg
 		  bg-primary
-
         `}
 						onClick={handleClick}>
 
