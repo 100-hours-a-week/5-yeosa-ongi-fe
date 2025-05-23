@@ -61,6 +61,7 @@ const AlbumEditor = () => {
 	const [loading, setLoading] = useState(false);
 	const [customError, setCustomError] = useState(null);
 	const { albumId } = useParams();
+
 	// useFileUpload 훅 사용 (최대 10장 제한)
 	const {
 		files,
@@ -188,15 +189,15 @@ const AlbumEditor = () => {
 			};
 
 			console.log("생성할 앨범 데이터:", albumData);
-			if (albumId === "new") {
+			if (!albumId) {
 				const result = await createAlbum(albumData);
 				console.log("앨범 생성 결과:", result);
+				navigate("/main");
 			} else {
 				const result = await addAlbumPicture(albumId, albumData);
 				console.log("사진 추가 결과:", result);
+				navigate(`/album/${albumId}`);
 			}
-
-			navigate("/main");
 		} catch (err) {
 			console.error("전체 오류:", err);
 			setCustomError("앨범 생성 중 오류가 발생했습니다.");
