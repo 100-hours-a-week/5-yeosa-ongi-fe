@@ -1,10 +1,13 @@
+
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAlbumAccess } from "../api/albums/albumAccessApi";
+
 import { comfirmInvite } from "../api/albums/inviteUser";
 
 const Invite = () => {
 	const [searchParams] = useSearchParams();
 	const token = searchParams.get("token");
+
 	const navigate = useNavigate();
 
 	const handleClick = () => {
@@ -18,6 +21,7 @@ const Invite = () => {
 			}
 		};
 		proccessInvite();
+
 	};
 
 	return (
@@ -33,6 +37,7 @@ const Invite = () => {
 		  bg-primary
         `}
 						onClick={handleClick}>
+
 						초대 수락
 					</button>
 				</div>
