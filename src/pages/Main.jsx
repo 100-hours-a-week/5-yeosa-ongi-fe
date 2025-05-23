@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // Components
 import AlbumListHeader from "@/components/Main/AlbumListHeader";
+import FlottingButton from "../components/common/FlottingButton";
 import Header from "../components/common/Header";
-import FlottingButton from "../components/Main/FlottingButton";
 import Month from "../components/Main/Month";
 
 // Stores
