@@ -2,7 +2,7 @@ import AlbumTitleForm from "@/components/AlbumEditor/AlbumTitleForm";
 import Grid from "@/components/common/Grid";
 import axios from "axios"; // 추가: axios import
 import { useCallback, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
 // 커스텀 컴포넌트와 훅
@@ -10,6 +10,7 @@ import Input from "../components/AlbumEditor/Input"; // 수정된 Input 컴포�
 import useFileUpload from "../hooks/useFileUpload";
 
 // Assets
+import { addAlbumPicture } from "../api/albums/albumAddApi";
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
@@ -59,7 +60,7 @@ const AlbumEditor = () => {
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
 	const [loading, setLoading] = useState(false);
 	const [customError, setCustomError] = useState(null);
-
+	const { albumId } = useParams();
 	// useFileUpload 훅 사용 (최대 10장 제한)
 	const {
 		files,
@@ -174,6 +175,7 @@ const AlbumEditor = () => {
 
 			// 4. 업로드 완료 후 앨범 생성 요청
 			// pictureUrl은 S3의 URL로 수정해야 함, presignedUrl은 업로드용이지 액세스용이 아님
+
 			const pictureData = presignedFiles.map((f) => ({
 				pictureUrl: f.pictureUrl || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
 				latitude: 0.0,
@@ -186,8 +188,13 @@ const AlbumEditor = () => {
 			};
 
 			console.log("생성할 앨범 데이터:", albumData);
-			const result = await createAlbum(albumData);
-			console.log("앨범 생성 결과:", result);
+			if (albumId === "new") {
+				const result = await createAlbum(albumData);
+				console.log("앨범 생성 결과:", result);
+			} else {
+				const result = await addAlbumPicture(albumId, albumData);
+				console.log("사진 추가 결과:", result);
+			}
 
 			navigate("/main");
 		} catch (err) {
