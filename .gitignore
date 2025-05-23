@@ -53,3 +53,6 @@ storybook-static
 dist
 build
 out
+
+SSH_KEY_FILE
+SSH_KEY_FILE.pub
