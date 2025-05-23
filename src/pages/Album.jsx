@@ -11,6 +11,7 @@ import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
 import AlbumSetting from "../components/Album/AlbumSetting";
+import FlottingButton from "../components/common/FlottingButton";
 import { Modal } from "../components/common/Modal";
 import useModal from "../hooks/useModal";
 import useCollectionStore from "../stores/collectionStore";
@@ -173,8 +174,9 @@ const Album = () => {
 					앨범 설정
 				</div>
 			</div>
-			{/*Modal*/}
+			<FlottingButton albumId={albumId} />
 
+			{/*Modal*/}
 			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
 				{modalData && (
 					<AlbumSetting
