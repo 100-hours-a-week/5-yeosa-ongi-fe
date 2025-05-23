@@ -1,6 +1,7 @@
-const FlottingButton = () => {
+const FlottingButton = ({ albumId = null }) => {
 	const handleClick = () => {
-		window.location.href = "/album-editor/new";
+		const location = albumId || "new";
+		window.location.href = `/album-editor/${location}`;
 	};
 	return (
 		<div className="absolute z-50 right-12 size-4 bottom-16">
