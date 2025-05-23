@@ -10,6 +10,7 @@ import Invite from './pages/Invite';
 import Main from './pages/Main';
 import MyActivities from './pages/MyActivities';
 import MyPage from './pages/MyPage';
+import Notification from './pages/Notification';
 import useAuthStore from './stores/userStore';
 
 interface ProtectedRouteProps {
@@ -132,6 +133,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <MyActivities />
+          </ProtectedRoute>
+        } 
+      />
+
+                        <Route 
+        path="/notification" 
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <Notification />
           </ProtectedRoute>
         } 
       />
