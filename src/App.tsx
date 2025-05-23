@@ -6,6 +6,7 @@ import AlbumEditor from './pages/AlbumEditor';
 import KakaoCallback from './pages/auth/KakaoCallback';
 import Collection from './pages/Collection';
 import Home from './pages/Home';
+import Invite from './pages/Invite';
 import Main from './pages/Main';
 import MyActivities from './pages/MyActivities';
 import MyPage from './pages/MyPage';
@@ -133,6 +134,12 @@ function AppRoutes() {
             <MyActivities />
           </ProtectedRoute>
         } 
+      />
+      <Route
+      path='/invite'
+      element={
+        <Invite/>
+      }
       />
       
       {/* 404 페이지 처리 */}
