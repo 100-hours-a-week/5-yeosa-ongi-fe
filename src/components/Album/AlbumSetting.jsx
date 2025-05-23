@@ -1,9 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSharingLink } from "../../api/albums/albumShareLink";
 import AlbumShare from "./AlbumShare";
 
-const AlbumSetting = ({ albumName, handleDelete, sharingLink }) => {
+const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 	const [activeSection, setActiveSection] = useState("sharing");
+	const [sharingLink, setSharingLink] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
 
+	useEffect(() => {
+		const fetchSharingLink = async () => {
+			if (!albumId) return;
+
+			try {
+				setLoading(true);
+				setError(null);
+				const result = await getSharingLink(albumId);
+				setSharingLink(result.data);
+			} catch (err) {
+				console.error("Failed to fetch sharing link:", err);
+				setError("공유 링크를 불러오는데 실패했습니다.");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchSharingLink();
+	}, [albumId]);
 	const sections = {
 		sharing: {
 			title: "공유하기",
