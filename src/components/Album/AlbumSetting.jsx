@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSharingLink } from "../../api/albums/albumShareLink";
+import TextInput from "../common/TextInput";
 import AlbumShare from "./AlbumShare";
 
 const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
@@ -7,6 +8,15 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 	const [sharingLink, setSharingLink] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [isValid, setIsValid] = useState(false);
+
+	const handleOnChange = (newValue, e) => {
+		const inputValue = newValue;
+		const expectedValue = albumName;
+
+		setIsValid(inputValue === expectedValue);
+		console.log(isValid);
+	};
 
 	useEffect(() => {
 		const fetchSharingLink = async () => {
@@ -43,20 +53,15 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 					</div>
 
 					<div className="flex-grow p-5">
-						<div className="mb-4">
-							<label
-								htmlFor="albumName"
-								className="block mb-1 text-sm font-medium text-gray-700">
-								삭제할 앨범 이름
-							</label>
-							<input
-								id="albumName"
-								className="w-full px-2 py-1 my-2 transition-colors border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 "
-								placeholder={
-									albumName || "앨범 이름을 입력해주세요."
-								}
-							/>
-						</div>
+						<TextInput
+							className="w-full px-2 py-1 my-2 transition-colors border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 "
+							placeholder={
+								albumName || "앨범 이름을 입력해주세요."
+							}
+							maxLength={12}
+							label={`삭제할 앨범 : ${albumName}`}
+							onChange={handleOnChange}
+						/>
 
 						<p className="flex items-center mt-2 text-xs text-red-600">
 							<svg
@@ -82,7 +87,11 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 						</button>
 						<button
 							onClick={handleDelete}
-							className="px-4 py-2 font-medium text-white transition-colors rounded-md bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+							className={`px-4 py-2 font-medium text-white transition-colors rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+								isValid
+									? "bg-red-600 hover:bg-red-700 focus:ring-red-500 cursor-pointer"
+									: "bg-gray-400 cursor-not-allowed"
+							}`}>
 							삭제
 						</button>
 					</div>
