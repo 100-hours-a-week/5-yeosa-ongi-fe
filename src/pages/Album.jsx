@@ -182,7 +182,10 @@ const Album = () => {
 					<AlbumSetting
 						albumId={albumId}
 						albumName={albumData.title}
-						handleDelete={() => deleteAlbum(albumId)}
+						handleDelete={() => {
+							deleteAlbum(albumId);
+							navigate("/main");
+						}}
 					/>
 				)}
 			</Modal>
