@@ -20,7 +20,7 @@ interface ProtectedRouteProps {
 
 // 보호된 라우트 컴포넌트
 const ProtectedRoute = ({ children, isAuthenticated }: ProtectedRouteProps) => {
-  return isAuthenticated ? children : <Navigate to="/" replace />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
 function AppRoutes() {
