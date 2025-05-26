@@ -1,16 +1,31 @@
-
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAlbumAccess } from "../api/albums/albumAccessApi";
 
 import { comfirmInvite } from "../api/albums/inviteUser";
+import useAuthStore from "../stores/userStore";
 
 const Invite = () => {
 	const [searchParams] = useSearchParams();
 	const token = searchParams.get("token");
 
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
 	const navigate = useNavigate();
 
+	const handleLogin = () => {
+		// 현재 URL을 로그인 후 리다이렉트 URL로 설정
+		const currentUrl = window.location.href;
+		const loginUrl = `/?redirect=${encodeURIComponent(currentUrl)}`;
+		window.location.href = loginUrl;
+	};
+
 	const handleClick = () => {
+		console.log(isAuthenticated);
+		if (!isAuthenticated) {
+			console.log("로그인 안된 초대된 사람");
+			handleLogin();
+			return;
+		}
+
 		const proccessInvite = async () => {
 			const response = await comfirmInvite(token);
 
@@ -21,7 +36,6 @@ const Invite = () => {
 			}
 		};
 		proccessInvite();
-
 	};
 
 	return (
@@ -37,7 +51,6 @@ const Invite = () => {
 		  bg-primary
         `}
 						onClick={handleClick}>
-
 						초대 수락
 					</button>
 				</div>

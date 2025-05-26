@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children, isAuthenticated }: ProtectedRouteProps) => {
 
 function AppRoutes() {
   const navigate = useNavigate();
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated());  // 함수로 사용
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated());  
   const refreshAccessToken = useAuthStore(state => state.refreshAccessToken);
   const logout = useAuthStore(state => state.logout);
   const getRefreshToken = useAuthStore(state => state.getRefreshToken);
@@ -33,10 +33,9 @@ function AppRoutes() {
   
   // 로그아웃 핸들러 - useCallback으로 감싸 안정성 개선
   const handleLogout = useCallback(() => {
-    logout(() => {
-      console.log("로그아웃 후 홈으로 이동");
-      navigate('/');
-    });
+    logout();
+    console.log("로그아웃 후 홈으로 이동");
+    navigate('/');
   }, [logout, navigate]);
   
   // 인증 초기화 효과
@@ -65,7 +64,7 @@ function AppRoutes() {
           console.log("액세스 토큰 유효함");
         }
       } else if (!isAuthenticated && !getRefreshToken()) {
-        console.log("미인증 상태, 정상");
+          console.log("미인증 상태, 정상");
       } else {
         console.log("인증 상태와 토큰 불일치, 상태 정리");
         // 인증 상태와 토큰 보유 상태가 불일치하면 로그아웃
