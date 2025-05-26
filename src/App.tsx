@@ -5,7 +5,7 @@ import Album from './pages/Album';
 import AlbumEditor from './pages/AlbumEditor';
 import KakaoCallback from './pages/auth/KakaoCallback';
 import Collection from './pages/Collection';
-import Home from './pages/Home';
+import Login from './pages/Home';
 import Invite from './pages/Invite';
 import Main from './pages/Main';
 import MyActivities from './pages/MyActivities';
@@ -35,7 +35,7 @@ function AppRoutes() {
   const handleLogout = useCallback(() => {
     logout();
     console.log("로그아웃 후 홈으로 이동");
-    navigate('/');
+    navigate('/login');
   }, [logout, navigate]);
   
   // 인증 초기화 효과
@@ -77,10 +77,10 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/auth/callback/kakao" element={<KakaoCallback />} />
       <Route 
-        path="/main" 
+        path="/" 
         element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Main />

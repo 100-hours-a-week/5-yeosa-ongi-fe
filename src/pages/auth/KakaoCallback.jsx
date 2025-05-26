@@ -41,7 +41,7 @@ const KakaoCallback = () => {
 						}
 					}
 					console.log("로그인 과정 완료");
-					navigate("/main");
+					navigate("/");
 				} else {
 					console.log("로그인 실패");
 				}
