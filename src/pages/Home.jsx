@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import kakaoLoginButton from "../assets/kakao_login_medium_narrow.png";
 import ongiLogo from "../assets/ongi_Logo.png";
 
-export default function Home() {
+export default function Login() {
 	const [searchParams] = useSearchParams();
 	const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_REST_API_KEY;
 	const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;

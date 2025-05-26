@@ -15,15 +15,21 @@ import useInfiniteScroll from "../hooks/infiniteScroll";
 
 const Main = () => {
 	const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore();
-	const [page, setPage] = useState(1); // 현재 페이지 번호
-	const [nextYearMonth, setNextYearMonth] = useState(null);
+
+	// 로딩
+	// 초기 로딩 관련
 	const [isInitialLoading, setIsInitialLoading] = useState(false);
 	const [initialLoadFailed, setInitialLoadFailed] = useState(false);
-	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
 	const [hasData, setHasData] = useState(false);
+
+	//무한 스크롤 관련
+	const [nextYearMonth, setNextYearMonth] = useState(null);
+	const scrollContainerRef = useRef(null); // 스크롤 컨테이너
+	const [page, setPage] = useState(1); // 현재 페이지 번호
 
 	useEffect(() => {
 		let isMounted = true;
+
 		const loadInitialData = async () => {
 			try {
 				setIsInitialLoading(true);
