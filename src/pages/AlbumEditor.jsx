@@ -62,7 +62,6 @@ const AlbumEditor = () => {
 	const [customError, setCustomError] = useState(null);
 	const { albumId } = useParams();
 
-	// useFileUpload 훅 사용 (최대 10장 제한)
 	const {
 		files,
 		addFile,
@@ -75,7 +74,7 @@ const AlbumEditor = () => {
 		isFull,
 		count,
 		maxFiles,
-	} = useFileUpload({ maxFiles: 10 });
+	} = useFileUpload({ maxFiles: 30 });
 
 	const navigate = useNavigate();
 
