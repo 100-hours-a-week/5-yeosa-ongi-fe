@@ -23,7 +23,7 @@ const Grid = ({ col = 4, items = [] }) => {
 						height: `calc(min(100vw,560px) / ${col})`,
 					}}>
 					{array.map((item, index) => (
-						<div className="border-solid">
+						<div>
 							<item.ElementType
 								id={item.element}
 								{...item.props}></item.ElementType>
