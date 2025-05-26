@@ -177,7 +177,7 @@ const AlbumEditor = () => {
 			// pictureUrl은 S3의 URL로 수정해야 함, presignedUrl은 업로드용이지 액세스용이 아님
 
 			const pictureData = presignedFiles.map((f) => ({
-				pictureUrl: f.pictureUrl || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
+				pictureUrl: f.pictureURL || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
 				latitude: 0.0,
 				longitude: 0.0,
 			}));
