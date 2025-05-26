@@ -27,7 +27,7 @@ const AlbumThumbnail = ({ id }) => {
 
 	return (
 		<div
-			className="relative w-full h-full border border-solid"
+			className="relative w-full h-full border-solid"
 			onClick={handleSelect}>
 			<img
 				className="absolute inset-0 object-cover w-full h-full"
