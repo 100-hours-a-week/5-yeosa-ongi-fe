@@ -3,6 +3,7 @@ import iconCheck from "@/assets/icons/icon_check.png";
 import icon_pencil from "@/assets/icons/icon_pencil.png";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import { updateUserInfo } from "../api/user/userInfoUpdate";
 import Header from "../components/common/Header";
@@ -11,6 +12,7 @@ import TextInput from "../components/common/TextInput";
 import ImageInput from "../components/MyPage/ImageInput";
 import useModal from "../hooks/useModal";
 import useAuthStore from "../stores/userStore";
+
 const MyPage = () => {
 	const navigate = useNavigate();
 
@@ -230,7 +232,7 @@ const MyPage = () => {
 		// 확장자 추출
 		const extension = fileName.split(".").pop().toLowerCase();
 		// 영문, 숫자, 하이픈만 포함하는 새 파일명 생성
-		return `profile-${timestamp}.${extension}`;
+		return `profile-${uuidv4(timestamp)}.${extension}`;
 	};
 
 	// 프로필 이미지 선택 처리
