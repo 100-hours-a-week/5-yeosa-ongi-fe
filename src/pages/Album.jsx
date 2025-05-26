@@ -6,6 +6,7 @@ import Category from "../components/Album/Category";
 import Header from "../components/common/Header";
 
 //Assets
+import { getAlbumAccess } from "../api/albums/albumAccessApi";
 import { deleteAlbum } from "../api/albums/albumDeleteApi";
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
@@ -38,6 +39,11 @@ const Album = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
+				const result = await getAlbumAccess(albumId);
+				const role = result.data.role;
+				if (role !== "OWNER" && role !== "NORMAL") {
+					navigate("/main");
+				}
 				const response = await getAlbumDetail(albumId);
 				setAlbumData(response.data);
 
