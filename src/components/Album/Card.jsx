@@ -1,4 +1,3 @@
-import KakaoMap from "@/components/common/Map";
 import useCollectionStore from "@/stores/collectionStore";
 import { useState } from "react";
 
@@ -41,9 +40,9 @@ const Card = () => {
 						top: 0,
 						left: 0,
 					}}>
-					<div className="absolute inset-0 object-cover w-full h-full rounded-3xl">
+					{/* <div className="absolute inset-0 object-cover w-full h-full rounded-3xl">
 						<KakaoMap />
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</div>
