@@ -1,31 +1,38 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getAlbumDetail } from "../api/albums/albumDetail";
+
+//Components
+import AlbumSetting from "../components/Album/AlbumSetting";
 import Card from "../components/Album/Card";
 import Category from "../components/Album/Category";
+import FlottingButton from "../components/common/FlottingButton";
 import Header from "../components/common/Header";
+import { Modal } from "../components/common/Modal";
 
-//Assets
+//Custom Hooks
+import useModal from "../hooks/useModal";
+
+//APIs
 import { getAlbumAccess } from "../api/albums/albumAccessApi";
 import { deleteAlbum } from "../api/albums/albumDeleteApi";
+import { getAlbumDetail } from "../api/albums/albumDetail";
+
+//Stores
+import useCollectionStore from "../stores/collectionStore";
+
+//Assets
 import Arrow_Right from "../assets/icons/Arrow Right.png";
 import iconDuplicated from "../assets/icons/icon_duplicated.png";
 import iconShaky from "../assets/icons/icon_shaky.png";
-import AlbumSetting from "../components/Album/AlbumSetting";
-import FlottingButton from "../components/common/FlottingButton";
-import { Modal } from "../components/common/Modal";
-import useModal from "../hooks/useModal";
-import useCollectionStore from "../stores/collectionStore";
 
 const Album = () => {
 	const navigate = useNavigate();
 	const { albumId } = useParams();
 	const [albumData, setAlbumData] = useState();
 	const [isLoading, setIsLoading] = useState(true);
-	const { isOpen, modalData, openModal, closeModal } = useModal();
-	const [isSetting, setIsSetting] = useState(false);
 	const [category, setCategory] = useState({});
 
+	const { isOpen, modalData, openModal, closeModal } = useModal();
 	const {
 		setPicturesAndCategorize,
 		tagCollections,
@@ -93,7 +100,6 @@ const Album = () => {
 	};
 
 	const handleSettingClick = () => {
-		setIsSetting(true);
 		openModal("설정");
 	};
 
