@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Arrow_Left from "../assets/icons/Arrow Left.png";
+import Arrow_Left from "../assets/icons/Arrow_Left.png";
 const Notification = () => {
 	const navigate = useNavigate();
 	return (
