@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import { updateUserInfo } from "../api/user/userInfoUpdate";
+import ConfirmModal from "../components/common/ConfirmModal";
 import Header from "../components/common/Header";
 import { Modal } from "../components/common/Modal";
 import TextInput from "../components/common/TextInput";
@@ -314,7 +315,7 @@ const MyPage = () => {
 			}
 
 			// Pre-Signed URL
-			const presignedUrl = response.data.presignedFiles[0].presignedUrl;
+			const presignedUrl = response.data.presignedFiles[0].presignedURL;
 
 			// 실제 저장될 영구 URL (S3에 저장된 후의 URL)
 			// 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
@@ -574,27 +575,16 @@ const MyPage = () => {
 			{/*Modal*/}
 			<Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
 				{modalData && (
-					<div>
-						<p>로그아웃 하시겠습니까?</p>
-						<div className="flex justify-center gap-16 mt-8">
-							<button
-								className="w-20 border rounded-lg h-7"
-								onClick={() => {
-									closeModal();
-								}}>
-								아니오
-							</button>
-							<button
-								className="w-20 border rounded-lg h-7"
-								onClick={() => {
-									useAuthStore.getState().logout();
-									closeModal();
-									navigate("/login");
-								}}>
-								예
-							</button>
-						</div>
-					</div>
+					<ConfirmModal
+						title={modalData}
+						content={"로그아웃 하시겠습니까?"}
+						closeModal={closeModal}
+						handleConfirm={() => {
+							useAuthStore.getState().logout();
+							closeModal();
+							navigate("/login");
+						}}
+					/>
 				)}
 			</Modal>
 		</>

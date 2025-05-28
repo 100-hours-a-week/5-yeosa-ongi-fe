@@ -1,5 +1,7 @@
-const Grid = ({ col = 4, items = [] }) => {
-	const chunkArrayByCol = (array, chunkSize) => {
+import { memo, useCallback, useMemo } from "react";
+
+const Grid = memo(({ col = 4, items = [] }) => {
+	const chunkArrayByCol = useCallback((array, chunkSize) => {
 		if (!array || array.length === 0) {
 			return [];
 		} else {
@@ -11,28 +13,32 @@ const Grid = ({ col = 4, items = [] }) => {
 					return array.slice(start, start + chunkSize);
 				});
 		}
-	};
-	const chunkArray = chunkArrayByCol(items, col);
+	}, []);
+
+	const chunkArray = useMemo(() => {
+		return chunkArrayByCol(items, col);
+	}, [items, col, chunkArrayByCol]);
+
 	return (
 		<>
-			{chunkArray.map((array, index) => (
+			{chunkArray.map((array, rowIndex) => (
 				<div
-					className={`grid`}
+					key={`row-${rowIndex}`}
+					className="grid"
 					style={{
 						gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
 						height: `calc(min(100vw,560px) / ${col})`,
 					}}>
 					{array.map((item, index) => (
-						<div>
-							<item.ElementType
-								id={item.element}
-								{...item.props}></item.ElementType>
-						</div>
+						<item.ElementType
+							id={item.element}
+							key={item.id || `${rowIndex}-${index}`}
+							{...item.props}></item.ElementType>
 					))}
 				</div>
 			))}
 		</>
 	);
-};
+});
 
 export default Grid;
