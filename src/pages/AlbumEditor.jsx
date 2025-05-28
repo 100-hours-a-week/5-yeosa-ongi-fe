@@ -5,17 +5,18 @@ import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CreateAlbumButton from "../components/AlbumEditor/CreateAlbumButton";
+
 // 커스텀 컴포넌트와 훅
 import Input from "../components/AlbumEditor/Input"; // 수정된 Input 컴포넌트
 import useFileUpload from "../hooks/useFileUpload";
+import { validateImageFiles } from "../services/validateImageFile";
 
 // Assets
 import { addAlbumPicture } from "../api/albums/albumAddApi";
 import { createAlbum } from "../api/albums/albumCreateApi";
 import { getPreSignedUrl } from "../api/albums/presignedUrl";
 import crossIcon from "../assets/cross_icon.png";
-import Arrow_Left from "../assets/icons/Arrow Left.png";
-import { validateImageFiles } from "../services/validateImageFile";
+import Arrow_Left from "../assets/icons/Arrow_Left.png";
 
 // 파일 미리보기 컴포넌트
 const FilePreview = ({ file, onDelete }) => (
@@ -57,10 +58,11 @@ const Alert = ({ message, type = "error", onAction, actionText }) => {
 };
 
 const AlbumEditor = () => {
+	const { albumId } = useParams();
+
 	const [albumTitle, setAlbumTitle] = useState("이름 없는 앨범");
 	const [loading, setLoading] = useState(false);
 	const [customError, setCustomError] = useState(null);
-	const { albumId } = useParams();
 
 	const {
 		files,

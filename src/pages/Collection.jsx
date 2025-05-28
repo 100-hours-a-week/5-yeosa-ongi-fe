@@ -9,7 +9,7 @@ import iconRecovery from "@/assets/icons/icon_recovery.png";
 import iconTrash from "@/assets/icons/icon_trash.png";
 import { deleteAlbumPicture } from "../api/pictures/deletePicture";
 import { recoverAlbumPicture } from "../api/pictures/recoverPicture";
-import arrowLeft from "../assets/icons/Arrow Left.png";
+import arrowLeft from "../assets/icons/Arrow_Left.png";
 import ConfirmModal from "../components/common/ConfirmModal";
 import { Modal } from "../components/common/Modal";
 import useModal from "../hooks/useModal";
