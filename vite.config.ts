@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true, 
       port: 5173, 
-      allowedHosts: ['ongi.today', 'dev.ongi.today'], 
+      allowedHosts: ['ongi.today', 'dev.ongi.today','www.ongi.today'], 
     },
     esbuild: {
       drop: isDev ? [] : ['console', 'debugger'],
