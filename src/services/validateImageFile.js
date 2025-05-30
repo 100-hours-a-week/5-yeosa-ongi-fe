@@ -9,7 +9,7 @@
  * @param {number} maxSize - 최대 허용 크기 (바이트 단위)
  * @returns {object} - { isValid: boolean, error: string | null }
  */
-export const validateFileSize = (file, maxSize = 5 * 1024 * 1024) => {
+export const validateFileSize = (file, maxSize = 10 * 1024 * 1024) => {
     if (file.size > maxSize) {
         return {
             isValid: false,
