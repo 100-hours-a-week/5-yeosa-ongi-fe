@@ -1,6 +1,13 @@
-const Coworker = ({ userId, nickname, profileImageURL, role, isOwner }) => {
+const Coworker = ({
+	userId,
+	nickname,
+	profileImageURL,
+	role,
+	isOwner,
+	handleRemove,
+}) => {
 	const handleRemoveClick = () => {
-		console.log("Remove coworker:", userId);
+		handleRemove(userId);
 		// Remove 버튼 클릭 시 로직 추가
 	};
 

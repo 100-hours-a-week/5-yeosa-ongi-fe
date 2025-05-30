@@ -1,27 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getAlbumAccess } from "../../api/albums/albumAccessApi";
-import getCoworkersList from "../../api/albums/albumCoworkers";
+import { getCoworkersList } from "../../api/albums/albumCoworkers";
 import Coworker from "./Coworker";
-const sampleCoworkers = [
-	{
-		userId: "whitneyblessing@gmail.com",
-		nickname: "Whitney Bless",
-		profileImageURL: null,
-		role: "NORMAL",
-	},
-	{
-		userId: "cherylgreen@gmail.com",
-		nickname: "Cheryl Green",
-		profileImageURL: null,
-		role: "OWNER",
-	},
-	{
-		userId: "bonnielopez@gmail.com",
-		nickname: "Bonnie Lopez",
-		profileImageURL: null,
-		role: "NORMAL",
-	},
-];
+
 const CoworkerManager = ({ albumId }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -35,7 +16,7 @@ const CoworkerManager = ({ albumId }) => {
 				const result = await getCoworkersList(albumId);
 				const response = await getAlbumAccess(albumId);
 				setUserRole(response.data.role);
-				//setCoworkerList(result.data.userInfo);
+				setCoworkerList(result.data.userInfo);
 			} catch (err) {
 				console.error(
 					"공동 작업자 목록을 불러오는데 실패했습니다",
@@ -48,8 +29,26 @@ const CoworkerManager = ({ albumId }) => {
 		};
 
 		fetchCoworkers();
-		setCoworkerList(sampleCoworkers);
 	}, []);
+
+	const handleRemove = useCallback(
+		(userId) => {
+			const deleteCoworker = async () => {
+				try {
+					const result = await deleteCoworker(albumId, userId);
+					console.log("삭제 성공!", result);
+					setCoworkerList((prev) =>
+						prev.filter((coworker) => coworker.userId !== userId)
+					);
+				} catch (error) {
+					console.error("삭제 실패:", error);
+					// 사용자에게 에러 알림 표시
+				}
+			};
+			deleteCoworker();
+		},
+		[albumId, coworkerList]
+	);
 
 	return (
 		<>
@@ -68,6 +67,7 @@ const CoworkerManager = ({ albumId }) => {
 								profileImageURL={element.profileImageURL}
 								role={element.role}
 								isOwner={userRole}
+								handleRemove={handleRemove}
 							/>
 						);
 					})}
