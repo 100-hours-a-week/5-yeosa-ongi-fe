@@ -1,6 +1,7 @@
 import { ReactNode, useCallback, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
+import MovingDotsLoader from './components/common/MovingDotsLoader';
 import Album from './pages/Album';
 import AlbumEditor from './pages/AlbumEditor';
 import KakaoCallback from './pages/auth/KakaoCallback';
@@ -153,7 +154,16 @@ function AppRoutes() {
       
       {/* 404 페이지 처리 */}
       <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+      path='/test'
+      element={
+        <MovingDotsLoader/>
+      }
+      />
     </Routes>
+
+
+      
   );
 }
 
