@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { kakaoLogin } from "../../api/auth/login";
+import MovingDotsLoader from "../../components/common/MovingDotsLoader";
 import useUserStore from "../../stores/userStore";
 
 const KakaoCallback = () => {
@@ -63,7 +64,7 @@ const KakaoCallback = () => {
 	}, [location]);
 
 	if (loading) {
-		return <div>로그인 처리 중...</div>;
+		return <MovingDotsLoader />;
 	}
 
 	if (error) {
