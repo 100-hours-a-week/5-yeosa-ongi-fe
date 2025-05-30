@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getSharingLink } from "../../api/albums/albumShareLink";
 import TextInput from "../common/TextInput";
 import AlbumShare from "./AlbumShare";
+import CoworkerManager from "./CoworkerManager";
 
 const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 	const [activeSection, setActiveSection] = useState("sharing");
@@ -41,6 +42,10 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 		sharing: {
 			title: "공유하기",
 			content: <AlbumShare sharingLink={sharingLink} />,
+		},
+		coworkerManager: {
+			title: "공동 작업자",
+			content: <CoworkerManager albumId={albumId} />,
 		},
 		deletion: {
 			title: "앨범 삭제",
@@ -113,7 +118,7 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 							{Object.entries(sections).map(([key, section]) => (
 								<button
 									key={key}
-									className={`w-full text-center text-sm px-5 py-2  transition ${
+									className={`w-full text-center text-sm px-4 py-2  transition ${
 										activeSection === key
 											? "bg-gray-300 text-white font-bold"
 											: "hover:bg-gray-100"
