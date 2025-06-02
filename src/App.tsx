@@ -1,18 +1,18 @@
 import { ReactNode, useCallback, useEffect } from 'react'
 import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
+    BrowserRouter,
+    Navigate,
+    Route,
+    Routes,
+    useNavigate,
 } from 'react-router-dom'
 import './App.css'
 import Album from './pages/Album'
 import AlbumEditor from './pages/AlbumEditor'
 import KakaoCallback from './pages/auth/KakaoCallback'
 import Collection from './pages/Collection'
-import Login from './pages/Home'
 import Invite from './pages/Invite'
+import Login from './pages/LoginPage'
 import Main from './pages/Main'
 import MyActivities from './pages/MyActivities'
 import MyPage from './pages/MyPage'
