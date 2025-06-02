@@ -1,39 +1,48 @@
-@import "@fontsource/pretendard/300.css"; /* Light */
-@import "@fontsource/pretendard/400.css"; /* Regular */
-@import "@fontsource/pretendard/500.css"; /* Medium */
-@import "@fontsource/pretendard/600.css"; /* SemiBold */
-@import "@fontsource/pretendard/700.css"; /* Bold */
+@import '@fontsource/pretendard/300.css'; /* Light */
+@import '@fontsource/pretendard/400.css'; /* Regular */
+@import '@fontsource/pretendard/500.css'; /* Medium */
+@import '@fontsource/pretendard/600.css'; /* SemiBold */
+@import '@fontsource/pretendard/700.css'; /* Bold */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-	/* 기본, 테마 1 (pastel pink) */
-	:root {
-		--color-primary: #f3d0d7;
-		--color-primaryBold: #feb4b8;
-		--color-secondary: #ffefef;
-		--color-background: #f6f5f2;
-		--color-background-alt: #f6f7fa;
-		--color-gray-100: #ebebeb;
-		--color-gray-500: #7d7d7d;
-		--color-black: #343a3f;
+    /* 기본, 테마 1 (pastel pink) */
+    :root {
+        --color-primary: #f3d0d7;
+        --color-primaryBold: #feb4b8;
+        --color-secondary: #ffefef;
+        --color-background: #f6f5f2;
+        --color-background-alt: #f6f7fa;
+        --color-gray-100: #ebebeb;
+        --color-gray-500: #7d7d7d;
+        --color-black: #343a3f;
 
-		/* 누락된 변수들 추가 */
-		--white-bage: #f6f5f2;
-		--white-blue: #f6f7fa;
-		--gray-light: #ebebeb;
-		--gray-dark: #7d7d7d;
-		--black-light: #343a3f;
-	}
+        /* 누락된 변수들 추가 */
+        --white-bage: #f6f5f2;
+        --white-blue: #f6f7fa;
+        --gray-light: #ebebeb;
+        --gray-dark: #7d7d7d;
+        --black-light: #343a3f;
+    }
 
-	/* Pretendard 폰트를 기본 글꼴로 설정 */
-	html,
-	body {
-		font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
-			Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-	}
+    /* Pretendard 폰트를 기본 글꼴로 설정 */
+    html,
+    body {
+        font-family:
+            'Pretendard',
+            -apple-system,
+            BlinkMacSystemFont,
+            'Segoe UI',
+            Roboto,
+            Oxygen,
+            Ubuntu,
+            Cantarell,
+            'Helvetica Neue',
+            sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 }
