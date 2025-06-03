@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import { getPreSignedUrl } from '../api/album'
-import { updateUserInfo } from '../api/user/userInfoUpdate'
+
+import { updateUserInfo } from '../api/user'
 import ConfirmModal from '../components/common/ConfirmModal'
 import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'

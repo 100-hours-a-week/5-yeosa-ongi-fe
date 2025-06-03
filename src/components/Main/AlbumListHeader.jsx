@@ -1,4 +1,4 @@
-import getTotalData from '@/api/totalData'
+import { getTotalData } from '@/api/user'
 import communityIcon from '@/assets/icons/community_icon.png'
 import albumIcon from '@/assets/icons/images_icon.png'
 import locationIcon from '@/assets/icons/location_icon.png'
