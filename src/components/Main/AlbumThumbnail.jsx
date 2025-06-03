@@ -1,6 +1,6 @@
-import { getAlubmSummary } from '@/api/albums/albumSummaryApi'
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
+import { getAlubmSummary } from '../../api/album'
 
 const AlbumThumbnail = ({ id }) => {
     const navigate = useNavigate()

@@ -5,12 +5,13 @@ import AlbumListHeader from '@/components/Main/AlbumListHeader'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
 import Month from '../components/Main/Month'
+import OnboardingScreen from '../components/Main/OnboardingScreen'
 
 // Stores
 import { useAlbumStore } from '@/stores/mainPageStore'
-
-import { fetchAlbumData } from '../api/albums/albumMonthly'
-import OnboardingScreen from '../components/Main/OnboardingScreen'
+// API
+import { fetchAlbumData } from '../api/album'
+// Hooks
 import useInfiniteScroll from '../hooks/infiniteScroll'
 
 const Main = () => {

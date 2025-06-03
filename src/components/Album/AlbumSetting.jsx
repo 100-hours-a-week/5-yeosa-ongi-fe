@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getSharingLink } from '../../api/albums/albumShareLink'
+
+import { getSharingLink } from '../../api/album'
 import TextInput from '../common/TextInput'
 import AlbumShare from './AlbumShare'
 import CoworkerManager from './CoworkerManager'

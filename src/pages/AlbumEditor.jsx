@@ -12,9 +12,8 @@ import useFileUpload from '../hooks/useFileUpload'
 import { validateImageFiles } from '../services/validateImageFile'
 
 // Assets
-import { addAlbumPicture } from '../api/albums/albumAddApi'
-import { createAlbum } from '../api/albums/albumCreateApi'
-import { getPreSignedUrl } from '../api/albums/presignedUrl'
+
+import { createAlbum, getPreSignedUrl } from '../api/album'
 import crossIcon from '../assets/cross_icon.png'
 import Arrow_Left from '../assets/icons/Arrow_Left.png'
 

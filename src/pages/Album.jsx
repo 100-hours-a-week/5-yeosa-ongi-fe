@@ -13,14 +13,12 @@ import { Modal } from '../components/common/Modal'
 import useModal from '../hooks/useModal'
 
 //APIs
-import { getAlbumAccess } from '../api/albums/albumAccessApi'
-import { deleteAlbum } from '../api/albums/albumDeleteApi'
-import { getAlbumDetail } from '../api/albums/albumDetail'
 
 //Stores
 import useCollectionStore from '../stores/collectionStore'
 
 //Assets
+import { deleteAlbum, getAlbumAccess, getAlbumDetail } from '../api/album'
 import Arrow_Right from '../assets/icons/Arrow Right.png'
 import iconDuplicated from '../assets/icons/icon_duplicated.png'
 import iconShaky from '../assets/icons/icon_shaky.png'
