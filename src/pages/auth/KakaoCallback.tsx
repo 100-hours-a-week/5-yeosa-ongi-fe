@@ -11,7 +11,7 @@ const KakaoCallback = () => {
     const location = useLocation()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const [error, setError] = useState('')
 
     const login = useUserStore(state => state.login)
 
@@ -22,7 +22,7 @@ const KakaoCallback = () => {
         console.log('인증 코드 받음:', code)
         console.log('초대토큰 : ', state)
 
-        const getKakaoToken = async code => {
+        const getKakaoToken = async (code: string) => {
             try {
                 const response = await kakaoLogin(code)
 
