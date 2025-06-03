@@ -1,5 +1,5 @@
 import { ApiResponse } from '../types'
-import { authenticatedFetch } from './auth/authUtils'
+import { authenticatedFetch } from './authUtils'
 import { API_BASE_URL } from './config'
 
 /**
@@ -23,7 +23,10 @@ export const getAlbumAccess = async (albumId: number): Promise<ApiResponse> => {
  * @param albumData
  * @returns
  */
-export const addAlbumPicture = async (albumId: number, albumData: any) => {
+export const addAlbumPicture = async (
+    albumId: number,
+    albumData: any
+): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, {
@@ -41,7 +44,7 @@ export const addAlbumPicture = async (albumId: number, albumData: any) => {
  * @param data
  * @returns
  */
-export const createAlbum = async (data: any) => {
+export const createAlbum = async (data: any): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album`
         return await authenticatedFetch(apiUrl, {
@@ -59,7 +62,7 @@ export const createAlbum = async (data: any) => {
  * @param albumId
  * @returns
  */
-export const deleteAlbum = async (albumId: number) => {
+export const deleteAlbum = async (albumId: number): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, { method: 'DELETE' })
@@ -69,7 +72,9 @@ export const deleteAlbum = async (albumId: number) => {
     }
 }
 
-export const fetchAlbumData = async (yearMonth: string) => {
+export const fetchAlbumData = async (
+    yearMonth: string
+): Promise<ApiResponse> => {
     try {
         const apiUrl =
             API_BASE_URL +
@@ -81,7 +86,9 @@ export const fetchAlbumData = async (yearMonth: string) => {
     }
 }
 
-export const getAlubmSummary = async (albumId: number) => {
+export const getAlubmSummary = async (
+    albumId: number
+): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/summary`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -99,7 +106,7 @@ export const getAlubmSummary = async (albumId: number) => {
  * @param albumId
  * @returns
  */
-export const getAlbumDetail = async (albumId: number) => {
+export const getAlbumDetail = async (albumId: number): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -116,7 +123,9 @@ export const getAlbumDetail = async (albumId: number) => {
  * @param albumId
  * @returns
  */
-export const getCoworkersList = async (albumId: number) => {
+export const getCoworkersList = async (
+    albumId: number
+): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -131,7 +140,7 @@ export const getCoworkersList = async (albumId: number) => {
  * @param albumId
  * @returns
  */
-export const getSharingLink = async (albumId: number) => {
+export const getSharingLink = async (albumId: number): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/invite/link`
         return await authenticatedFetch(apiUrl, { method: 'POST' })
@@ -149,7 +158,9 @@ export const getSharingLink = async (albumId: number) => {
  * @param inviteToken
  * @returns
  */
-export const comfirmInvite = async (inviteToken: string) => {
+export const comfirmInvite = async (
+    inviteToken: string
+): Promise<ApiResponse> => {
     try {
         const apiUrl =
             API_BASE_URL + `/api/album/invite?inviteToken=${inviteToken}`
@@ -166,7 +177,10 @@ export const comfirmInvite = async (inviteToken: string) => {
  * @param userId
  * @returns
  */
-export const deleteCoworker = async (albumId: number, userId: number) => {
+export const deleteCoworker = async (
+    albumId: number,
+    userId: number
+): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members/${userId}`
         return await authenticatedFetch(apiUrl, { method: 'DELETE' })
@@ -176,7 +190,7 @@ export const deleteCoworker = async (albumId: number, userId: number) => {
     }
 }
 
-export const getPreSignedUrl = async (pictures: any) => {
+export const getPreSignedUrl = async (pictures: any): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/presigned-url`
         return await authenticatedFetch(apiUrl, {
