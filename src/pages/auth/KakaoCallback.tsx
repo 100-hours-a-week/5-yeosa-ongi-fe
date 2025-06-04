@@ -23,7 +23,6 @@ const KakaoCallback = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string>('')
 
-
     const login = useUserStore(state => state.login)
 
     useEffect(() => {

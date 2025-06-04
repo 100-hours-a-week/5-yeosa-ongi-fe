@@ -1,8 +1,12 @@
+import { useEffect, useState } from 'react'
+
+// APIs
 import { getTotalData } from '@/api/user'
+
+//Assets
 import communityIcon from '@/assets/icons/community_icon.png'
 import albumIcon from '@/assets/icons/images_icon.png'
 import locationIcon from '@/assets/icons/location_icon.png'
-import { useEffect, useState } from 'react'
 
 const AlbumListHeader = () => {
     const [counts, setCounts] = useState({
