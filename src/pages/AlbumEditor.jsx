@@ -103,7 +103,7 @@ const AlbumEditor = () => {
 
     return (
         <div className='flex flex-col min-h-screen'>
-            <AlbumEditorHeader />
+            <AlbumEditorHeader title={'앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
             <AlbumTitleForm initialTitle={albumTitle} onTitleChange={handleTitleChange} />
