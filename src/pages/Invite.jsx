@@ -1,7 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { getAlbumAccess } from '../api/albums/albumAccessApi'
 
-import { comfirmInvite } from '../api/albums/inviteUser'
+import { comfirmInvite, getAlbumAccess } from '../api/album'
 import useAuthStore from '../stores/userStore'
 
 const Invite = () => {

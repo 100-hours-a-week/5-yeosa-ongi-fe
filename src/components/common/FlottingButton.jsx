@@ -1,4 +1,4 @@
-const FlottingButton = ({ albumId = null }) => {
+const FlottingButton = ({ albumId }) => {
     const handleClick = () => {
         const location = albumId || 'new'
         window.location.href = `/album-editor/${location}`

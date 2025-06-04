@@ -1,4 +1,4 @@
-import { authenticatedFetch } from '../auth/authUtils'
+import { authenticatedFetch } from '../authUtils'
 import { API_BASE_URL } from '../config'
 
 const recoverAlbumPicture = async (albumId, selectedPictureIds) => {

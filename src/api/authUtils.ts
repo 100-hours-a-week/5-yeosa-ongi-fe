@@ -1,9 +1,18 @@
-import useAuthStore from '../../stores/userStore'
+import useAuthStore from '../stores/userStore'
+
+interface ApiRequstOption {
+    method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH'
+    headers?: Record<string, string>
+    body?: string | FormData | null
+}
 
 // 인증된 API 요청 유틸리티 함수
-export const authenticatedFetch = async (url, options = {}) => {
+export const authenticatedFetch = async (
+    url: string,
+    options: ApiRequstOption = { method: 'GET' }
+) => {
     // 액세스 토큰 가져오기
-    let accessToken = useAuthStore.getState().getAccessToken()
+    let accessToken: string = useAuthStore.getState().getAccessToken()
 
     // 액세스 토큰이 없거나 만료된 경우 갱신 시도
     if (!accessToken) {

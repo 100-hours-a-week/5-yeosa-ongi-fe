@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getAlbumAccess } from '../../api/albums/albumAccessApi'
-import { getCoworkersList } from '../../api/albums/albumCoworkers'
+
+import { getAlbumAccess, getCoworkersList } from '../../api/album'
 import Coworker from './Coworker'
 
 const CoworkerManager = ({ albumId }) => {
