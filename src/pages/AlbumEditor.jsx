@@ -11,9 +11,10 @@ import Input from '../components/AlbumEditor/Input' // 수정된 Input 컴포넌
 import useFileUpload from '../hooks/useFileUpload'
 import { validateImageFiles } from '../services/validateImageFile'
 
-// Assets
-
+// APIs
 import { createAlbum, getPreSignedUrl } from '../api/album'
+
+// Assets
 import crossIcon from '../assets/cross_icon.png'
 import Arrow_Left from '../assets/icons/Arrow_Left.png'
 
@@ -329,7 +330,7 @@ const AlbumEditor = () => {
                 )}
             </div>
             {/* 푸터 (앨범 생성 버튼) */}
-            <footer className='px-4 py-4 mt-auto'>
+            <footer className='px-4 py-3 mt-auto'>
                 <CreateAlbumButton
                     disabled={isButtonDisabled}
                     onClick={handleCreateAlbum}
