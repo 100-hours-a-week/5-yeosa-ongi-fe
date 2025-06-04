@@ -1,12 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AlbumUploadService } from '../services/albumUploadService'
-
-export interface FileItem {
-    id: string
-    file: File
-    preview: string // blob URL for preview
-}
+import { FileItem } from '../types/upload'
 
 export const useAlbumCreation = () => {
     const [loading, setLoading] = useState(false)
