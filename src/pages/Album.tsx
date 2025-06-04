@@ -52,8 +52,6 @@ const Album = () => {
     const [albumData, setAlbumData] = useState<AlbumData>()
 
     const [isLoading, setIsLoading] = useState(true)
-    const [category, setCategory] = useState({})
-
     const [showRightIndicator, setShowRightIndicator] = useState(true)
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
@@ -63,9 +61,6 @@ const Album = () => {
         duplicatedCollection,
         shakyCollection,
     } = useCollectionStore()
-
-    // 전체 사진 목록
-    const [allPhotos, setAllPhotos] = useState([])
 
     /**
      * 스크롤 이벤트 처리
@@ -82,6 +77,10 @@ const Album = () => {
         } else {
             setShowRightIndicator(true)
         }
+    }
+
+    const handleSettingClick = () => {
+        openModal('설정')
     }
 
     useEffect(() => {
@@ -120,14 +119,6 @@ const Album = () => {
                 <MovingDotsLoader />
             </>
         )
-    }
-
-    const handleClick = () => {
-        openModal('앨범 삭제')
-    }
-
-    const handleSettingClick = () => {
-        openModal('설정')
     }
 
     return (
