@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom'
+
+// Components
 import Header from '../components/common/Header'
 
 const MyActivities = () => {
