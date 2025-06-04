@@ -1,17 +1,27 @@
-// KakaoCallback.js - 리다이렉트 처리 컴포넌트
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { kakaoLogin } from '../../api/auth/login'
+
+// Components
 import MovingDotsLoader from '../../components/common/MovingDotsLoader'
+
+//APIs
+import { kakaoLogin } from '../../api/auth'
+
+// Store
 import useUserStore from '../../stores/userStore'
 
+interface InviteData {
+    type: 'invite'
+    redirectUrl: string
+}
+
 const KakaoCallback = () => {
-    console.log('카카오 콜백')
     const [searchParams] = useSearchParams()
     const location = useLocation()
     const navigate = useNavigate()
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState('')
+
+    const [loading, setLoading] = useState<boolean>(true)
+    const [error, setError] = useState<string>('')
 
     const login = useUserStore(state => state.login)
 
