@@ -16,26 +16,30 @@ import { createAlbum, getPreSignedUrl } from '../api/album'
 
 // Assets
 import crossIcon from '../assets/cross_icon.png'
-import Arrow_Left from '../assets/icons/Arrow_Left.png'
+import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
+import { useAlbumTitle } from '../hooks/useAlbumTitle'
 
 // 파일 미리보기 컴포넌트
+/**
+ * 새로운 컴포넌트로 분리 가능
+ * @param {*} param0
+ * @returns
+ */
 const FilePreview = ({ file, onDelete }) => (
     <div className='relative w-full h-full'>
-        <img
-            src={file.preview}
-            alt={`Preview ${file.id}`}
-            className='absolute inset-0 object-cover w-full h-full'
-        />
-        <button
-            className='absolute z-10 top-2 right-2'
-            onClick={() => onDelete(file.id)}
-        >
+        <img src={file.preview} alt={`Preview ${file.id}`} className='absolute inset-0 object-cover w-full h-full' />
+        <button className='absolute z-10 top-2 right-2' onClick={() => onDelete(file.id)}>
             <img className='w-4 h-4' src={crossIcon} alt='삭제' />
         </button>
     </div>
 )
 
 // 알림 컴포넌트
+/**
+ * 꼭 있어야 할까?
+ * @param {} param0
+ * @returns
+ */
 const Alert = ({ message, type = 'error', onAction, actionText }) => {
     if (!message) return null
 
@@ -47,10 +51,7 @@ const Alert = ({ message, type = 'error', onAction, actionText }) => {
             <div className='flex items-center justify-between'>
                 <p>{message}</p>
                 {onAction && actionText && (
-                    <button
-                        className='px-3 py-1 ml-4 text-sm font-medium bg-white rounded-md'
-                        onClick={onAction}
-                    >
+                    <button className='px-3 py-1 ml-4 text-sm font-medium bg-white rounded-md' onClick={onAction}>
                         {actionText}
                     </button>
                 )}
@@ -61,10 +62,12 @@ const Alert = ({ message, type = 'error', onAction, actionText }) => {
 
 const AlbumEditor = () => {
     const { albumId } = useParams()
+    const navigate = useNavigate()
 
-    const [albumTitle, setAlbumTitle] = useState('이름 없는 앨범')
     const [loading, setLoading] = useState(false)
     const [customError, setCustomError] = useState(null)
+
+    const { albumTitle, handleTitleChange } = useAlbumTitle()
 
     const {
         files,
@@ -80,8 +83,6 @@ const AlbumEditor = () => {
         maxFiles,
     } = useFileUpload({ maxFiles: 30 })
 
-    const navigate = useNavigate()
-
     // 오류 처리 핸들러
     const handleError = useCallback(errorMessage => {
         setCustomError(errorMessage)
@@ -91,9 +92,7 @@ const AlbumEditor = () => {
     const handleFileAdded = useCallback(
         newFiles => {
             // 배열이 아닌 경우 배열로 변환
-            const filesToProcess = Array.isArray(newFiles)
-                ? newFiles
-                : [newFiles]
+            const filesToProcess = Array.isArray(newFiles) ? newFiles : [newFiles]
 
             // 먼저 기본적인 파일 유효성 검사 진행 (크기, 형식)
             const validationResult = validateImageFiles(filesToProcess)
@@ -124,8 +123,7 @@ const AlbumEditor = () => {
         try {
             // 1. 앨범 이름과 파일 메타데이터 준비 - 각 파일에 새 이름 할당
             const filesWithNewNames = files.map(fileItem => {
-                const newName =
-                    uuidv4() + '.' + fileItem.file.type.split('/')[1]
+                const newName = uuidv4() + '.' + fileItem.file.type.split('/')[1]
                 return {
                     ...fileItem,
                     newName,
@@ -151,14 +149,10 @@ const AlbumEditor = () => {
                 const file = fileItem.originalFile
                 const newName = fileItem.newName
 
-                const matched = presignedFiles.find(
-                    f => f.pictureName === newName
-                )
+                const matched = presignedFiles.find(f => f.pictureName === newName)
 
                 if (!matched) {
-                    console.error(
-                        `${newName}에 대한 매칭되는 presigned URL을 찾을 수 없습니다.`
-                    )
+                    console.error(`${newName}에 대한 매칭되는 presigned URL을 찾을 수 없습니다.`)
                     continue
                 }
 
@@ -209,16 +203,6 @@ const AlbumEditor = () => {
         }
     }
 
-    // 앨범 제목 변경 핸들러
-    const handleTitleChange = useCallback(newTitle => {
-        setAlbumTitle(newTitle)
-    }, [])
-
-    // 뒤로 가기 핸들러
-    const handleBackClick = useCallback(() => {
-        navigate(-1)
-    }, [navigate])
-
     // 초과 파일 추가 핸들러
     const handleAddOverflowFiles = useCallback(() => {
         addOverflowFiles()
@@ -240,68 +224,36 @@ const AlbumEditor = () => {
                 element: 0,
             },
             ...files.map((fileItem, index) => ({
-                ElementType: () => (
-                    <FilePreview file={fileItem} onDelete={removeFile} />
-                ),
+                ElementType: () => <FilePreview file={fileItem} onDelete={removeFile} />,
                 element: index + 1,
             })),
         ],
-        [
-            files,
-            handleFileAdded,
-            removeFile,
-            isFull,
-            isProcessing,
-            setProcessing,
-            handleError,
-        ]
+        [files, handleFileAdded, removeFile, isFull, isProcessing, setProcessing, handleError]
     )
 
     // 버튼 비활성화 여부를 useMemo로 감싸기
     const isButtonDisabled = useMemo(() => {
-        return (
-            albumTitle.trim() === '' ||
-            files.length === 0 ||
-            loading ||
-            isProcessing
-        )
+        return albumTitle.trim() === '' || files.length === 0 || loading || isProcessing
     }, [albumTitle, files.length, loading, isProcessing])
 
     return (
         <div className='flex flex-col min-h-screen'>
-            {/* 헤더 */}
-            <header className='h-[52px] relative flex items-center justify-center'>
-                <button
-                    className='absolute left-4 top-1/4'
-                    onClick={handleBackClick}
-                >
-                    <img className='h-1/2' src={Arrow_Left} alt='뒤로가기' />
-                </button>
-                <h1 className='text-center'>앨범 생성</h1>
-            </header>
+            <AlbumEditorHeader />
 
             {/* 앨범 제목 폼 */}
-            <AlbumTitleForm
-                initialTitle={albumTitle}
-                onTitleChange={handleTitleChange}
-            />
+            <AlbumTitleForm initialTitle={albumTitle} onTitleChange={handleTitleChange} />
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
                 {/* 로딩 인디케이터 */}
                 {isProcessing && (
                     <div className='my-2 text-center text-blue-600'>
-                        이미지 파일 처리 중... HEIC 변환은 시간이 더 소요될 수
-                        있습니다.
+                        이미지 파일 처리 중... HEIC 변환은 시간이 더 소요될 수 있습니다.
                     </div>
                 )}
 
                 <div className='flex items-center justify-between my-4'>
-                    <span
-                        className={
-                            count === maxFiles ? 'text-red-500 font-bold' : ''
-                        }
-                    >
+                    <span className={count === maxFiles ? 'text-red-500 font-bold' : ''}>
                         현재 {count}장 업로드 중. (최대 {maxFiles}장)
                     </span>
                 </div>
@@ -312,37 +264,20 @@ const AlbumEditor = () => {
 
             <div className='mb-12'>
                 {/* 오류 메시지 표시 */}
-                {customError && (
-                    <Alert
-                        message={customError}
-                        onAction={() => setCustomError(null)}
-                        actionText='닫기'
-                    />
-                )}
+                {customError && <Alert message={customError} onAction={() => setCustomError(null)} actionText='닫기' />}
 
                 {/* 파일 업로드 오류 표시 */}
-                {fileError && (
-                    <Alert
-                        message={fileError}
-                        onAction={() => setCustomError(null)}
-                        actionText='닫기'
-                    />
-                )}
+                {fileError && <Alert message={fileError} onAction={() => setCustomError(null)} actionText='닫기' />}
             </div>
             {/* 푸터 (앨범 생성 버튼) */}
             <footer className='px-4 py-3 mt-auto'>
-                <CreateAlbumButton
-                    disabled={isButtonDisabled}
-                    onClick={handleCreateAlbum}
-                >
+                <CreateAlbumButton disabled={isButtonDisabled} onClick={handleCreateAlbum}>
                     {loading ? '생성 중...' : '앨범 생성'}
                 </CreateAlbumButton>
 
                 {/* 로딩 인디케이터 */}
                 {loading && (
-                    <div className='mt-2 text-center text-gray-600'>
-                        이미지 업로드 중입니다. 잠시만 기다려주세요...
-                    </div>
+                    <div className='mt-2 text-center text-gray-600'>이미지 업로드 중입니다. 잠시만 기다려주세요...</div>
                 )}
             </footer>
         </div>
