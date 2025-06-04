@@ -23,6 +23,7 @@ const KakaoCallback = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string>('')
 
+
     const login = useUserStore(state => state.login)
 
     useEffect(() => {
@@ -76,9 +77,11 @@ const KakaoCallback = () => {
     if (loading) {
         return <MovingDotsLoader />
     }
+
     if (error) {
         return <div className='self-auto'>오류: {error}</div>
     }
+
     return null
 }
 
