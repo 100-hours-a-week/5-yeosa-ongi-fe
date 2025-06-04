@@ -7,7 +7,7 @@ import { API_BASE_URL } from './config'
  * @param albumId
  * @returns
  */
-export const getAlbumAccess = async (albumId: number): Promise<ApiResponse> => {
+export const getAlbumAccess = async (albumId: string): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/role`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -62,7 +62,7 @@ export const createAlbum = async (data: any): Promise<ApiResponse> => {
  * @param albumId
  * @returns
  */
-export const deleteAlbum = async (albumId: number): Promise<ApiResponse> => {
+export const deleteAlbum = async (albumId: string): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, { method: 'DELETE' })
@@ -106,7 +106,7 @@ export const getAlubmSummary = async (
  * @param albumId
  * @returns
  */
-export const getAlbumDetail = async (albumId: number): Promise<ApiResponse> => {
+export const getAlbumDetail = async (albumId: string): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
