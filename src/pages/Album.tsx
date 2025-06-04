@@ -21,6 +21,7 @@ import useCollectionStore from '../stores/collectionStore'
 import Arrow_Right from '../assets/icons/Arrow Right.png'
 import iconDuplicated from '../assets/icons/icon_duplicated.png'
 import iconShaky from '../assets/icons/icon_shaky.png'
+import images_icon from '../assets/icons/images_icon.png'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import { ApiResponse } from '../types'
 
@@ -58,6 +59,7 @@ const Album = () => {
     const {
         setPicturesAndCategorize,
         tagCollections,
+        allCollection,
         duplicatedCollection,
         shakyCollection,
     } = useCollectionStore()
@@ -100,7 +102,7 @@ const Album = () => {
                 if (response.data && response.data.picture) {
                     // 스토어에 원본 사진 데이터 전달 - 내부적으로 카테고라이징 실행
                     const pictures: Picture[] = response.data.picture
-                    setPicturesAndCategorize(albumId, pictures)
+                    await setPicturesAndCategorize(albumId, pictures)
                 }
 
                 setIsLoading(false)
@@ -126,7 +128,21 @@ const Album = () => {
             <Header />
             <Card />
             <div className='m-4 mt-6'>
-                <div className='ml-4 font-sans text-md'>카테고리 </div>
+                <div className='flex items-center justify-between'>
+                    <div className='ml-4 font-sans text-md'>카테고리 </div>
+                    <button
+                        onClick={() => navigate(`/album/${albumId}/전체`)}
+                        className='px-2'
+                    >
+                        <div className='flex items-center '>
+                            <img src={images_icon} className='h-4'></img>
+                            <div className='px-2 text-xs tracking-tighter'>
+                                전체 {allCollection.count} 개 사진 보기
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
                 <div className='relative'>
                     <div
                         className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
