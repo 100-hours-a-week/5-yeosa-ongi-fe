@@ -1,18 +1,27 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+
+// Components
+import ConfirmModal from '../components/common/ConfirmModal'
 import Grid from '../components/common/Grid'
 import Header from '../components/common/Header'
+import { Modal } from '../components/common/Modal'
+
+// APIs
+import { deleteAlbumPicture } from '../api/pictures/deletePicture'
+import { recoverAlbumPicture } from '../api/pictures/recoverPicture'
+
+// Store
 import useCollectionStore from '../stores/collectionStore'
+
+//Hooks
+import useModal from '../hooks/useModal'
 
 // Assets
 import iconRecovery from '@/assets/icons/icon_recovery.png'
 import iconTrash from '@/assets/icons/icon_trash.png'
-import { deleteAlbumPicture } from '../api/pictures/deletePicture'
-import { recoverAlbumPicture } from '../api/pictures/recoverPicture'
 import arrowLeft from '../assets/icons/Arrow_Left.png'
-import ConfirmModal from '../components/common/ConfirmModal'
-import { Modal } from '../components/common/Modal'
-import useModal from '../hooks/useModal'
+
 const Collection = () => {
     const { albumId, collectionName } = useParams()
     const navigate = useNavigate()
@@ -28,6 +37,7 @@ const Collection = () => {
     )
     const removePictures = useCollectionStore(state => state.removePictures)
     const recoverPictures = useCollectionStore(state => state.recoverPictures)
+
     useEffect(() => {
         try {
             setLoading(true)
@@ -99,6 +109,7 @@ const Collection = () => {
             return newSelected
         })
     }
+
     // 사진 배열이 있는지 확인
     const pictures = currentCollection.pictures || []
 
