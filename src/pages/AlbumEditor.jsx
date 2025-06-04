@@ -9,54 +9,12 @@ import Input from '../components/AlbumEditor/Input' // 수정된 Input 컴포넌
 import useFileUpload from '../hooks/useFileUpload'
 import { validateImageFiles } from '../services/validateImageFile'
 
-// APIs
-
 // Assets
-import crossIcon from '../assets/cross_icon.png'
+import { FilePreview } from '../components/AlbumEditor/\bFilePreview'
 import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
+import { Alert } from '../components/AlbumEditor/Alert'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 import { useAlbumTitle } from '../hooks/useAlbumTitle'
-
-// 파일 미리보기 컴포넌트
-/**
- * 새로운 컴포넌트로 분리 가능
- * @param {*} param0
- * @returns
- */
-const FilePreview = ({ file, onDelete }) => (
-    <div className='relative w-full h-full'>
-        <img src={file.preview} alt={`Preview ${file.id}`} className='absolute inset-0 object-cover w-full h-full' />
-        <button className='absolute z-10 top-2 right-2' onClick={() => onDelete(file.id)}>
-            <img className='w-4 h-4' src={crossIcon} alt='삭제' />
-        </button>
-    </div>
-)
-
-// 알림 컴포넌트
-/**
- * 꼭 있어야 할까?
- * @param {} param0
- * @returns
- */
-const Alert = ({ message, type = 'error', onAction, actionText }) => {
-    if (!message) return null
-
-    const bgColor = type === 'error' ? 'bg-red-100' : 'bg-yellow-100'
-    const textColor = type === 'error' ? 'text-red-800' : 'text-yellow-800'
-
-    return (
-        <div className={`p-4 mb-4 rounded-md ${bgColor} ${textColor}`}>
-            <div className='flex items-center justify-between'>
-                <p>{message}</p>
-                {onAction && actionText && (
-                    <button className='px-3 py-1 ml-4 text-sm font-medium bg-white rounded-md' onClick={onAction}>
-                        {actionText}
-                    </button>
-                )}
-            </div>
-        </div>
-    )
-}
 
 const AlbumEditor = () => {
     const { albumId } = useParams()
@@ -104,102 +62,7 @@ const AlbumEditor = () => {
         },
         [addFile]
     )
-    // const handleCreateAlbum = async () => {
-    //     if (files.length === 0 || loading || isProcessing) return
 
-    //     const trimmedTitle = albumTitle.trim()
-    //     if (!trimmedTitle) {
-    //         setCustomError('앨범 제목을 입력해주세요.')
-    //         return
-    //     }
-
-    //     setLoading(true)
-    //     setCustomError(null)
-
-    //     try {
-    //         // 1. 앨범 이름과 파일 메타데이터 준비 - 각 파일에 새 이름 할당
-    //         const filesWithNewNames = files.map(fileItem => {
-    //             const newName = uuidv4() + '.' + fileItem.file.type.split('/')[1]
-    //             return {
-    //                 ...fileItem,
-    //                 newName,
-    //                 originalFile: fileItem.file,
-    //             }
-    //         })
-
-    //         const pictures = filesWithNewNames.map(fileItem => ({
-    //             pictureName: fileItem.newName,
-    //             pictureType: fileItem.originalFile.type,
-    //         }))
-
-    //         console.log('생성된 pictures:', pictures)
-
-    //         // 2. presigned URL 요청
-    //         const response = await getPreSignedUrl({ pictures })
-    //         const presignedFiles = response.data.presignedFiles
-
-    //         console.log('서버에서 받은 presignedFiles:', presignedFiles)
-
-    //         // 3. 각 파일을 presigned URL을 사용하여 업로드
-    //         for (const fileItem of filesWithNewNames) {
-    //             const file = fileItem.originalFile
-    //             const newName = fileItem.newName
-
-    //             const matched = presignedFiles.find(f => f.pictureName === newName)
-
-    //             if (!matched) {
-    //                 console.error(`${newName}에 대한 매칭되는 presigned URL을 찾을 수 없습니다.`)
-    //                 continue
-    //             }
-
-    //             console.log(`${newName} 파일 업로드 시작...`)
-
-    //             try {
-    //                 await axios.put(matched.presignedUrl, file, {
-    //                     headers: {
-    //                         'Content-Type': file.type,
-    //                     },
-    //                 })
-    //                 console.log(`${newName} 파일 업로드 완료!`)
-    //             } catch (error) {
-    //                 console.error(`${newName} 파일 업로드 중 오류:`, error)
-    //                 throw error // 오류를 상위로 전파
-    //             }
-    //         }
-
-    //         // 4. 업로드 완료 후 앨범 생성 요청
-    //         // pictureUrl은 S3의 URL로 수정해야 함, presignedUrl은 업로드용이지 액세스용이 아님
-
-    //         const pictureData = presignedFiles.map(f => ({
-    //             pictureUrl: f.pictureURL || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
-    //             latitude: 0.0,
-    //             longitude: 0.0,
-    //         }))
-
-    //         const albumData = {
-    //             albumName: trimmedTitle,
-    //             pictureUrls: pictureData,
-    //         }
-
-    //         console.log('생성할 앨범 데이터:', albumData)
-    //         if (!albumId) {
-    //             const result = await createAlbum(albumData)
-    //             console.log('앨범 생성 결과:', result)
-    //             navigate('/main')
-    //         } else {
-    //             const result = await addAlbumPicture(albumId, albumData)
-    //             console.log('사진 추가 결과:', result)
-    //             navigate(`/album/${albumId}`)
-    //         }
-    //     } catch (err) {
-    //         console.error('전체 오류:', err)
-    //         setCustomError('앨범 생성 중 오류가 발생했습니다.')
-    //     } finally {
-    //         setLoading(false)
-    //     }
-    // }
-
-    // 앨범 생성 핸들러 - 이제 단순히 훅 호출만
     const handleCreateAlbum = useCallback(async () => {
         if (files.length === 0 || loading || isProcessing) return
 
