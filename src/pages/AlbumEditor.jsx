@@ -5,16 +5,14 @@ import { useParams } from 'react-router-dom'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // 커스텀 컴포넌트와 훅
-import Input from '../components/AlbumEditor/Input' // 수정된 Input 컴포넌트
-import useFileUpload from '../hooks/useFileUpload'
-import { validateImageFiles } from '../services/validateImageFile'
-
-// Assets
-import { FilePreview } from '../components/AlbumEditor/\bFilePreview'
 import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import { Alert } from '../components/AlbumEditor/Alert'
+import { FilePreview } from '../components/AlbumEditor/FilePreview'
+import Input from '../components/AlbumEditor/Input'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 import { useAlbumTitle } from '../hooks/useAlbumTitle'
+import useFileUpload from '../hooks/useFileUpload'
+import { validateImageFiles } from '../services/validateImageFile'
 
 const AlbumEditor = () => {
     const { albumId } = useParams()
