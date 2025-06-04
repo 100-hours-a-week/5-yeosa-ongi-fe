@@ -126,6 +126,9 @@ const Album = () => {
     return (
         <>
             <Header />
+            <div className='mt-2 ml-4 font-sans text-lg'>
+                {albumData?.title}
+            </div>
             <Card />
             <div className='m-4 mt-6'>
                 <div className='flex items-center justify-between'>
