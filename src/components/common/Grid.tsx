@@ -1,13 +1,19 @@
-import { memo, useCallback, useMemo } from 'react'
+import { GridItem } from '@/types'
+import { FC, memo, useCallback, useMemo } from 'react'
 
-const Grid = memo(({ col = 4, items = [] }) => {
-    const chunkArrayByCol = useCallback((array, chunkSize) => {
+interface GridProps {
+    col?: number
+    items?: GridItem[]
+}
+
+const Grid: FC<GridProps> = memo(({ col = 4, items = [] }) => {
+    const chunkArrayByCol = useCallback((array: GridItem[], chunkSize: number): GridItem[][] => {
         if (!array || array.length === 0) {
             return []
         } else {
             return Array(Math.ceil(array.length / chunkSize))
-                .fill()
-                .map((_, index) => {
+                .fill(null)
+                .map((_, index: number) => {
                     // For each placeholder, return a slice of the original array
                     const start = index * chunkSize
                     return array.slice(start, start + chunkSize)
@@ -16,6 +22,7 @@ const Grid = memo(({ col = 4, items = [] }) => {
     }, [])
 
     const chunkArray = useMemo(() => {
+        console.log(items)
         return chunkArrayByCol(items, col)
     }, [items, col, chunkArrayByCol])
 
@@ -30,9 +37,9 @@ const Grid = memo(({ col = 4, items = [] }) => {
                         height: `calc(min(100vw,560px) / ${col})`,
                     }}
                 >
-                    {array.map((item, index) => (
+                    {array.map((item: GridItem, index: number) => (
                         <item.ElementType
-                            id={item.element}
+                            {...(item.id ? { id: item.id } : {})}
                             key={item.id || `${rowIndex}-${index}`}
                             {...item.props}
                         ></item.ElementType>
