@@ -23,10 +23,7 @@ export const getAlbumAccess = async (albumId: string): Promise<ApiResponse> => {
  * @param albumData
  * @returns
  */
-export const addAlbumPicture = async (
-    albumId: number,
-    albumData: any
-): Promise<ApiResponse> => {
+export const addAlbumPicture = async (albumId: number, albumData: any): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, {
@@ -72,13 +69,9 @@ export const deleteAlbum = async (albumId: string): Promise<ApiResponse> => {
     }
 }
 
-export const fetchAlbumData = async (
-    yearMonth: string
-): Promise<ApiResponse> => {
+export const fetchAlbumData = async (yearMonth: string): Promise<ApiResponse> => {
     try {
-        const apiUrl =
-            API_BASE_URL +
-            `/api/album/monthly${yearMonth ? '?yearMonth=' + yearMonth : ''}`
+        const apiUrl = API_BASE_URL + `/api/album/monthly${yearMonth ? '?yearMonth=' + yearMonth : ''}`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
     } catch (error) {
         console.error('앨범 데이터 Fetch 실패:', (error as Error).message)
@@ -86,17 +79,12 @@ export const fetchAlbumData = async (
     }
 }
 
-export const getAlubmSummary = async (
-    albumId: number
-): Promise<ApiResponse> => {
+export const getAlubmSummary = async (albumId: string): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/summary`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
     } catch (error) {
-        console.error(
-            '앨범 요약 정보 조회 요청 실패:',
-            (error as Error).message
-        )
+        console.error('앨범 요약 정보 조회 요청 실패:', error as Error)
         throw error
     }
 }
@@ -123,9 +111,7 @@ export const getAlbumDetail = async (albumId: string): Promise<ApiResponse> => {
  * @param albumId
  * @returns
  */
-export const getCoworkersList = async (
-    albumId: number
-): Promise<ApiResponse> => {
+export const getCoworkersList = async (albumId: number): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -145,10 +131,7 @@ export const getSharingLink = async (albumId: number): Promise<ApiResponse> => {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/invite/link`
         return await authenticatedFetch(apiUrl, { method: 'POST' })
     } catch (error) {
-        console.error(
-            '앨범 공유 링크 생성 요청 실패:',
-            (error as Error).message
-        )
+        console.error('앨범 공유 링크 생성 요청 실패:', (error as Error).message)
         throw error
     }
 }
@@ -158,12 +141,9 @@ export const getSharingLink = async (albumId: number): Promise<ApiResponse> => {
  * @param inviteToken
  * @returns
  */
-export const comfirmInvite = async (
-    inviteToken: string
-): Promise<ApiResponse> => {
+export const comfirmInvite = async (inviteToken: string): Promise<ApiResponse> => {
     try {
-        const apiUrl =
-            API_BASE_URL + `/api/album/invite?inviteToken=${inviteToken}`
+        const apiUrl = API_BASE_URL + `/api/album/invite?inviteToken=${inviteToken}`
         return await authenticatedFetch(apiUrl, { method: 'POST' })
     } catch (error) {
         console.error('앨범 초대 실패:', (error as Error).message)
@@ -177,10 +157,7 @@ export const comfirmInvite = async (
  * @param userId
  * @returns
  */
-export const deleteCoworker = async (
-    albumId: number,
-    userId: number
-): Promise<ApiResponse> => {
+export const deleteCoworker = async (albumId: number, userId: number): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members/${userId}`
         return await authenticatedFetch(apiUrl, { method: 'DELETE' })
