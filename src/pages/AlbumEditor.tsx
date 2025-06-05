@@ -1,10 +1,12 @@
 import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
 import Grid from '@/components/common/Grid'
-import { useCallback, useMemo, useState } from 'react'
+import { FC, useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // 커스텀 컴포넌트와 훅
+import { GridItem } from '@/types'
+import { FileItem } from '@/types/upload'
 import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import { Alert } from '../components/AlbumEditor/Alert'
 import { FilePreview } from '../components/AlbumEditor/FilePreview'
@@ -14,20 +16,17 @@ import { useAlbumTitle } from '../hooks/useAlbumTitle'
 import useFileUpload from '../hooks/useFileUpload'
 import { validateImageFiles } from '../services/validateImageFile'
 
-const AlbumEditor = () => {
-    const { albumId } = useParams()
-
-    const [customError, setCustomError] = useState(null)
+const AlbumEditor: FC = () => {
+    const { albumId } = useParams<{ albumId?: string }>()
+    const [customError, setCustomError] = useState<string>('')
 
     const { albumTitle, handleTitleChange } = useAlbumTitle()
-    const { loading, error: albumError, createAlbumWithFiles, setError: setAlbumError } = useAlbumCreation()
+    const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
     const {
         files,
         addFile,
         removeFile,
         error: fileError,
-        overflowFiles,
-        addOverflowFiles,
         isProcessing,
         setProcessing,
         isFull,
@@ -36,45 +35,38 @@ const AlbumEditor = () => {
     } = useFileUpload({ maxFiles: 30 })
 
     // 오류 처리 핸들러
-    const handleError = useCallback(errorMessage => {
+    const handleError = useCallback((errorMessage: string): void => {
         setCustomError(errorMessage)
     }, [])
 
     // 파일 추가 핸들러
     const handleFileAdded = useCallback(
-        newFiles => {
-            // 배열이 아닌 경우 배열로 변환
+        (newFiles: File | File[]) => {
             const filesToProcess = Array.isArray(newFiles) ? newFiles : [newFiles]
 
-            // 먼저 기본적인 파일 유효성 검사 진행 (크기, 형식)
-            const validationResult = validateImageFiles(filesToProcess)
+            const validationResult: { isValid?: boolean; error?: string } = validateImageFiles(filesToProcess)
 
             if (!validationResult.isValid) {
-                setCustomError(validationResult.error)
+                setCustomError(validationResult.error || '')
                 return
             }
 
             // 검증된 파일을 useFileUpload에 추가 (개수 제한은 useFileUpload에서 처리)
-            setCustomError(null)
+            setCustomError('')
             addFile(filesToProcess)
         },
         [addFile]
     )
 
-    const handleCreateAlbum = useCallback(async () => {
+    const handleCreateAlbum = useCallback(async (): Promise<void> => {
         if (files.length === 0 || loading || isProcessing) return
 
         // 앨범 생성 로직을 훅에 위임
-        await createAlbumWithFiles(albumTitle, files, albumId)
+        await createAlbumWithFiles(albumTitle, files, albumId as string)
     }, [albumTitle, files, albumId, createAlbumWithFiles, loading, isProcessing])
 
-    // 초과 파일 추가 핸들러
-    const handleAddOverflowFiles = useCallback(() => {
-        addOverflowFiles()
-    }, [addOverflowFiles])
-
     // 그리드 아이템 생성
-    const gridItems = useMemo(
+    const gridItems: GridItem[] = useMemo(
         () => [
             {
                 ElementType: () => (
@@ -88,7 +80,7 @@ const AlbumEditor = () => {
                 ),
                 element: 0,
             },
-            ...files.map((fileItem, index) => ({
+            ...files.map((fileItem: FileItem, index: number) => ({
                 ElementType: () => <FilePreview file={fileItem} onDelete={removeFile} />,
                 element: index + 1,
             })),
@@ -129,10 +121,14 @@ const AlbumEditor = () => {
 
             <div className='mb-12'>
                 {/* 오류 메시지 표시 */}
-                {customError && <Alert message={customError} onAction={() => setCustomError(null)} actionText='닫기' />}
+                {customError && (
+                    <Alert type='error' message={customError} onAction={() => setCustomError('')} actionText='닫기' />
+                )}
 
                 {/* 파일 업로드 오류 표시 */}
-                {fileError && <Alert message={fileError} onAction={() => setCustomError(null)} actionText='닫기' />}
+                {fileError && (
+                    <Alert type='error' message={fileError} onAction={() => setCustomError('')} actionText='닫기' />
+                )}
             </div>
             {/* 푸터 (앨범 생성 버튼) */}
             <footer className='px-4 py-3 mt-auto'>
