@@ -4,7 +4,7 @@ import AlbumThumbnail from './AlbumThumbnail'
 const Month = ({ albumIds, title }) => {
     let items = []
     albumIds.forEach(id => {
-        items.push({ ElementType: AlbumThumbnail, element: id })
+        items.push({ ElementType: AlbumThumbnail, element: id, id })
     })
     return (
         <>
