@@ -20,20 +20,18 @@ const useAlbumStore = create((set, get) => ({
 
         albumData.forEach(album => {
             const date = new Date(album.createdAt)
-            const monthKey = `${date.getFullYear()}-${String(
-                date.getMonth() + 1
-            ).padStart(2, '0')}`
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 
             if (!albumsByMonth[monthKey]) {
                 albumsByMonth[monthKey] = []
             }
-            albums[album.albumId] = {
+            albums[album.albumId.toString()] = {
                 albumName: album.albumName,
                 thumbnailURL: album.thumbnailPictureURL,
                 createdAt: album.createdAt,
                 memberProfileImageURL: album.memberProfileImageURL,
             }
-            albumsByMonth[monthKey].push(album.albumId)
+            albumsByMonth[monthKey].push(album.albumId.toString())
         })
         // console.log(albums);
         // console.log(albumsByMonth);
@@ -53,9 +51,7 @@ const useAlbumStore = create((set, get) => ({
         // 새 앨범 데이터 처리
         albumData.forEach(album => {
             const date = new Date(album.createdAt)
-            const monthKey = `${date.getFullYear()}-${String(
-                date.getMonth() + 1
-            ).padStart(2, '0')}`
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 
             // 해당 월이 없으면 생성
             if (!updatedAlbumsByMonth[monthKey]) {
@@ -63,7 +59,7 @@ const useAlbumStore = create((set, get) => ({
             }
 
             // 앨범 객체 추가
-            updatedAlbums[album.albumId] = {
+            updatedAlbums[album.albumId.toString()] = {
                 albumName: album.albumName,
                 thumbnailURL: album.thumbnailURL,
                 createdAt: album.createdAt,
@@ -71,8 +67,8 @@ const useAlbumStore = create((set, get) => ({
             }
 
             // 앨범 ID가 해당 월에 없는 경우에만 추가 (중복 방지)
-            if (!updatedAlbumsByMonth[monthKey].includes(album.albumId)) {
-                updatedAlbumsByMonth[monthKey].push(album.albumId)
+            if (!updatedAlbumsByMonth[monthKey].includes(album.albumId.toString())) {
+                updatedAlbumsByMonth[monthKey].push(album.albumId.toString())
             }
         })
 
@@ -85,9 +81,7 @@ const useAlbumStore = create((set, get) => ({
         })
 
         // 새로 추가된 월 키 반환 (필요시 활용 가능)
-        return Object.keys(updatedAlbumsByMonth).filter(
-            key => !Object.keys(albumsByMonth).includes(key)
-        )
+        return Object.keys(updatedAlbumsByMonth).filter(key => !Object.keys(albumsByMonth).includes(key))
     },
 }))
 
