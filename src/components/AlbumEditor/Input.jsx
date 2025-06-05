@@ -1,13 +1,7 @@
 import { batchProcessImages } from '@/services/imageConversionService'
 import { useRef } from 'react'
 
-const Input = ({
-    onFileSelect,
-    disabled = false,
-    setProcessing = () => {},
-    isProcessing = false,
-    onError = () => {},
-}) => {
+const Input = ({ onFileSelect, disabled = false, setProcessing, isProcessing = false, onError }) => {
     const fileInputRef = useRef(null)
 
     const handleFileChange = async e => {
@@ -25,25 +19,20 @@ const Input = ({
         setProcessing(true)
         try {
             const processingStartTime = performance.now()
-            const { processedFiles, failedFiles } = await batchProcessImages(
-                selectedFiles,
-                {
-                    convertHeic: true,
-                    heicOptions: {
-                        toType: 'image/jpeg',
-                        quality: 0.8,
-                    },
-                }
-            )
+            const { processedFiles, failedFiles } = await batchProcessImages(selectedFiles, {
+                convertHeic: true,
+                heicOptions: {
+                    toType: 'image/jpeg',
+                    quality: 0.8,
+                },
+            })
 
             const processingEndTime = performance.now()
             const processingDuration = processingEndTime - processingStartTime
 
             if (failedFiles.length > 0) {
                 const failedNames = failedFiles.map(f => f.name).join(', ')
-                onError(
-                    `${failedFiles.length}개 파일 처리 실패: ${failedNames}`
-                )
+                onError(`${failedFiles.length}개 파일 처리 실패: ${failedNames}`)
             }
 
             if (processedFiles.length > 0) {
