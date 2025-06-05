@@ -1,15 +1,33 @@
+import { FileItem } from '@/types/upload'
 import { useEffect, useState } from 'react'
 
+interface UseFileUploadOptions {
+    maxFiles?: number
+}
+
+interface UseFileUploadReturn {
+    files: FileItem[]
+    addFile: (files: File[]) => void
+    removeFile: (id: string) => void
+    clearFiles: () => void
+    error: string
+    isFull: boolean
+    count: number
+    maxFiles: number
+    isProcessing: boolean
+    setProcessing: (isProcessing: boolean) => void
+}
+
 /**
- * 파일 업로드를 관리하는 커스텀 훅 - 단순화 버전
+ * 파일 업로드를 관리하는 커스텀 훅
  * @param {Object} options 파일 업로드 옵션
  * @param {number} options.maxFiles 최대 파일 수 (기본값: 10)
  * @returns {Object} 파일 관리 객체와 메서드
  */
-const useFileUpload = (options = {}) => {
+const useFileUpload = (options: UseFileUploadOptions = {}) => {
     const { maxFiles = 10 } = options
-    const [files, setFiles] = useState([])
-    const [error, setError] = useState(null)
+    const [files, setFiles] = useState<FileItem[]>([])
+    const [error, setError] = useState<string | null>(null)
     const [isProcessing, setProcessing] = useState(false)
 
     /**
@@ -17,7 +35,7 @@ const useFileUpload = (options = {}) => {
      * @param {File|File[]} newFiles 추가할 파일(들)
      * @returns {boolean} 성공 여부
      */
-    const addFile = newFiles => {
+    const addFile = (newFiles: File | File[]) => {
         if (!newFiles) return false
 
         // 배열이 아닌 경우 배열로 변환
@@ -35,7 +53,7 @@ const useFileUpload = (options = {}) => {
                 id: Math.random().toString(36).substr(2, 9),
             }))
 
-            setFiles(prevFiles => [...prevFiles, ...newFileItems])
+            setFiles((prevFiles: FileItem[]) => [...prevFiles, ...newFileItems])
             setError(null)
             return true
         } else {
@@ -51,13 +69,11 @@ const useFileUpload = (options = {}) => {
                     id: Math.random().toString(36).substr(2, 9),
                 }))
 
-                setFiles(prevFiles => [...prevFiles, ...newFileItems])
+                setFiles((prevFiles: FileItem[]) => [...prevFiles, ...newFileItems])
 
                 // 초과분 정보만 오류 메시지로 표시
                 const excludedCount = filesToAdd.length - remainingSlots
-                setError(
-                    `최대 ${maxFiles}장까지만 업로드할 수 있습니다. ${excludedCount}장이 제외되었습니다.`
-                )
+                setError(`최대 ${maxFiles}장까지만 업로드할 수 있습니다. ${excludedCount}장이 제외되었습니다.`)
             } else {
                 // 슬롯이 없는 경우 모든 파일이 제외됨
                 setError(
@@ -73,7 +89,7 @@ const useFileUpload = (options = {}) => {
      * 파일을 제거하는 함수
      * @param {string} fileId 제거할 파일 ID
      */
-    const removeFile = fileId => {
+    const removeFile = (fileId: string) => {
         const fileToRemove = files.find(item => item.id === fileId)
         if (fileToRemove) {
             URL.revokeObjectURL(fileToRemove.preview) // 메모리 누수 방지
