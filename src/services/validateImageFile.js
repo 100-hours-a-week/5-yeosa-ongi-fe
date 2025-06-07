@@ -28,7 +28,7 @@ export const validateFileSize = (file, maxSize = 10 * 1024 * 1024) => {
  */
 export const validateFileType = (
     file,
-    allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+    allowedTypes = ['image/jpeg', 'image/png', 'image/heic']
 ) => {
     if (!allowedTypes.includes(file.type)) {
         return {
@@ -69,8 +69,8 @@ export const validateFileCount = (currentFiles, maxFiles = 10) => {
  */
 export const validateFileBasics = (file, options = {}) => {
     const {
-        maxSize = 5 * 1024 * 1024,
-        allowedTypes = ['image/jpeg', 'image/png', 'image/gif'],
+        maxSize = 10 * 1024 * 1024,
+        allowedTypes = ['image/jpeg', 'image/png', 'image/heic'],
     } = options
 
     // 파일 크기 검증
@@ -99,8 +99,8 @@ export const validateFileBasics = (file, options = {}) => {
 export const validateImageFile = (file, currentFiles = []) => {
     // 기본 유효성 검사 (크기, 타입)
     const basicResult = validateFileBasics(file, {
-        maxSize: 5 * 1024 * 1024, // 5MB
-        allowedTypes: ['image/jpeg', 'image/png', 'image/gif'],
+        maxSize: 10 * 1024 * 1024, // 5MB
+        allowedTypes: ['image/jpeg', 'image/png', 'image/heic'],
     })
 
     if (!basicResult.isValid) {
