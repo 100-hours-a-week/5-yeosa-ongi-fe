@@ -6,8 +6,8 @@ const AlbumThumbnail = ({ id }) => {
     const navigate = useNavigate()
     const hasCoworkers = false
     const { albums } = useAlbumStore()
-    const album = albums[id]
-
+    const album = albums[id.toString()]
+    console.log(album)
     const isSelected = useMainPageStore(state => state.selectedId === id)
     const selectItem = useMainPageStore(state => state.selectItem)
     const setSelectedAlbumSummary = useMainPageStore(state => state.setSelectedAlbumSummary)
