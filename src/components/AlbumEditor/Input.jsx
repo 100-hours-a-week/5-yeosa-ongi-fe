@@ -1,76 +1,60 @@
-import { batchProcessImages } from '@/services/imageConversionService'
+import { validateFileCount, validateImageFiles } from '@/services/validateImageFile'
 import { useRef } from 'react'
 
-const Input = ({ onFileSelect, disabled = false, setProcessing, isProcessing = false, onError }) => {
+const Input = ({ onFileSelect, disabled = false, setProcessing, isProcessing = false, onError, currentFiles = [] }) => {
     const fileInputRef = useRef(null)
 
     const handleFileChange = async e => {
-        console.log('handleFileChange 호출!')
         const selectedFiles = Array.from(e.target.files)
-        console.log('선택된 파일:', selectedFiles)
 
         if (selectedFiles.length === 0) {
             e.target.value = ''
             return
         }
-
-        const batchStartTime = performance.now()
-
+        console.log(selectedFiles)
         setProcessing(true)
         try {
-            const processingStartTime = performance.now()
-            const { processedFiles, failedFiles } = await batchProcessImages(selectedFiles, {
-                convertHeic: true,
-                heicOptions: {
-                    toType: 'image/jpeg',
-                    quality: 0.8,
-                },
-            })
+            /**
+             * 파일 검증 파이프라인
+             */
+            const totalFiles = currentFiles.length + selectedFiles.length
+            const countValidation = validateFileCount(Array(totalFiles), 10)
 
-            const processingEndTime = performance.now()
-            const processingDuration = processingEndTime - processingStartTime
-
-            if (failedFiles.length > 0) {
-                const failedNames = failedFiles.map(f => f.name).join(', ')
-                onError(`${failedFiles.length}개 파일 처리 실패: ${failedNames}`)
+            if (!countValidation.isValid) {
+                onError(countValidation.error)
+                e.target.value = ''
+                return
             }
 
-            if (processedFiles.length > 0) {
-                const uiRenderStartTime = performance.now()
+            const validationResult = validateImageFiles(selectedFiles)
 
-                if (processedFiles.length === 1) {
-                    onFileSelect(processedFiles[0])
-                } else {
-                    onFileSelect(processedFiles)
-                }
-                setTimeout(() => {
-                    const uiRenderEndTime = performance.now()
-                    const uiRenderDuration = uiRenderEndTime - uiRenderStartTime
-                    const totalBatchDuration = uiRenderEndTime - batchStartTime
+            if (!validationResult.isValid) {
+                onError(validationResult.error)
+                e.target.value = ''
+                return
+            }
 
-                    // 성능 데이터 콘솔 출력
-                    console.log({
-                        processingDuration,
-                        timestamp: new Date().toISOString(),
-                        totalBatchDuration,
-                        uiRenderDuration,
-                    })
-                }, 0)
-            } else if (failedFiles.length > 0) {
-                onError('모든 파일 처리에 실패했습니다.')
+            const validFiles = validationResult.validFiles
+            console.log('검증 통과한 파일들:', validFiles)
+
+            if (validFiles.length === 1) {
+                onFileSelect(validFiles[0])
+            } else {
+                onFileSelect(validFiles)
             }
         } catch (error) {
             console.error('파일 처리 중 오류 발생:', error)
             onError('파일 처리 중 오류가 발생했습니다.')
         } finally {
             setProcessing(false)
+            e.target.value = ''
         }
     }
 
     const handleClick = () => {
         if (!isProcessing) {
             if (disabled) {
-                onError(`사진은 최대 10장 선택할 수 있습니다.`)
+                onError(`사진은 최대 30장 선택할 수 있습니다.`)
                 return
             }
             fileInputRef.current.click()
