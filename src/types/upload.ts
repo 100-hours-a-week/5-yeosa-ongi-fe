@@ -21,5 +21,18 @@ export interface UploadState {
 export interface FileItem {
     id: string
     file: File
-    preview: string // blob URL for preview
+    preview: string
+
+    // 변환 관련 필드 추가
+    convertedFile?: File
+    convertedPreview?: string
+    isConverting?: boolean
+    conversionError?: string
+
+    GPS?: {
+        latitude?: number | null
+        longitude?: number | null
+    }
+    isProcessed: boolean
+    thumbnail?: string
 }
