@@ -1,97 +1,103 @@
+// AlbumEditor.tsx (파일 교체 지원 최종 버전)
+
 import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
-import Grid from '@/components/common/Grid'
-import { FC, useCallback, useMemo, useState } from 'react'
+import { FC, useCallback, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // 커스텀 컴포넌트와 훅
-import { GridItem } from '@/types'
+import FileManager from '@/components/AlbumEditor/FileManager'
+import { useAlbumCreationUI } from '@/hooks/useAlbumCreationUI'
+import useFileUpload from '@/hooks/useFileUpload'
 import { FileItem } from '@/types/upload'
 import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
-import { Alert } from '../components/AlbumEditor/Alert'
-import { FilePreview } from '../components/AlbumEditor/FilePreview'
-import Input from '../components/AlbumEditor/Input'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 import { useAlbumTitle } from '../hooks/useAlbumTitle'
-import useFileUpload from '../hooks/useFileUpload'
-import { validateImageFiles } from '../services/validateImageFile'
 
 const AlbumEditor: FC = () => {
     const { albumId } = useParams<{ albumId?: string }>()
-    const [customError, setCustomError] = useState<string>('')
 
     const { albumTitle, handleTitleChange } = useAlbumTitle()
     const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
-    const {
-        files,
-        addFile,
-        removeFile,
-        error: fileError,
-        isProcessing,
-        setProcessing,
-        isFull,
-        count,
-        maxFiles,
-    } = useFileUpload({ maxFiles: 30 })
 
-    // 오류 처리 핸들러
-    const handleError = useCallback((errorMessage: string): void => {
-        setCustomError(errorMessage)
-    }, [])
+    // 통합된 파일 관리
+    const fileManager = useFileUpload({ maxFiles: 30 })
 
-    // 파일 추가 핸들러
-    const handleFileAdded = useCallback(
-        (newFiles: File | File[]) => {
-            const filesToProcess = Array.isArray(newFiles) ? newFiles : [newFiles]
+    // 앨범 UI 로직
+    const albumUI = useAlbumCreationUI({
+        files: fileManager.files,
+        isProcessing: fileManager.isProcessing,
+        albumId,
+    })
 
-            const validationResult: { isValid?: boolean; error?: string } = validateImageFiles(filesToProcess)
+    // 파일 변환 완료 핸들러 (메타데이터 보존하면서 파일만 교체)
+    const handleFileConverted = useCallback(
+        async (originalFile: File, convertedFile: File) => {
+            console.log(
+                '파일 변환 완료, 원본 메타데이터 보존하면서 파일 교체:',
+                originalFile.name,
+                '→',
+                convertedFile.name
+            )
 
-            if (!validationResult.isValid) {
-                setCustomError(validationResult.error || '')
-                return
+            try {
+                // files 배열에서 원본 파일 찾기
+                const originalFileItem = fileManager.files?.find(
+                    fileItem =>
+                        fileItem.file === originalFile ||
+                        (fileItem.file.name === originalFile.name &&
+                            fileItem.file.size === originalFile.size &&
+                            fileItem.file.lastModified === originalFile.lastModified)
+                )
+
+                if (!originalFileItem) {
+                    console.error('원본 파일을 찾을 수 없음:', originalFile.name)
+                    return
+                }
+
+                console.log('원본 파일 발견:', originalFileItem.id, originalFileItem.file.name)
+                console.log('보존할 GPS 정보:', originalFileItem.GPS)
+
+                // 파일만 교체하고 메타데이터는 원본 것을 보존
+                const updateData: Partial<FileItem> = {
+                    file: convertedFile,
+                    preview: URL.createObjectURL(convertedFile),
+                    isProcessed: true,
+                    // 원본에서 추출한 GPS 정보 보존
+                    GPS: originalFileItem.GPS,
+                }
+
+                fileManager.updateFile(originalFileItem.id, updateData)
+
+                console.log('파일 교체 완료 (메타데이터 보존):', convertedFile.name, 'Type:', convertedFile.type)
+                console.log('보존된 GPS 정보:', updateData.GPS)
+            } catch (error) {
+                console.error('파일 교체 중 오류:', error)
             }
-
-            // 검증된 파일을 useFileUpload에 추가 (개수 제한은 useFileUpload에서 처리)
-            setCustomError('')
-            addFile(filesToProcess)
         },
-        [addFile]
+        [fileManager]
     )
 
-    const handleCreateAlbum = useCallback(async (): Promise<void> => {
-        if (files.length === 0 || loading || isProcessing) return
+    useEffect(() => {
+        console.log('AlbumEditor 리렌더링 발생')
+        console.log('Current files:', fileManager.files?.length || 0)
 
-        // 앨범 생성 로직을 훅에 위임
-        await createAlbumWithFiles(albumTitle, files, albumId as string)
-    }, [albumTitle, files, albumId, createAlbumWithFiles, loading, isProcessing])
+        // 파일 타입별 분석
+        const fileAnalysis =
+            fileManager.files?.map(f => ({
+                id: f.id,
+                name: f.file.name,
+                type: f.file.type,
+                size: f.file.size,
+                isHeic: f.file.type.includes('heic') || f.file.name.toLowerCase().includes('.heic'),
+                isJpeg: f.file.type.includes('jpeg') || f.file.type.includes('jpg'),
+            })) || []
 
-    // 그리드 아이템 생성
-    const gridItems: GridItem[] = useMemo(
-        () => [
-            {
-                ElementType: () => (
-                    <Input
-                        onFileSelect={handleFileAdded}
-                        disabled={isFull}
-                        setProcessing={setProcessing}
-                        isProcessing={isProcessing}
-                        onError={handleError}
-                    />
-                ),
-                element: 0,
-            },
-            ...files.map((fileItem: FileItem, index: number) => ({
-                ElementType: () => <FilePreview file={fileItem} onDelete={removeFile} />,
-                element: index + 1,
-            })),
-        ],
-        [files, handleFileAdded, removeFile, isFull, isProcessing, setProcessing, handleError]
-    )
-
-    // 버튼 비활성화 여부를 useMemo로 감싸기
-    const isButtonDisabled = useMemo(() => {
-        return albumTitle.trim() === '' || files.length === 0 || loading || isProcessing
-    }, [albumTitle, files.length, loading, isProcessing])
+        console.log('Files analysis:', fileAnalysis)
+        console.log('HEIC files:', fileAnalysis.filter(f => f.isHeic).length)
+        console.log('JPEG files:', fileAnalysis.filter(f => f.isJpeg).length)
+        console.log('Button disabled:', albumUI.isButtonDisabled)
+    })
 
     return (
         <div className='flex flex-col min-h-screen'>
@@ -102,37 +108,19 @@ const AlbumEditor: FC = () => {
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
-                {/* 로딩 인디케이터 */}
-                {isProcessing && (
-                    <div className='my-2 text-center text-blue-600'>
-                        이미지 파일 처리 중... HEIC 변환은 시간이 더 소요될 수 있습니다.
-                    </div>
-                )}
-
-                <div className='flex items-center justify-between my-4'>
-                    <span className={count === maxFiles ? 'text-red-500 font-bold' : ''}>
-                        현재 {count}장 업로드 중. (최대 {maxFiles}장)
-                    </span>
-                </div>
-
-                {/* 이미지 그리드 */}
-                <Grid items={gridItems} />
+                <FileManager
+                    files={fileManager.files}
+                    onFileDelete={fileManager.removeFile}
+                    onFileAdd={fileManager.addFile}
+                    onFileConverted={handleFileConverted} // 변환 완료 콜백
+                    isProcessing={fileManager.isProcessing}
+                    maxFiles={30}
+                />
             </main>
 
-            <div className='mb-12'>
-                {/* 오류 메시지 표시 */}
-                {customError && (
-                    <Alert type='error' message={customError} onAction={() => setCustomError('')} actionText='닫기' />
-                )}
-
-                {/* 파일 업로드 오류 표시 */}
-                {fileError && (
-                    <Alert type='error' message={fileError} onAction={() => setCustomError('')} actionText='닫기' />
-                )}
-            </div>
             {/* 푸터 (앨범 생성 버튼) */}
             <footer className='px-4 py-3 mt-auto'>
-                <CreateAlbumButton disabled={isButtonDisabled} onClick={handleCreateAlbum}>
+                <CreateAlbumButton disabled={albumUI.isButtonDisabled} onClick={albumUI.handleCreateAlbum}>
                     {loading ? '생성 중...' : '앨범 생성'}
                 </CreateAlbumButton>
 
@@ -140,9 +128,15 @@ const AlbumEditor: FC = () => {
                 {loading && (
                     <div className='mt-2 text-center text-gray-600'>이미지 업로드 중입니다. 잠시만 기다려주세요...</div>
                 )}
+
+                {/* 에러 표시 */}
+                {albumError && <div className='mt-2 text-center text-red-600'>에러: {albumError}</div>}
             </footer>
         </div>
     )
 }
+
+// displayName 설정
+AlbumEditor.displayName = 'AlbumEditor'
 
 export default AlbumEditor
