@@ -37,13 +37,16 @@ const Grid: FC<GridProps> = memo(({ col = 4, items = [] }) => {
                         height: `calc(min(100vw,560px) / ${col})`,
                     }}
                 >
-                    {array.map((item: GridItem, index: number) => (
-                        <item.ElementType
-                            {...(item.id ? { id: item.id } : {})}
-                            key={item.id || `${rowIndex}-${index}`}
-                            {...item.props}
-                        ></item.ElementType>
-                    ))}
+                    {array.map((item: GridItem, index: number) => {
+                        console.log(`🔑 렌더링 key: ${item.id || `${rowIndex}-${index}`}`)
+                        return (
+                            <item.ElementType
+                                {...(item.id ? { id: item.id } : {})}
+                                key={item.id || `${rowIndex}-${index}`}
+                                {...item.props}
+                            ></item.ElementType>
+                        )
+                    })}
                 </div>
             ))}
         </>
