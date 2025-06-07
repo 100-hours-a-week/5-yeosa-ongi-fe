@@ -48,7 +48,7 @@ const AlbumTitleForm = ({ initialTitle, onTitleChange }) => {
     }
 
     return (
-        <div className='flex flex-col w-full mt-4 mb-6'>
+        <div className='flex flex-col w-full mt-4 mb-2'>
             <div className='flex items-center pb-2 mx-4 border-b border-gray-300'>
                 <div className='w-16 mx-4 text-gray'> 제목</div>
                 <input
