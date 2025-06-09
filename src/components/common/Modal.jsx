@@ -40,9 +40,7 @@ export function Modal({ isOpen, onClose, title, children }) {
                         </svg>
                     </button>
                 </div>
-                <div className='text-gray-700 dark:text-gray-300'>
-                    {children}
-                </div>
+                <div className='text-gray-700 dark:text-gray-300'>{children}</div>
             </div>
         </div>,
         modalRoot
