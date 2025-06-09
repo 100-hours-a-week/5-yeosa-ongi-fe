@@ -19,6 +19,7 @@ import useModal from '../hooks/useModal'
 
 // Assets
 import CollectionHeader from '@/components/Collection/CollectionHeader'
+import ImageModal from '@/components/Collection/ImageModal'
 import MovingDotsLoader from '@/components/common/MovingDotsLoader'
 import arrowLeft from '../assets/icons/Arrow_Left.png'
 
@@ -32,6 +33,12 @@ const Collection = () => {
     const [isRecovery, setIsRecovery] = useState(false)
     const [selectedPictures, setSelectedPictures] = useState(new Set())
     const { isOpen, modalData, openModal, closeModal } = useModal()
+    const {
+        isOpen: isImageModalOpen,
+        modalData: imageModalData,
+        openModal: openImageModal,
+        closeModal: closeImageModal,
+    } = useModal()
     const getCollectionByName = useCollectionStore(state => state.getCollectionByName)
     const removePictures = useCollectionStore(state => state.removePictures)
     const recoverPictures = useCollectionStore(state => state.recoverPictures)
@@ -51,13 +58,17 @@ const Collection = () => {
     // 로딩 중이거나 currentCollection이 없으면 빈 배열 사용
     const pictures = currentCollection?.pictures || []
 
-    const formattedPictures = pictures.map(picture => ({
+    const formattedPictures = pictures.map((picture, index) => ({
         ElementType: () => {
             const isSelected = selectedPictures.has(picture.pictureId)
 
             return (
                 <div className='relative w-full h-full' onClick={() => isSelectMode && toggleSelect(picture.pictureId)}>
-                    <img src={picture.pictureURL} className='absolute inset-0 object-cover w-full h-full' />
+                    <img
+                        src={picture.pictureURL}
+                        className='absolute inset-0 object-cover w-full h-full'
+                        onClick={() => handleImageClick(index)}
+                    />
                     {isSelectMode && (
                         <div className='absolute z-10 top-2 right-2'>
                             <div
@@ -101,6 +112,11 @@ const Collection = () => {
             return
         }
         openModal('사진 복원')
+    }
+
+    const handleImageClick = index => {
+        console.log('이미지 클릭')
+        openImageModal(index)
     }
 
     /**
@@ -204,9 +220,7 @@ const Collection = () => {
                 isCollectionShaky={isCollectionShaky}
             />
 
-            <div>
-                <Grid col={3} items={formattedPictures} />
-            </div>
+            <Grid col={3} items={formattedPictures} />
 
             {/* Modal */}
             {isRecovery ? (
@@ -235,6 +249,9 @@ const Collection = () => {
                     )}
                 </Modal>
             )}
+            <Modal isOpen={isImageModalOpen} onClose={closeImageModal} title={imageModalData}>
+                <ImageModal idx={imageModalData} pictures={pictures} />
+            </Modal>
         </>
     )
 }
