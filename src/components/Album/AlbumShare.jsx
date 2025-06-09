@@ -32,7 +32,7 @@ const AlbumShare = ({ sharingLink = 'https://example.com/share/album123456' }) =
                     {/* 복사되는 공유 링크와 복사 버튼 */}
                     <div className='flex items-center mt-2'>
                         <div className='flex-grow w-40 px-3 py-2 overflow-hidden text-sm text-gray-700 truncate border border-gray-300 bg-gray-50 rounded-l-md'>
-                            {sharingLink}||' '
+                            {sharingLink || ' '}
                         </div>
                         <button
                             onClick={handleCopy}
