@@ -77,10 +77,7 @@ const Login = () => {
             {/* OAuth */}
             <div className='mt-[100px]'>카카오톡으로 간편 로그인</div>
             <button onClick={handleLogin}>
-                <img
-                    className='hover:cursor-pointer '
-                    src={kakaoLoginButton}
-                ></img>
+                <img className='hover:cursor-pointer ' src={kakaoLoginButton}></img>
             </button>
         </div>
     )

@@ -5,16 +5,16 @@ import useAuthStore from '../stores/userStore'
 
 const Invite = () => {
     const [searchParams] = useSearchParams()
+    const navigate = useNavigate()
     const token = searchParams.get('token')
 
     const isAuthenticated = useAuthStore(state => state.isAuthenticated())
-    const navigate = useNavigate()
 
     const handleLogin = () => {
         // 현재 URL을 로그인 후 리다이렉트 URL로 설정
         const currentUrl = window.location.href
-        const loginUrl = `/?redirect=${encodeURIComponent(currentUrl)}`
-        window.location.href = loginUrl
+        const loginUrl = `/login/?redirect=${encodeURIComponent(currentUrl)}&invite=${token}}`
+        navigate(loginUrl)
     }
 
     const handleClick = () => {
