@@ -12,9 +12,11 @@ import { useAlbumStore } from '@/stores/mainPageStore'
 // API
 import { fetchAlbumData } from '../api/album'
 // Hooks
+import KakaoMap from '@/components/Main/KakaoMap'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import useInfiniteScroll from '../hooks/infiniteScroll'
 
+import bannerImage from '@/assets/banners/banner01.png'
 const Main = () => {
     const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
 
@@ -34,11 +36,7 @@ const Main = () => {
         console.log('무한 스크롤 로직 시작 = == = = = ==')
 
         // 초기 로드에 실패했거나 nextYearMonth가 없으면 더 로드하지 않음
-        console.log(
-            initialLoadFailed,
-            nextYearMonth,
-            initialLoadFailed || !nextYearMonth
-        )
+        console.log(initialLoadFailed, nextYearMonth, initialLoadFailed || !nextYearMonth)
         if (initialLoadFailed || !nextYearMonth) return false
 
         console.log('last', lastAttemptedYearMonth)
@@ -64,10 +62,7 @@ const Main = () => {
             addAlbums(response.data.albumInfo)
             setHasData(true)
             // 새로운 nextYearMonth 값이 있으면 업데이트
-            if (
-                response.data.nextYearMonth &&
-                response.data.nextYearMonth !== nextYearMonth
-            ) {
+            if (response.data.nextYearMonth && response.data.nextYearMonth !== nextYearMonth) {
                 setNextYearMonth(response.data.nextYearMonth)
                 lastAttemptedYearMonth.current = null // 새 yearMonth가 설정되었으므로 리셋
             } else {
@@ -78,9 +73,7 @@ const Main = () => {
             setPage(prevPage => prevPage + 1)
 
             // 더 로드할 데이터가 있는지 반환
-            const hasNextData =
-                response.data.hasNext === 'true' ||
-                response.data.hasNext === true
+            const hasNextData = response.data.hasNext === 'true' || response.data.hasNext === true
             console.log('hasNext 체크:', hasNextData, response.data.hasNext)
             return response.data.hasNext === 'true'
         } catch (error) {
@@ -89,10 +82,7 @@ const Main = () => {
         }
     }, [nextYearMonth, addAlbums, initialLoadFailed])
 
-    const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(
-        fetchMoreAlbums,
-        true
-    )
+    const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(fetchMoreAlbums, true)
 
     useEffect(() => {
         let isMounted = true
@@ -142,12 +132,11 @@ const Main = () => {
     return (
         <div className='relative h-screen overflow-hidden'>
             <Header />
+
             <div className='flex-col content'>
-                {/* <div
-					className="border-t border-solid"
-					style={{ height: "min(80vw, 560px)" }}>
-					<KaKaoMap />
-				</div> */}
+                <div className='border-t border-solid' style={{ height: 'min(80vw, 560px)' }}>
+                    <KakaoMap />
+                </div>
 
                 {hasData || hasNext ? (
                     <>
@@ -156,16 +145,11 @@ const Main = () => {
                         <div
                             className='overflow-y-auto'
                             style={{
-                                /*height: "calc(100vh - min(80vw,560px) - 160px)",*/
-                                height: 'calc(100vh - 96px)',
+                                height: 'calc(100vh - min(80vw,560px) - 168px)',
                             }}
                         >
                             {Object.keys(albumsByMonth).map((month, index) => (
-                                <Month
-                                    key={month}
-                                    title={month}
-                                    albumIds={albumsByMonth[month]}
-                                />
+                                <Month key={month} title={month} albumIds={albumsByMonth[month]} />
                             ))}
                             {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
                             <div ref={observerRef} style={{ height: '10px' }} />
@@ -175,6 +159,8 @@ const Main = () => {
                     <OnboardingScreen />
                 )}
             </div>
+            {/*배너 */}
+            <img src={bannerImage} className='h-[72px]'></img>
             <FlottingButton />
         </div>
     )
