@@ -296,14 +296,16 @@ const MyPage = () => {
             }
 
             // Pre-Signed URL
+
             const presignedUrl = response.data.presignedFiles[0].presignedUrl
+
 
             // 실제 저장될 영구 URL (S3에 저장된 후의 URL)
             // 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
             // 가정: 응답에 원본 URL이 포함되어 있거나, 패턴을 알고 있는 경우
-            console.log('!!!!')
-            console.log(response.data.presignedFiles[0].presignedUrl)
+
             const permanentImageUrl = response.data.presignedFiles[0].pictureURL || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
+
 
             // 파일 업로드 (S3에 직접 업로드)
             const uploadResponse = await axios.put(presignedUrl, file, {
@@ -312,8 +314,9 @@ const MyPage = () => {
                 },
             })
 
-            console.log(permanentImageUrl)
+
             if (uploadResponse.status !== 200) {
+
                 throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
