@@ -25,7 +25,7 @@ export const GridWithChildren: FC<GridProps> = memo(({ col = 4, children, items 
                         className='grid'
                         style={{
                             gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
-                            height: `calc(min(100vw,560px) / ${col})`,
+                            height: `calc(min(100vw,430px) / ${col})`,
                         }}
                     >
                         {rowChildren.map((child, childIndex) => child)}
@@ -62,7 +62,7 @@ export const GridWithChildren: FC<GridProps> = memo(({ col = 4, children, items 
                     className='grid'
                     style={{
                         gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
-                        height: `calc(min(100vw,560px) / ${col})`,
+                        height: `calc(min(100vw,430px) / ${col})`,
                     }}
                 >
                     {array.map((item: GridItem, index: number) => (
