@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 // Assets
 import kakaoLoginButton from '@/assets/kakao_login_medium_narrow.png'
 import ongiLogo from '@/assets/ongi_Logo.png'
+import OnboardingUI from '@/components/Login/OnboardingUI'
 
 interface AuthState {
     type: 'normal' | 'invite' | 'protected' | 'expired'
@@ -71,11 +72,15 @@ const Login = () => {
     }
 
     return (
-        <div className='container flex flex-col items-center justify-center min-h-screen px-4 mx-auto'>
-            <img className='w-[120px]' src={ongiLogo}></img>
+        <div className='container flex flex-col items-center justify-center h-full p-4 px-4 '>
+            <img className='w-12' src={ongiLogo}></img>
 
+            {/* Onboarding Contents */}
+            <div className='flex flex-col items-center justify-center px-4 mx-auto mt-10'>
+                <OnboardingUI />
+            </div>
             {/* OAuth */}
-            <div className='mt-[100px]'>카카오톡으로 간편 로그인</div>
+            <div className='mt-5'></div>
             <button onClick={handleLogin}>
                 <img className='hover:cursor-pointer ' src={kakaoLoginButton}></img>
             </button>
