@@ -41,6 +41,7 @@ const AlbumTitleForm = ({ initialTitle, onTitleChange }) => {
         if (!isValid) {
             setIsValid(true)
             setValidationMessage('')
+            onTitleChange(title)
         }
     }
 
