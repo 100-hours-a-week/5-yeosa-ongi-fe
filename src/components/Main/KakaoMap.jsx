@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAlbumStore, useMainPageStore } from '../../stores/mainPageStore'
 
-const KakaoMap = () => {
+const KakaoMap = ({ height }) => {
     const mapContainer = useRef(null)
     const mapInstance = useRef(null)
     const markersRef = useRef([])
@@ -11,8 +11,18 @@ const KakaoMap = () => {
     // Zustand 스토어에서 상태 가져오기
     const { selectedAlbumSummary, selectedId, getSelectedAlbumSummary } = useMainPageStore()
     const { albums } = useAlbumStore()
-
+    const [mapHeight, setMapHeight] = useState('100%') // 높이 상태 추가
     console.log('KakaoMap 렌더링 - selectedId:', selectedId)
+
+    const changeMapHeight = height => {
+        setMapHeight(height)
+        // 지도 크기가 변경되면 resize 이벤트 발생
+        setTimeout(() => {
+            if (mapInstance.current) {
+                mapInstance.current.relayout()
+            }
+        }, 100)
+    }
 
     // 지도 이동 함수
     const panTo = (x, y) => {
@@ -41,7 +51,7 @@ const KakaoMap = () => {
             console.log('지도가 준비되지 않음')
             return
         }
-        clearMarkers()
+        // clearMarkers()
         const albumSummary = getSelectedAlbumSummary()
 
         if (!albumSummary || !albumSummary.length) {
@@ -58,44 +68,6 @@ const KakaoMap = () => {
             console.log('위치 정보가 있는 사진이 없습니다')
             return
         }
-
-        // 각 사진을 마커로 표시
-        photosWithLocation.forEach((photo, index) => {
-            const position = new window.kakao.maps.LatLng(photo.latitude, photo.longitude)
-            const photoUrl = photo.thumbnailURL || photo.pictureURL
-
-            if (photoUrl) {
-                const overlayContent = `
-                    <div style="
-                        width: 60px;
-                        height: 60px;
-                        border: 4px solid #F3D0D7;
-                        border-radius: 8px;
-                        overflow: hidden;
-                        background: white;
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                        cursor: pointer;
-                        position: relative;
-                    ">
-                        <img src="${photoUrl}" style="
-                            width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                            display: block;
-                        " onerror="this.style.display='none'" />
-                    </div>
-                `
-
-                const customOverlay = new window.kakao.maps.CustomOverlay({
-                    content: overlayContent,
-                    position: position,
-                    yAnchor: 1,
-                })
-
-                customOverlay.setMap(mapInstance.current)
-                markersRef.current.push(customOverlay)
-            }
-        })
 
         // 모든 마커가 보이도록 지도 범위 조정
         if (photosWithLocation.length > 0) {
@@ -402,7 +374,7 @@ const KakaoMap = () => {
                 ref={mapContainer}
                 style={{
                     width: '100%',
-                    height: '100%',
+                    height: height,
                 }}
             />
         </div>
