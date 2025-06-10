@@ -1,25 +1,25 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 const ResizableList = ({ children, className = '', showHeightIndicator = false }) => {
     // 3단계 높이 정의 (헤더 56px만 제외, 배너도 가릴 수 있도록)
     const headerHeight = 56
-    const availableHeight = window.innerHeight - headerHeight
+    const screenHeight = window.innerHeight - headerHeight
 
-    const minHeight = Math.round(availableHeight * 0.3) // 사용 가능 높이의 30%
-    const midHeight = Math.round(availableHeight * 0.6) // 사용 가능 높이의 60%
-    const maxHeight = availableHeight // 배너까지 포함한 전체 높이
+    const minHeight = Math.round(screenHeight * 0.3) // 화면의 30%
+    const midHeight = Math.round(screenHeight * 0.6) // 화면의 60%
+    const maxHeight = screenHeight // 헤더 제외한 전체 화면
 
     const heights = [minHeight, midHeight, maxHeight]
 
     const [currentHeightIndex, setCurrentHeightIndex] = useState(0) // 0: min, 1: mid, 2: max
     const [isResizing, setIsResizing] = useState(false)
-    const [dragHeight, setDragHeight] = useState(heights[0])
+    const [tempHeight, setTempHeight] = useState(heights[0])
 
     const startY = useRef(0)
     const startHeight = useRef(0)
 
     // 현재 높이 가져오기
-    const getCurrentHeight = () => (isResizing ? dragHeight : heights[currentHeightIndex])
+    const getCurrentHeight = () => (isResizing ? tempHeight : heights[currentHeightIndex])
 
     // 가장 가까운 높이 단계 찾기
     const findClosestHeightIndex = height => {
@@ -36,77 +36,67 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
         return closestIndex
     }
 
-    // 마우스/터치 무브 핸들러
-    const handleMove = useCallback(
-        clientY => {
-            if (!isResizing) return
-
-            const deltaY = startY.current - clientY
-            const newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight.current + deltaY))
-            console.log(newHeight)
-            setDragHeight(newHeight)
-            console.log(dragHeight)
-        },
-        [isResizing, minHeight, maxHeight]
-    )
-
-    // 드래그 종료 핸들러
-    const handleEnd = useCallback(() => {
-        if (!isResizing) return
-
-        setIsResizing(false)
-        // 가장 가까운 높이로 스냅
-        console.log(dragHeight)
-        const closestIndex = findClosestHeightIndex(dragHeight)
-        setCurrentHeightIndex(closestIndex)
-
-        // 이벤트 리스너 제거
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
-        document.removeEventListener('touchmove', onTouchMove)
-        document.removeEventListener('touchend', onTouchEnd)
-    }, [isResizing, dragHeight])
-
-    // 이벤트 핸들러들
-    const onMouseMove = useCallback(e => handleMove(e.clientY), [handleMove])
-    const onMouseUp = useCallback(() => handleEnd(), [handleEnd])
-    const onTouchMove = useCallback(
-        e => {
-            e.preventDefault()
-            handleMove(e.touches[0].clientY)
-        },
-        [handleMove]
-    )
-    const onTouchEnd = useCallback(() => handleEnd(), [handleEnd])
-
-    // 드래그 시작 (마우스)
+    // 드래그 시작
     const handleMouseDown = useCallback(
         e => {
-            e.preventDefault()
             setIsResizing(true)
             startY.current = e.clientY
             startHeight.current = getCurrentHeight()
-            setDragHeight(startHeight.current)
+            setTempHeight(startHeight.current)
 
-            document.addEventListener('mousemove', onMouseMove)
-            document.addEventListener('mouseup', onMouseUp)
+            const handleMouseMove = e => {
+                const deltaY = startY.current - e.clientY
+                const newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight.current + deltaY))
+                setTempHeight(newHeight)
+            }
+
+            const handleMouseUp = () => {
+                setIsResizing(false)
+                // 가장 가까운 높이로 스냅
+                const closestIndex = findClosestHeightIndex(tempHeight)
+                setCurrentHeightIndex(closestIndex)
+
+                document.removeEventListener('mousemove', handleMouseMove)
+                document.removeEventListener('mouseup', handleMouseUp)
+            }
+
+            document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('mouseup', handleMouseUp)
+            e.preventDefault()
         },
-        [getCurrentHeight, onMouseMove, onMouseUp]
+        [tempHeight, minHeight, maxHeight]
     )
 
-    // 드래그 시작 (터치)
+    // 터치 이벤트 처리
     const handleTouchStart = useCallback(
         e => {
-            e.preventDefault()
             setIsResizing(true)
             startY.current = e.touches[0].clientY
             startHeight.current = getCurrentHeight()
-            setDragHeight(startHeight.current)
+            setTempHeight(startHeight.current)
 
-            document.addEventListener('touchmove', onTouchMove, { passive: false })
-            document.addEventListener('touchend', onTouchEnd)
+            const handleTouchMove = e => {
+                e.preventDefault()
+                const deltaY = startY.current - e.touches[0].clientY
+                const newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight.current + deltaY))
+                setTempHeight(newHeight)
+            }
+
+            const handleTouchEnd = () => {
+                setIsResizing(false)
+                // 가장 가까운 높이로 스냅
+                const closestIndex = findClosestHeightIndex(tempHeight)
+                setCurrentHeightIndex(closestIndex)
+
+                document.removeEventListener('touchmove', handleTouchMove)
+                document.removeEventListener('touchend', handleTouchEnd)
+            }
+
+            document.addEventListener('touchmove', handleTouchMove, { passive: false })
+            document.addEventListener('touchend', handleTouchEnd)
+            e.preventDefault()
         },
-        [getCurrentHeight, onTouchMove, onTouchEnd]
+        [tempHeight, minHeight, maxHeight]
     )
 
     // 높이 레벨 이름
@@ -114,16 +104,6 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
         const labels = ['최소', '중간', '최대']
         return labels[currentHeightIndex]
     }
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 정리
-    useEffect(() => {
-        return () => {
-            document.removeEventListener('mousemove', onMouseMove)
-            document.removeEventListener('mouseup', onMouseUp)
-            document.removeEventListener('touchmove', onTouchMove)
-            document.removeEventListener('touchend', onTouchEnd)
-        }
-    }, [])
 
     return (
         <div
@@ -145,19 +125,19 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
             >
                 <div className='w-8 h-1 bg-gray-400 rounded'></div>
 
-                {/* 높이 표시 - 핸들 중앙에 위치 */}
+                {/* 높이 표시 */}
                 {showHeightIndicator && (
                     <div className='absolute right-3 bg-black bg-opacity-50 text-white px-2 py-0.5 rounded text-xs'>
                         {getCurrentHeight()}px ({getHeightLabel()})
                     </div>
                 )}
 
-                {/* 단계 인디케이터 - 드래그 중에만 표시 */}
-                {isResizing && (
-                    <div className='absolute flex gap-1 transform -translate-x-1/2 left-1/2 mt-7'>
-                        {heights.map((height, index) => {
-                            // 현재 드래그 높이와 각 단계 높이의 차이 계산
-                            const diff = Math.abs(dragHeight - height)
+                {/* 단계 인디케이터 - 드래그 중에는 마그넷 효과 표시 */}
+                <div className='absolute flex gap-1 transform -translate-x-1/2 left-1/2 mt-7'>
+                    {heights.map((height, index) => {
+                        if (isResizing) {
+                            // 드래그 중: 마그넷 효과 표시
+                            const diff = Math.abs(tempHeight - height)
                             const threshold = 50 // 마그넷 효과 임계값
                             const isClose = diff < threshold
 
@@ -169,23 +149,19 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
                                     }`}
                                 />
                             )
-                        })}
-                    </div>
-                )}
-
-                {/* 드래그 중이 아닐 때 현재 단계 표시 */}
-                {!isResizing && (
-                    <div className='absolute flex gap-1 transform -translate-x-1/2 left-1/2 mt-7'>
-                        {heights.map((_, index) => (
-                            <div
-                                key={index}
-                                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                                    currentHeightIndex === index ? 'bg-blue-500' : 'bg-gray-300'
-                                }`}
-                            />
-                        ))}
-                    </div>
-                )}
+                        } else {
+                            // 드래그 중이 아닐 때: 현재 단계 표시
+                            return (
+                                <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                                        currentHeightIndex === index ? 'bg-blue-500' : 'bg-gray-300'
+                                    }`}
+                                />
+                            )
+                        }
+                    })}
+                </div>
             </div>
 
             {/* 리스트 컨테이너 */}
