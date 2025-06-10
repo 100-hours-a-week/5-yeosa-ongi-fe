@@ -41,8 +41,10 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
         e => {
             setIsResizing(true)
             startY.current = e.clientY
-            startHeight.current = getCurrentHeight()
-            setTempHeight(startHeight.current)
+            // getCurrentHeight() 대신 직접 계산
+            const currentHeight = heights[currentHeightIndex]
+            startHeight.current = currentHeight
+            setTempHeight(currentHeight)
 
             const handleMouseMove = e => {
                 const deltaY = startY.current - e.clientY
@@ -52,9 +54,12 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
 
             const handleMouseUp = () => {
                 setIsResizing(false)
-                // 가장 가까운 높이로 스냅
-                const closestIndex = findClosestHeightIndex(tempHeight)
-                setCurrentHeightIndex(closestIndex)
+                // tempHeight를 클로저에서 직접 참조하지 말고 콜백에서 받기
+                setTempHeight(currentTempHeight => {
+                    const closestIndex = findClosestHeightIndex(currentTempHeight)
+                    setCurrentHeightIndex(closestIndex)
+                    return currentTempHeight // tempHeight는 변경하지 않음
+                })
 
                 document.removeEventListener('mousemove', handleMouseMove)
                 document.removeEventListener('mouseup', handleMouseUp)
@@ -64,7 +69,7 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
             document.addEventListener('mouseup', handleMouseUp)
             e.preventDefault()
         },
-        [tempHeight, minHeight, maxHeight]
+        [currentHeightIndex, heights, minHeight, maxHeight]
     )
 
     // 터치 이벤트 처리
@@ -72,8 +77,10 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
         e => {
             setIsResizing(true)
             startY.current = e.touches[0].clientY
-            startHeight.current = getCurrentHeight()
-            setTempHeight(startHeight.current)
+            // getCurrentHeight() 대신 직접 계산
+            const currentHeight = heights[currentHeightIndex]
+            startHeight.current = currentHeight
+            setTempHeight(currentHeight)
 
             const handleTouchMove = e => {
                 e.preventDefault()
@@ -84,9 +91,12 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
 
             const handleTouchEnd = () => {
                 setIsResizing(false)
-                // 가장 가까운 높이로 스냅
-                const closestIndex = findClosestHeightIndex(tempHeight)
-                setCurrentHeightIndex(closestIndex)
+                // tempHeight를 클로저에서 직접 참조하지 말고 콜백에서 받기
+                setTempHeight(currentTempHeight => {
+                    const closestIndex = findClosestHeightIndex(currentTempHeight)
+                    setCurrentHeightIndex(closestIndex)
+                    return currentTempHeight
+                })
 
                 document.removeEventListener('touchmove', handleTouchMove)
                 document.removeEventListener('touchend', handleTouchEnd)
@@ -96,7 +106,7 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
             document.addEventListener('touchend', handleTouchEnd)
             e.preventDefault()
         },
-        [tempHeight, minHeight, maxHeight]
+        [currentHeightIndex, heights, minHeight, maxHeight]
     )
 
     // 높이 레벨 이름
@@ -166,7 +176,7 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
 
             {/* 리스트 컨테이너 */}
             <div
-                className={`overflow-y-auto ${className}`}
+                className={`flex flex-col ${className}`}
                 style={{ height: `calc(100% - 20px)` }} // 핸들 높이(20px) 제외
             >
                 {children}
