@@ -65,11 +65,7 @@ const MyPage = () => {
                 if (userInfoRaw) {
                     try {
                         const userInfoFromSession = JSON.parse(userInfoRaw)
-                        if (
-                            userInfoFromSession &&
-                            userInfoFromSession.state &&
-                            userInfoFromSession.state.user
-                        ) {
+                        if (userInfoFromSession && userInfoFromSession.state && userInfoFromSession.state.user) {
                             const user = userInfoFromSession.state.user
                             const updatedInfo = {
                                 userId: user.userId,
@@ -83,9 +79,7 @@ const MyPage = () => {
                                 setPreviewImageURL(updatedInfo.profileImageURL)
                             }
                         } else {
-                            throw new Error(
-                                '세션 스토리지에 유효한 사용자 정보가 없습니다.'
-                            )
+                            throw new Error('세션 스토리지에 유효한 사용자 정보가 없습니다.')
                         }
                     } catch (error) {
                         console.error('세션 스토리지 파싱 오류:', error)
@@ -114,21 +108,14 @@ const MyPage = () => {
             const authStorageRaw = sessionStorage.getItem('auth-storage')
             if (authStorageRaw) {
                 const authStorage = JSON.parse(authStorageRaw)
-                if (
-                    authStorage &&
-                    authStorage.state &&
-                    authStorage.state.user
-                ) {
+                if (authStorage && authStorage.state && authStorage.state.user) {
                     // 사용자 정보 업데이트
                     authStorage.state.user = {
                         ...authStorage.state.user,
                         ...updatedUser,
                     }
                     // 업데이트된 정보를 세션 스토리지에 저장
-                    sessionStorage.setItem(
-                        'auth-storage',
-                        JSON.stringify(authStorage)
-                    )
+                    sessionStorage.setItem('auth-storage', JSON.stringify(authStorage))
                     console.log('세션 스토리지 업데이트 완료')
                 }
             }
@@ -268,9 +255,7 @@ const MyPage = () => {
             })
 
             if (!response.ok) {
-                throw new Error(
-                    `이미지 로드 실패: ${response.status} ${response.statusText}`
-                )
+                throw new Error(`이미지 로드 실패: ${response.status} ${response.statusText}`)
             }
 
             // 응답에서 Blob 추출
@@ -305,23 +290,18 @@ const MyPage = () => {
                 ],
             })
 
-            if (
-                !response.data ||
-                !response.data.presignedFiles ||
-                response.data.presignedFiles.length === 0
-            ) {
+            if (!response.data || !response.data.presignedFiles || response.data.presignedFiles.length === 0) {
                 throw new Error('Pre-Signed URL을 가져오는데 실패했습니다.')
             }
 
             // Pre-Signed URL
-            const presignedUrl = response.data.presignedFiles[0].presignedURL
+            const presignedUrl = response.data.presignedFiles[0].pictureURL
 
             // 실제 저장될 영구 URL (S3에 저장된 후의 URL)
             // 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
             // 가정: 응답에 원본 URL이 포함되어 있거나, 패턴을 알고 있는 경우
-            const permanentImageUrl =
-                response.data.presignedFiles[0].permanentUrl ||
-                presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
+            console.log(presignedUrl)
+            const permanentImageUrl = response.data.presignedFiles[0].permanentUrl || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
 
             // 파일 업로드 (S3에 직접 업로드)
             const uploadResponse = await fetch(presignedUrl, {
@@ -333,9 +313,7 @@ const MyPage = () => {
             })
 
             if (!uploadResponse.ok) {
-                throw new Error(
-                    `파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`
-                )
+                throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
             // API 호출하여 사용자 정보 업데이트
@@ -382,23 +360,11 @@ const MyPage = () => {
                     </div>
                 ) : (
                     <div className='flex flex-col items-center'>
-                        <ImageInput
-                            onFileSelect={handleProfileImageSelect}
-                            accept='image/*'
-                            id='profileImageInput'
-                        >
+                        <ImageInput onFileSelect={handleProfileImageSelect} accept='image/*' id='profileImageInput'>
                             <img
-                                src={
-                                    previewImageURL ||
-                                    userInfo.profileImageURL ||
-                                    defaultProfileImage
-                                }
-                                alt={`${
-                                    userInfo.nickname || '사용자'
-                                }의 프로필 이미지`}
-                                className={`w-24 h-24 rounded-full object-cover ${
-                                    isUploading ? 'opacity-50' : ''
-                                }`}
+                                src={previewImageURL || userInfo.profileImageURL || defaultProfileImage}
+                                alt={`${userInfo.nickname || '사용자'}의 프로필 이미지`}
+                                className={`w-24 h-24 rounded-full object-cover ${isUploading ? 'opacity-50' : ''}`}
                             />
                             {isUploading && (
                                 <div className='absolute inset-0 flex items-center justify-center'>
@@ -438,36 +404,24 @@ const MyPage = () => {
                                         maxLength={12}
                                         showCharacterCount={false}
                                         validationFunction={nicknameValidation}
-                                        onValidationChange={state =>
-                                            setIsValid(state.isValid)
-                                        }
+                                        onValidationChange={state => setIsValid(state.isValid)}
                                     />
                                     <button
                                         onClick={handleSave}
                                         className='absolute p-1 px-2 py-1 ml-2 text-sm text-white transform -translate-y-1/2 rounded -right-8 top-1/2'
                                     >
-                                        <img
-                                            className='w-3 h-3'
-                                            src={iconCheck}
-                                            alt='편집'
-                                        />
+                                        <img className='w-3 h-3' src={iconCheck} alt='편집' />
                                     </button>
                                 </div>
                             ) : (
                                 <>
-                                    <h2 className='font-bold text-center text-md w-60'>
-                                        {nickname}
-                                    </h2>
+                                    <h2 className='font-bold text-center text-md w-60'>{nickname}</h2>
                                     <button
                                         className='absolute p-1 transform -translate-y-1/2 -right-8 top-1/2'
                                         onClick={handleEditClick}
                                         aria-label='프로필 편집'
                                     >
-                                        <img
-                                            className='w-4 h-4'
-                                            src={icon_pencil}
-                                            alt='편집'
-                                        />
+                                        <img className='w-4 h-4' src={icon_pencil} alt='편집' />
                                     </button>
                                 </>
                             )}
@@ -495,9 +449,7 @@ const MyPage = () => {
                                                 d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
                                             ></path>
                                         </svg>
-                                        <span className='text-base'>
-                                            내 활동
-                                        </span>
+                                        <span className='text-base'>내 활동</span>
                                     </div>
                                     <svg
                                         className='w-5 h-5 text-gray-400'
@@ -539,9 +491,7 @@ const MyPage = () => {
                                                 d='M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z'
                                             ></path>
                                         </svg>
-                                        <span className='text-base'>
-                                            문의하기
-                                        </span>
+                                        <span className='text-base'>문의하기</span>
                                     </div>
                                     <svg
                                         className='w-5 h-5 text-gray-400'
@@ -580,9 +530,7 @@ const MyPage = () => {
                                                 d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1'
                                             ></path>
                                         </svg>
-                                        <span className='text-base'>
-                                            로그아웃
-                                        </span>
+                                        <span className='text-base'>로그아웃</span>
                                     </div>
                                 </button>
                             </div>
