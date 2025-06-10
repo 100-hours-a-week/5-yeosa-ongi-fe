@@ -1,12 +1,17 @@
 import { useCallback, useRef, useState } from 'react'
 
-const ResizableList = ({ children, className = '', showHeightIndicator = false }) => {
+const ResizableList = ({
+    children,
+    className = '',
+    showHeightIndicator = false,
+    onHeightChange, // 높이 변경 콜백 추가
+}) => {
     // 3단계 높이 정의 (헤더 56px만 제외, 배너도 가릴 수 있도록)
     const headerHeight = 56
     const screenHeight = window.innerHeight - headerHeight
 
     const minHeight = Math.round(screenHeight * 0.3) // 화면의 30%
-    const midHeight = Math.round(screenHeight * 0.6) // 화면의 60%
+    const midHeight = Math.round(screenHeight * 0.5) // 화면의 60%
     const maxHeight = screenHeight // 헤더 제외한 전체 화면
 
     const heights = [minHeight, midHeight, maxHeight]
@@ -20,6 +25,21 @@ const ResizableList = ({ children, className = '', showHeightIndicator = false }
 
     // 현재 높이 가져오기
     const getCurrentHeight = () => (isResizing ? tempHeight : heights[currentHeightIndex])
+
+    // 높이 변경 시 부모에게 알림
+    const notifyHeightChange = useCallback(
+        height => {
+            if (onHeightChange) {
+                onHeightChange(height)
+            }
+        },
+        [onHeightChange]
+    )
+
+    // 높이가 변경될 때마다 부모에게 알림
+    useEffect(() => {
+        notifyHeightChange(getCurrentHeight())
+    }, [tempHeight, currentHeightIndex, isResizing, notifyHeightChange])
 
     // 가장 가까운 높이 단계 찾기
     const findClosestHeightIndex = height => {
