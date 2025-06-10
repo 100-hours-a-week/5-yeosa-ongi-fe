@@ -157,7 +157,7 @@ const KakaoMap = () => {
                     <div style="
                         width: 60px;
                         height: 60px;
-                        border: 4px solid #3b82f6;
+                        border: 4px solid #F3D0D7;
                         border-radius: 8px;
                         overflow: hidden;
                         background: white;
@@ -171,23 +171,6 @@ const KakaoMap = () => {
                             object-fit: cover;
                             display: block;
                         " onerror="this.style.display='none'" />
-                        <div style="
-                            position: absolute;
-                            bottom: -2px;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            background: #3b82f6;
-                            color: white;
-                            font-size: 10px;
-                            padding: 2px 6px;
-                            border-radius: 8px;
-                            white-space: nowrap;
-                            max-width: 80px;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                        ">
-                            ${albumData.albumName || '앨범'}
-                        </div>
                     </div>
                 `
 
