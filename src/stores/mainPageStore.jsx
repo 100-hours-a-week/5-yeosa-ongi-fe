@@ -31,6 +31,8 @@ const useAlbumStore = create((set, get) => ({
             albums[album.albumId.toString()] = {
                 albumName: album.albumName,
                 thumbnailURL: album.thumbnailPictureURL,
+                latitude: album.latitude,
+                longitude: album.longitude,
                 createdAt: album.createdAt,
                 memberProfileImageURL: album.memberProfileImageURL,
             }
@@ -65,6 +67,8 @@ const useAlbumStore = create((set, get) => ({
             updatedAlbums[album.albumId.toString()] = {
                 albumName: album.albumName,
                 thumbnailURL: album.thumbnailURL,
+                latitude: album.latitude,
+                longitude: album.longitude,
                 createdAt: album.createdAt,
                 memberProfileImageURL: album.memberProfileImageURL,
             }
