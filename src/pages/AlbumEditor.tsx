@@ -1,7 +1,7 @@
 // AlbumEditor.tsx (파일 교체 지원 최종 버전)
 
 import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
-import { FC, useCallback, useEffect } from 'react'
+import { FC, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
@@ -12,12 +12,11 @@ import useFileUpload from '@/hooks/useFileUpload'
 import { FileItem } from '@/types/upload'
 import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
-import { useAlbumTitle } from '../hooks/useAlbumTitle'
+// import { useAlbumTitle } from '../hooks/useAlbumTitle'
 
 const AlbumEditor: FC = () => {
     const { albumId } = useParams<{ albumId?: string }>()
 
-    const { albumTitle, handleTitleChange } = useAlbumTitle()
     const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
 
     // 통합된 파일 관리
@@ -78,33 +77,12 @@ const AlbumEditor: FC = () => {
         [fileManager]
     )
 
-    useEffect(() => {
-        console.log('AlbumEditor 리렌더링 발생')
-        console.log('Current files:', fileManager.files?.length || 0)
-
-        // 파일 타입별 분석
-        const fileAnalysis =
-            fileManager.files?.map(f => ({
-                id: f.id,
-                name: f.file.name,
-                type: f.file.type,
-                size: f.file.size,
-                isHeic: f.file.type.includes('heic') || f.file.name.toLowerCase().includes('.heic'),
-                isJpeg: f.file.type.includes('jpeg') || f.file.type.includes('jpg'),
-            })) || []
-
-        console.log('Files analysis:', fileAnalysis)
-        console.log('HEIC files:', fileAnalysis.filter(f => f.isHeic).length)
-        console.log('JPEG files:', fileAnalysis.filter(f => f.isJpeg).length)
-        console.log('Button disabled:', albumUI.isButtonDisabled)
-    })
-
     return (
         <div className='flex flex-col min-h-screen'>
             <AlbumEditorHeader title={'앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
-            <AlbumTitleForm initialTitle={albumTitle} onTitleChange={handleTitleChange} />
+            <AlbumTitleForm initialTitle={albumUI.albumTitle} onTitleChange={albumUI.handleTitleChange} />
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
@@ -112,7 +90,7 @@ const AlbumEditor: FC = () => {
                     files={fileManager.files}
                     onFileDelete={fileManager.removeFile}
                     onFileAdd={fileManager.addFile}
-                    onFileConverted={handleFileConverted} // 변환 완료 콜백
+                    onFileConverted={handleFileConverted}
                     isProcessing={fileManager.isProcessing}
                     maxFiles={30}
                 />
@@ -136,7 +114,6 @@ const AlbumEditor: FC = () => {
     )
 }
 
-// displayName 설정
 AlbumEditor.displayName = 'AlbumEditor'
 
 export default AlbumEditor
