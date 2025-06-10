@@ -41,7 +41,7 @@ const KakaoMap = () => {
             console.log('지도가 준비되지 않음')
             return
         }
-
+        clearMarkers()
         const albumSummary = getSelectedAlbumSummary()
 
         if (!albumSummary || !albumSummary.length) {
