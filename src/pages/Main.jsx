@@ -33,6 +33,22 @@ const Main = () => {
     const [page, setPage] = useState(1) // 현재 페이지 번호
     const lastAttemptedYearMonth = useRef(null)
 
+    const [listHeight, setListHeight] = useState(0)
+
+    const handleListHeightChange = useCallback(height => {
+        setListHeight(height)
+    }, [])
+
+    // 지도의 실제 높이 계산
+    const getMapHeight = () => {
+        console.log('맵 높이 다시계산 !!!!!')
+        const totalHeight = window.innerHeight - 56 // 헤더 제외
+        const bannerHeight = 72
+        const availableHeight = totalHeight - bannerHeight
+        const mapHeight = availableHeight - listHeight
+        return Math.max(0, mapHeight) // 최소 0
+    }
+
     const fetchMoreAlbums = useCallback(async () => {
         console.log('무한 스크롤 로직 시작 = == = = = ==')
 
@@ -142,13 +158,17 @@ const Main = () => {
 
                     {/* 지도를 배경에 깔기 */}
                     <div className='absolute inset-0 top-[72px] border-t border-solid'>
-                        <KakaoMap />
+                        <KakaoMap height={getMapHeight()} />
                     </div>
 
                     {hasData || hasNext ? (
                         <>
                             {/* ResizableList - absolute로 하단에서 올라오도록 */}
-                            <ResizableList showHeightIndicator={false} className=''>
+                            <ResizableList
+                                showHeightIndicator={false}
+                                className=''
+                                onHeightChange={handleListHeightChange}
+                            >
                                 {/* AlbumListHeader를 ResizableList 밖으로 이동하고 고정 */}
                                 <div className='z-20 bg-white border-b'>
                                     <AlbumListHeader />
