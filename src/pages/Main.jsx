@@ -148,17 +148,20 @@ const Main = () => {
                     {hasData || hasNext ? (
                         <>
                             {/* ResizableList - absolute로 하단에서 올라오도록 */}
-                            <ResizableList showControls={true} showHeightIndicator={false} className=''>
-                                {/* AlbumListHeader를 리스트 내부로 이동 */}
-                                <div className='sticky top-0 z-10 bg-white border-b'>
+                            <ResizableList showHeightIndicator={false} className=''>
+                                {/* AlbumListHeader를 ResizableList 밖으로 이동하고 고정 */}
+                                <div className='z-20 bg-white border-b'>
                                     <AlbumListHeader />
                                 </div>
 
-                                {Object.keys(albumsByMonth).map((month, index) => (
-                                    <Month key={month} title={month} albumIds={albumsByMonth[month]} />
-                                ))}
-                                {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
-                                <div ref={observerRef} style={{ height: '10px' }} />
+                                {/* 스크롤 가능한 컨텐츠 영역 */}
+                                <div className='flex-1 overflow-y-auto'>
+                                    {Object.keys(albumsByMonth).map((month, index) => (
+                                        <Month key={month} title={month} albumIds={albumsByMonth[month]} />
+                                    ))}
+                                    {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
+                                    <div ref={observerRef} style={{ height: '10px' }} />
+                                </div>
                             </ResizableList>
                         </>
                     ) : (
