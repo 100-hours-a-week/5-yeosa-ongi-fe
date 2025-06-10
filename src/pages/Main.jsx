@@ -17,6 +17,7 @@ import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import useInfiniteScroll from '../hooks/infiniteScroll'
 
 import bannerImage from '@/assets/banners/banner01.png'
+import ResizableList from '@/components/Main/ResizableList'
 const Main = () => {
     const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
 
@@ -132,33 +133,38 @@ const Main = () => {
     return (
         <div className='relative h-screen overflow-hidden'>
             <Header />
-            {/*배너 */}
-            <img src={bannerImage} className='h-[72px]'></img>
+
             <div className='flex-col content'>
-                <div className='border-t border-solid' style={{ height: 'min(80vw, 430px)' }}>
-                    <KakaoMap />
+                {/* 배너와 지도를 포함한 전체 컨테이너 */}
+                <div className='relative' style={{ height: 'calc(100vh - 56px)' }}>
+                    {/* 배너 */}
+                    <img src={bannerImage} className='h-[72px] w-full relative z-0'></img>
+
+                    {/* 지도를 배경에 깔기 */}
+                    <div className='absolute inset-0 top-[72px] border-t border-solid'>
+                        <KakaoMap />
+                    </div>
+
+                    {hasData || hasNext ? (
+                        <>
+                            {/* ResizableList - absolute로 하단에서 올라오도록 */}
+                            <ResizableList showControls={true} showHeightIndicator={false} className=''>
+                                {/* AlbumListHeader를 리스트 내부로 이동 */}
+                                <div className='sticky top-0 z-10 bg-white border-b'>
+                                    <AlbumListHeader />
+                                </div>
+
+                                {Object.keys(albumsByMonth).map((month, index) => (
+                                    <Month key={month} title={month} albumIds={albumsByMonth[month]} />
+                                ))}
+                                {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
+                                <div ref={observerRef} style={{ height: '10px' }} />
+                            </ResizableList>
+                        </>
+                    ) : (
+                        <OnboardingScreen />
+                    )}
                 </div>
-
-                {hasData || hasNext ? (
-                    <>
-                        <AlbumListHeader />
-
-                        <div
-                            className='overflow-y-auto'
-                            style={{
-                                height: 'calc(100vh - min(80vw,430px) - 168px)',
-                            }}
-                        >
-                            {Object.keys(albumsByMonth).map((month, index) => (
-                                <Month key={month} title={month} albumIds={albumsByMonth[month]} />
-                            ))}
-                            {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
-                            <div ref={observerRef} style={{ height: '10px' }} />
-                        </div>
-                    </>
-                ) : (
-                    <OnboardingScreen />
-                )}
             </div>
 
             <FlottingButton />
