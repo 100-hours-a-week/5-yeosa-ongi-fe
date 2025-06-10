@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { getPreSignedUrl } from '../api/album'
 
+import axios from 'axios'
 import { updateUserInfo } from '../api/user'
 import ConfirmModal from '../components/common/ConfirmModal'
 import Header from '../components/common/Header'
@@ -295,24 +296,27 @@ const MyPage = () => {
             }
 
             // Pre-Signed URL
-            const presignedUrl = response.data.presignedFiles[0].pictureURL
+
+            const presignedUrl = response.data.presignedFiles[0].presignedUrl
+
 
             // 실제 저장될 영구 URL (S3에 저장된 후의 URL)
             // 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
             // 가정: 응답에 원본 URL이 포함되어 있거나, 패턴을 알고 있는 경우
-            console.log(presignedUrl)
-            const permanentImageUrl = response.data.presignedFiles[0].permanentUrl || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
+
+            const permanentImageUrl = response.data.presignedFiles[0].pictureURL || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
+
 
             // 파일 업로드 (S3에 직접 업로드)
-            const uploadResponse = await fetch(presignedUrl, {
-                method: 'PUT',
+            const uploadResponse = await axios.put(presignedUrl, file, {
                 headers: {
                     'Content-Type': file.type,
                 },
-                body: file,
             })
 
-            if (!uploadResponse.ok) {
+
+            if (uploadResponse.status !== 200) {
+
                 throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
