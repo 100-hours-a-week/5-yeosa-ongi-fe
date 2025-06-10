@@ -135,7 +135,7 @@ const Main = () => {
             {/*배너 */}
             <img src={bannerImage} className='h-[72px]'></img>
             <div className='flex-col content'>
-                <div className='border-t border-solid' style={{ height: 'min(80vw, 560px)' }}>
+                <div className='border-t border-solid' style={{ height: 'min(80vw, 430px)' }}>
                     <KakaoMap />
                 </div>
 
@@ -146,7 +146,7 @@ const Main = () => {
                         <div
                             className='overflow-y-auto'
                             style={{
-                                height: 'calc(100vh - min(80vw,560px) - 168px)',
+                                height: 'calc(100vh - min(80vw,430px) - 168px)',
                             }}
                         >
                             {Object.keys(albumsByMonth).map((month, index) => (
