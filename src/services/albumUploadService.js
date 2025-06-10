@@ -42,11 +42,11 @@ export class AlbumUploadService {
         }
     }
 
-    static createAlbumData(albumTitle, presignedFiles) {
+    static createAlbumData(albumTitle, files, presignedFiles) {
         const pictureData = presignedFiles.map(f => ({
             pictureUrl: f.pictureURL || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
-            latitude: 0.0,
-            longitude: 0.0,
+            latitude: files.filter(file => file.newname === f.pictureName).GPS.latitude,
+            longitude: files.filter(file => file.newname === f.pictureName).GPS.longitude
         }))
 
         return {
@@ -70,13 +70,11 @@ export class AlbumUploadService {
         const response = await getPreSignedUrl({ pictures })
         const presignedFiles = response.data.presignedFiles
 
-        console.log('서버에서 받은 presignedFiles:', presignedFiles)
-
         // 3. 각 파일을 presigned URL을 사용하여 업로드
         await this.uploadFilesToS3(filesWithNewNames, presignedFiles)
 
         // 4. 업로드 완료 후 앨범 생성 요청
-        const albumData = this.createAlbumData(albumTitle, presignedFiles)
+        const albumData = this.createAlbumData(albumTitle, filesWithNewNames, presignedFiles)
 
         console.log('생성할 앨범 데이터:', albumData)
 
