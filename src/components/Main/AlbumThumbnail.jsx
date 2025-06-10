@@ -7,10 +7,9 @@ const AlbumThumbnail = ({ id }) => {
     const hasCoworkers = false
     const { albums } = useAlbumStore()
     const album = albums[id.toString()]
-    console.log(album)
-    const isSelected = useMainPageStore(state => state.selectedId === id)
-    const selectItem = useMainPageStore(state => state.selectItem)
-    const setSelectedAlbumSummary = useMainPageStore(state => state.setSelectedAlbumSummary)
+
+    const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
+    const isSelected = selectedId === id
     const handleSelect = async () => {
         if (isSelected) {
             console.log('앨범 상세페이지로 이동 : ', id)
@@ -19,7 +18,6 @@ const AlbumThumbnail = ({ id }) => {
             selectItem(id)
             const response = await getAlubmSummary(id)
             setSelectedAlbumSummary(response.data)
-            console.log(response)
         }
     }
 
