@@ -132,7 +132,8 @@ const Main = () => {
     return (
         <div className='relative h-screen overflow-hidden'>
             <Header />
-
+            {/*배너 */}
+            <img src={bannerImage} className='h-[72px]'></img>
             <div className='flex-col content'>
                 <div className='border-t border-solid' style={{ height: 'min(80vw, 560px)' }}>
                     <KakaoMap />
@@ -159,8 +160,7 @@ const Main = () => {
                     <OnboardingScreen />
                 )}
             </div>
-            {/*배너 */}
-            <img src={bannerImage} className='h-[72px]'></img>
+
             <FlottingButton />
         </div>
     )
