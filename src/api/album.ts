@@ -185,7 +185,7 @@ export const changeClusterTitle = async (albumId: string, clusterId: string, clu
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/cluster/${clusterId}`
         return await authenticatedFetch(apiUrl, {
             method: 'PATCH',
-            body: JSON.stringify(clusterName),
+            body: JSON.stringify({ clusterName: clusterName }),
         })
     } catch (error) {
         console.error('클러스터 이름 수정 실패:', (error as Error).message)
