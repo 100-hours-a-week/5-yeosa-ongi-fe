@@ -14,17 +14,11 @@ const KakaoMap = ({ height }) => {
     const [mapHeight, setMapHeight] = useState('100%') // 높이 상태 추가
     console.log('KakaoMap 렌더링 - selectedId:', selectedId)
 
-    const changeMapHeight = height => {
-        setMapHeight(height)
-        // 지도 크기가 변경되면 resize 이벤트 발생
-        setTimeout(() => {
-            if (mapInstance.current) {
-                mapInstance.current.relayout()
-            }
-        }, 100)
-    }
-
-    // 지도 이동 함수
+    /**
+     * 지도 이동 함수
+     * @param {*} x
+     * @param {*} y
+     */
     const panTo = (x, y) => {
         if (mapInstance.current) {
             const moveLatLon = new window.kakao.maps.LatLng(x, y)
@@ -35,9 +29,20 @@ const KakaoMap = ({ height }) => {
         }
     }
 
-    // 기존 마커들 제거 함수
+    /**
+     * 기존 마커 제거 함수
+     */
     const clearMarkers = () => {
         markersRef.current.forEach(marker => {
+            // CustomOverlay의 경우 이벤트 리스너 정리
+            if (marker.getContent) {
+                const element = marker.getContent()
+                if (element) {
+                    // 복제된 요소로 이벤트 리스너 제거
+                    const newElement = element.cloneNode(true)
+                    element.parentNode?.replaceChild(newElement, element)
+                }
+            }
             marker.setMap(null)
         })
         markersRef.current = []
@@ -88,7 +93,10 @@ const KakaoMap = ({ height }) => {
         }
     }
 
-    // 전체 앨범을 마커로 표시하는 함수
+    /**
+     * 전체 앨범 마커 표시
+     * @returns
+     */
     const displayAllAlbumMarkers = () => {
         console.log('전체 앨범 마커 표시 시작')
 
@@ -96,8 +104,6 @@ const KakaoMap = ({ height }) => {
             console.log('지도가 준비되지 않음')
             return
         }
-
-        // 기존 마커들 제거
         clearMarkers()
 
         if (!albums || Object.keys(albums).length === 0) {
@@ -125,65 +131,56 @@ const KakaoMap = ({ height }) => {
             const thumbnailUrl = albumData.thumbnailURL
 
             if (thumbnailUrl) {
-                const overlayContent = `
-                    <div style="
-                        width: 60px;
-                        height: 60px;
-                        border: 4px solid #F3D0D7;
-                        border-radius: 8px;
-                        overflow: hidden;
-                        background: white;
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                        cursor: pointer;
-                        position: relative;
-                    " data-album-id="${albumId}">
-                        <img src="${thumbnailUrl}" style="
-                            width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                            display: block;
-                        " onerror="this.style.display='none'" />
-                    </div>
-                `
+                // DOM 요소를 직접 생성
+                const markerDiv = document.createElement('div')
+                markerDiv.className = 'album-marker'
+                markerDiv.style.cssText = `
+                width: 60px;
+                height: 60px;
+                border: 4px solid #F3D0D7;
+                border-radius: 8px;
+                overflow: hidden;
+                background: white;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                cursor: pointer;
+                position: relative;
+                z-index: 100;
+            `
+                markerDiv.dataset.albumId = albumId
 
-                const customOverlay = new window.kakao.maps.CustomOverlay({
-                    content: overlayContent,
-                    position: position,
-                    yAnchor: 1,
-                })
+                const img = document.createElement('img')
+                img.src = thumbnailUrl
+                img.style.cssText = `
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                pointer-events: none;
+            `
+                img.onerror = () => (img.style.display = 'none')
 
-                customOverlay.setMap(mapInstance.current)
-                markersRef.current.push(customOverlay)
+                markerDiv.appendChild(img)
 
-                // 앨범 마커 클릭 이벤트
-                setTimeout(() => {
-                    const overlayElement = customOverlay.getContent()
-                    if (overlayElement) {
-                        overlayElement.addEventListener('click', () => {
-                            console.log('앨범 선택됨:', albumId)
-                            const { selectItem } = useMainPageStore.getState()
-                            selectItem(albumId)
-                            panTo(albumData.latitude, albumData.longitude)
-                        })
-                    }
-                }, 100)
-            } else {
-                // 썸네일이 없는 경우 기본 마커
-                const marker = new window.kakao.maps.Marker({
-                    position: position,
-                    title: albumData.albumName || '앨범',
-                })
-
-                marker.setMap(mapInstance.current)
-                markersRef.current.push(marker)
-
-                // 기본 마커 클릭 이벤트
-                window.kakao.maps.event.addListener(marker, 'click', () => {
+                // 이벤트 리스너 추가
+                markerDiv.addEventListener('click', e => {
+                    e.preventDefault()
+                    e.stopPropagation()
                     console.log('앨범 선택됨:', albumId)
+
                     const { selectItem } = useMainPageStore.getState()
                     selectItem(albumId)
                     panTo(albumData.latitude, albumData.longitude)
                 })
+
+                const customOverlay = new window.kakao.maps.CustomOverlay({
+                    content: markerDiv,
+                    position: position,
+                    yAnchor: 1,
+                    clickable: true,
+                })
+
+                customOverlay.setMap(mapInstance.current)
+                markersRef.current.push(customOverlay)
             }
         })
 
