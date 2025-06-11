@@ -2,6 +2,8 @@ import ArrowRight from '@/assets/icons/Arrow Right.png'
 import ArrowLeft from '@/assets/icons/Arrow_Left.png'
 import onboadingImage1 from '@/assets/onboardingImages/onboarding01.png'
 import onboadingImage2 from '@/assets/onboardingImages/onboarding02.png'
+import onboadingImage3 from '@/assets/onboardingImages/onboarding03.png'
+import onboadingImage4 from '@/assets/onboardingImages/onboarding04.png'
 import { useState } from 'react'
 const OnboardingUI = () => {
     const [currentSlide, setCurrentSlide] = useState(0)
@@ -16,6 +18,19 @@ const OnboardingUI = () => {
         {
             id: 2,
             image: onboadingImage2,
+            title: 'AI가 사진에 맞는 카테고리를 분류해줘요',
+            description:
+                '카테고리 분류중에서도 중복되거나 흔들린 사진과 같은 품질이 떨어지는 사진도 AI가 분류해줍니다.',
+        },
+        {
+            id: 3,
+            image: onboadingImage3,
+            title: '사진에 나온 인물들을 분류해요',
+            description: '우리 앨범에서 나만 나온 사진을 모아보고 저장할 수 있어요',
+        },
+        {
+            id: 4,
+            image: onboadingImage4,
             title: '친구를 초대하고 함께 앨범을 만들어요',
             description: '앨범에 함께 사진을 추가하면서 우리의 추억을 공유해요',
         },
@@ -45,18 +60,18 @@ const OnboardingUI = () => {
                 >
                     {slides.map((slide, index) => (
                         <div key={slide.id} className='flex-shrink-0 w-full px-8 pb-8'>
-                            <div className='grid items-center gap-8 md:grid-cols-2'>
+                            <div className='grid items-center grid-rows-2'>
                                 {/* Image Section */}
                                 <div className='relative group'>
                                     <img
                                         src={slide.image}
                                         alt={slide.title}
-                                        className='object-cover w-full transition-transform duration-300 h-52 rounded-2xl group-hover:scale-105'
+                                        className='w-full transition-transform duration-300 h-52 rounded-2xl group-hover:scale-105'
                                     />
                                 </div>
 
                                 {/* Text Section */}
-                                <div className='space-y-6'>
+                                <div className='space-y-2'>
                                     <div className='flex flex-col items-center justify-center '>
                                         <h1 className='font-bold leading-tight text-gray-900 text-md'>{slide.title}</h1>
                                         <h2 className='font-medium text-gray-600 text-md'>{slide.subtitle}</h2>
