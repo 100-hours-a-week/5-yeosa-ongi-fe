@@ -4,9 +4,15 @@ import onboadingImage1 from '@/assets/onboardingImages/onboarding01.png'
 import onboadingImage2 from '@/assets/onboardingImages/onboarding02.png'
 import onboadingImage3 from '@/assets/onboardingImages/onboarding03.png'
 import onboadingImage4 from '@/assets/onboardingImages/onboarding04.png'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
 const OnboardingUI = () => {
     const [currentSlide, setCurrentSlide] = useState(0)
+    const [touchStart, setTouchStart] = useState(null)
+    const [touchEnd, setTouchEnd] = useState(null)
+    const [isDragging, setIsDragging] = useState(false)
+    const [dragOffset, setDragOffset] = useState(0)
+    const containerRef = useRef(null)
 
     const slides = [
         {
@@ -36,6 +42,9 @@ const OnboardingUI = () => {
         },
     ]
 
+    // 최소 스와이프 거리 (픽셀)
+    const minSwipeDistance = 50
+
     const nextSlide = () => {
         setCurrentSlide(prev => (prev + 1) % slides.length)
     }
@@ -48,18 +57,135 @@ const OnboardingUI = () => {
         setCurrentSlide(index)
     }
 
+    // 터치 시작
+    const onTouchStart = e => {
+        setTouchEnd(null)
+        setTouchStart(e.targetTouches[0].clientX)
+        setIsDragging(true)
+    }
+
+    // 터치 이동
+    const onTouchMove = e => {
+        if (!isDragging) return
+
+        const currentTouch = e.targetTouches[0].clientX
+        const diff = touchStart - currentTouch
+
+        // 드래그 제한 (현재 슬라이드 기준으로 좌우 100% 이내)
+        const containerWidth = containerRef.current?.offsetWidth || 0
+        const maxDrag = containerWidth
+        const limitedDiff = Math.max(-maxDrag, Math.min(maxDrag, diff))
+
+        setDragOffset(limitedDiff)
+        setTouchEnd(currentTouch)
+    }
+
+    // 터치 종료
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) {
+            setIsDragging(false)
+            setDragOffset(0)
+            return
+        }
+
+        const distance = touchStart - touchEnd
+        const isLeftSwipe = distance > minSwipeDistance
+        const isRightSwipe = distance < -minSwipeDistance
+
+        if (isLeftSwipe && currentSlide < slides.length - 1) {
+            nextSlide()
+        }
+        if (isRightSwipe && currentSlide > 0) {
+            prevSlide()
+        }
+
+        // 상태 초기화
+        setIsDragging(false)
+        setDragOffset(0)
+        setTouchStart(null)
+        setTouchEnd(null)
+    }
+
+    // 마우스 이벤트 (데스크톱 호환성)
+    const onMouseDown = e => {
+        setTouchEnd(null)
+        setTouchStart(e.clientX)
+        setIsDragging(true)
+    }
+
+    const onMouseMove = e => {
+        if (!isDragging) return
+
+        const currentMouse = e.clientX
+        const diff = touchStart - currentMouse
+
+        const containerWidth = containerRef.current?.offsetWidth || 0
+        const maxDrag = containerWidth
+        const limitedDiff = Math.max(-maxDrag, Math.min(maxDrag, diff))
+
+        setDragOffset(limitedDiff)
+        setTouchEnd(currentMouse)
+    }
+
+    const onMouseUp = () => {
+        if (!touchStart || !touchEnd) {
+            setIsDragging(false)
+            setDragOffset(0)
+            return
+        }
+
+        const distance = touchStart - touchEnd
+        const isLeftSwipe = distance > minSwipeDistance
+        const isRightSwipe = distance < -minSwipeDistance
+
+        if (isLeftSwipe && currentSlide < slides.length - 1) {
+            nextSlide()
+        }
+        if (isRightSwipe && currentSlide > 0) {
+            prevSlide()
+        }
+
+        setIsDragging(false)
+        setDragOffset(0)
+        setTouchStart(null)
+        setTouchEnd(null)
+    }
+
+    // 마우스 이벤트 리스너 등록/해제
+    useEffect(() => {
+        if (isDragging) {
+            document.addEventListener('mousemove', onMouseMove)
+            document.addEventListener('mouseup', onMouseUp)
+
+            return () => {
+                document.removeEventListener('mousemove', onMouseMove)
+                document.removeEventListener('mouseup', onMouseUp)
+            }
+        }
+    }, [isDragging, touchStart, touchEnd])
+
     return (
         <>
             {/* Header */}
 
             {/* Content Container */}
-            <div className='relative overflow-hidden'>
+            <div
+                ref={containerRef}
+                className='relative overflow-hidden'
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                onMouseDown={onMouseDown}
+                style={{ userSelect: 'none' }}
+            >
                 <div
-                    className='flex transition-transform duration-500 ease-out'
-                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                    className={`flex ${isDragging ? '' : 'transition-transform duration-500 ease-out'}`}
+                    style={{
+                        transform: `translateX(-${currentSlide * 100}%) translateX(-${isDragging ? dragOffset : 0}px)`,
+                    }}
                 >
                     {slides.map((slide, index) => (
-                        <div key={slide.id} className='flex-shrink-0 w-full px-8 pb-8'>
+                        <div key={slide.id} className='flex-shrink-0 w-full px-8'>
                             <div className='grid items-center grid-rows-2'>
                                 {/* Image Section */}
                                 <div className='relative group'>
@@ -67,13 +193,16 @@ const OnboardingUI = () => {
                                         src={slide.image}
                                         alt={slide.title}
                                         className='w-full transition-transform duration-300 h-52 rounded-2xl group-hover:scale-105'
+                                        draggable={false}
                                     />
                                 </div>
 
                                 {/* Text Section */}
                                 <div className='space-y-2'>
                                     <div className='flex flex-col items-center justify-center '>
-                                        <h1 className='font-bold leading-tight text-gray-900 text-md'>{slide.title}</h1>
+                                        <h1 className='mb-2 font-bold leading-tight text-gray-900 text-md'>
+                                            {slide.title}
+                                        </h1>
                                         <h2 className='font-medium text-gray-600 text-md'>{slide.subtitle}</h2>
                                         <p className='text-xs leading-relaxed text-gray-500'>{slide.description}</p>
                                     </div>
@@ -84,7 +213,7 @@ const OnboardingUI = () => {
                 </div>
             </div>
 
-            <div className='px-8 pt-8 text-center'>
+            <div className='px-8 text-center'>
                 <div className='flex justify-center mb-6 space-x-2'>
                     {slides.map((_, index) => (
                         <button
@@ -100,8 +229,8 @@ const OnboardingUI = () => {
                 </div>
             </div>
 
-            {/* Navigation Arrows */}
-            <div className='absolute transform -translate-y-1/2 top-1/2 left-4'>
+            {/* Navigation Arrows - 모바일에서는 숨김 */}
+            <div className='absolute hidden transform -translate-y-1/2 top-1/2 left-4 md:block'>
                 <button
                     onClick={prevSlide}
                     className='p-3 text-gray-700 transition-all duration-200 bg-transparent rounded-full hover:bg-white hover:scale-110'
@@ -110,7 +239,7 @@ const OnboardingUI = () => {
                 </button>
             </div>
 
-            <div className='absolute transform -translate-y-1/2 top-1/2 right-4'>
+            <div className='absolute hidden transform -translate-y-1/2 top-1/2 right-4 md:block'>
                 <button
                     onClick={nextSlide}
                     className='p-3 text-gray-700 transition-all duration-200 bg-transparent rounded-full hover:bg-white hover:scale-110'
