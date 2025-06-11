@@ -179,3 +179,16 @@ export const getPreSignedUrl = async (pictures: any): Promise<ApiResponse> => {
         throw error
     }
 }
+
+export const changeClusterTitle = async (albumId: string, clusterId: string, clusterName: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/cluster/${clusterId}`
+        return await authenticatedFetch(apiUrl, {
+            method: 'PATCH',
+            body: JSON.stringify({ clusterName: clusterName }),
+        })
+    } catch (error) {
+        console.error('클러스터 이름 수정 실패:', (error as Error).message)
+        throw error
+    }
+}
