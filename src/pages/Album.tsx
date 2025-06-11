@@ -18,12 +18,47 @@ import { deleteAlbum, getAlbumAccess, getAlbumDetail } from '../api/album'
 import useCollectionStore from '../stores/collectionStore'
 
 //Assets
+import Cluster from '@/components/Album/Cluster'
 import Arrow_Right from '../assets/icons/Arrow Right.png'
 import iconDuplicated from '../assets/icons/icon_duplicated.png'
 import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import { ApiResponse } from '../types'
+
+// const mockClusters = [
+//     {
+//         clusterId: 1,
+//         clusterName: '사람-1',
+//         representativePicture: 'https://cdn.ongi.today/image1.jpg',
+//         bboxX1: 0,
+//         bboxY1: 0,
+//         bboxX2: 0,
+//         bboxY2: 0,
+//         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
+//     },
+//     {
+//         clusterId: 1,
+//         clusterName: '사람-1',
+//         representativePicture: 'https://cdn.ongi.today/image1.jpg',
+//         bboxX1: 0,
+//         bboxY1: 0,
+//         bboxX2: 0,
+//         bboxY2: 0,
+//         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
+//     },
+// ]
+
+interface Cluster {
+    clusterId: string | number
+    clusterName: string
+    representativePicture: string
+    bboxX1: number
+    bboxY1: number
+    bboxX2: number
+    bboxY2: number
+    clusterPicture: string[]
+}
 
 interface Picture {
     id: string | number
@@ -56,23 +91,16 @@ const Album = () => {
     const [showRightIndicator, setShowRightIndicator] = useState(true)
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
-    const {
-        setPicturesAndCategorize,
-        tagCollections,
-        allCollection,
-        duplicatedCollection,
-        shakyCollection,
-    } = useCollectionStore()
-
+    const { setPicturesAndCategorize, tagCollections, allCollection, duplicatedCollection, shakyCollection } =
+        useCollectionStore()
+    const [clusters, setClusters] = useState<Cluster[]>([])
     /**
      * 스크롤 이벤트 처리
      * @param e
      */
     const handleScroll = (e: React.UIEvent) => {
         const container = e.target as HTMLDivElement
-        const isScrollEnd =
-            container.scrollWidth - container.scrollLeft <=
-            container.clientWidth + 10
+        const isScrollEnd = container.scrollWidth - container.scrollLeft <= container.clientWidth + 10
 
         if (isScrollEnd) {
             setShowRightIndicator(false)
@@ -88,9 +116,7 @@ const Album = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result: ApiResponse = await getAlbumAccess(
-                    albumId as string
-                )
+                const result: ApiResponse = await getAlbumAccess(albumId as string)
                 const role = result.data.role
                 if (role !== 'OWNER' && role !== 'NORMAL') {
                     navigate('/main')
@@ -104,6 +130,8 @@ const Album = () => {
                     const pictures: Picture[] = response.data.picture
                     await setPicturesAndCategorize(albumId, pictures)
                 }
+                setClusters(response.data.cluster)
+                // setClusters(mockClusters)
 
                 setIsLoading(false)
             } catch (error) {
@@ -126,22 +154,15 @@ const Album = () => {
     return (
         <>
             <Header />
-            <div className='mt-2 ml-4 font-sans text-lg'>
-                {albumData?.title}
-            </div>
+            <div className='mt-2 ml-4 font-sans text-lg'>{albumData?.title}</div>
             <Card />
             <div className='m-4 mt-6'>
                 <div className='flex items-center justify-between'>
                     <div className='ml-4 font-sans text-md'>카테고리 </div>
-                    <button
-                        onClick={() => navigate(`/album/${albumId}/전체`)}
-                        className='px-2'
-                    >
+                    <button onClick={() => navigate(`/album/${albumId}/전체`)} className='px-2'>
                         <div className='flex items-center '>
                             <img src={images_icon} className='h-4'></img>
-                            <div className='px-2 text-xs tracking-tighter'>
-                                전체 {allCollection.count} 개 사진 보기
-                            </div>
+                            <div className='px-2 text-xs tracking-tighter'>전체 {allCollection.count} 개 사진 보기</div>
                         </div>
                     </button>
                 </div>
@@ -152,15 +173,9 @@ const Album = () => {
                         onScroll={handleScroll}
                     >
                         {tagCollections &&
-                            tagCollections.map(
-                                (category: Category, index: number) => (
-                                    <Category
-                                        title={category.name}
-                                        pictures={category.pictures}
-                                        albumId={albumId}
-                                    />
-                                )
-                            )}
+                            tagCollections.map((category: Category, index: number) => (
+                                <Category title={category.name} pictures={category.pictures} albumId={albumId} />
+                            ))}
                     </div>
                     {showRightIndicator && (
                         <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
@@ -184,9 +199,12 @@ const Album = () => {
                     )}
                 </div>
             </div>
-            {/* <div className="m-4 mt-6">
-				<div className="ml-4 font-sans text-md">하이라이트 </div>
-			</div> */}
+            <div className='m-4 mt-6'>
+                {clusters ? <div className='ml-4 font-sans text-md'>인물 분류</div> : ' '}
+                <div className='flex gap-4 mt-6'>
+                    {clusters && clusters.map((cluster: Cluster, index) => <Cluster cluster={cluster} />)}
+                </div>
+            </div>
             <div className='m-4 mt-6'>
                 <div className='ml-4 font-sans text-md'>검토해줘 </div>
 
@@ -199,9 +217,7 @@ const Album = () => {
                             <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50'>
                                 <img src={iconDuplicated}></img>
                             </div>
-                            <div className='text-sm text-gray-dark'>
-                                중복된 사진
-                            </div>
+                            <div className='text-sm text-gray-dark'>중복된 사진</div>
                         </div>
                         <img className='m-2 size-2' src={Arrow_Right} />
                     </button>
@@ -216,17 +232,12 @@ const Album = () => {
                             <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50'>
                                 <img src={iconShaky}></img>
                             </div>
-                            <div className='text-sm text-gray-dark'>
-                                흔들린 사진
-                            </div>
+                            <div className='text-sm text-gray-dark'>흔들린 사진</div>
                         </div>
                         <img className='m-2 size-2' src={Arrow_Right} />
                     </button>
                 </div>
-                <div
-                    className='m-4 cursor-pointer text-md'
-                    onClick={handleSettingClick}
-                >
+                <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
                     앨범 설정
                 </div>
             </div>
