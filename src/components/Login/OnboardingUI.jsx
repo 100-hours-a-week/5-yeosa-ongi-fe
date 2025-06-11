@@ -25,8 +25,8 @@ const OnboardingUI = () => {
             id: 2,
             image: onboadingImage2,
             title: 'AI가 사진에 맞는 카테고리를 분류해줘요',
-            description:
-                '카테고리 분류중에서도 중복되거나 흔들린 사진과 같은 품질이 떨어지는 사진도 AI가 분류해줍니다.',
+            subtitle: '카테고리 분류중에서도 중복되거나',
+            description: ' 흔들린 사진과 같은 품질이 떨어지는 사진도 AI가 분류해줍니다.',
         },
         {
             id: 3,
@@ -166,9 +166,6 @@ const OnboardingUI = () => {
 
     return (
         <>
-            {/* Header */}
-
-            {/* Content Container */}
             <div
                 ref={containerRef}
                 className='relative overflow-hidden'
@@ -188,11 +185,11 @@ const OnboardingUI = () => {
                         <div key={slide.id} className='flex-shrink-0 w-full px-8'>
                             <div className='grid items-center grid-rows-2'>
                                 {/* Image Section */}
-                                <div className='relative group'>
+                                <div className='relative flex justify-center group'>
                                     <img
                                         src={slide.image}
                                         alt={slide.title}
-                                        className='w-full h-full transition-transform duration-300 rounded-2xl group-hover:scale-105'
+                                        className='h-40 transition-transform duration-300 rounded-2xl group-hover:scale-105'
                                         draggable={false}
                                     />
                                 </div>
@@ -200,11 +197,15 @@ const OnboardingUI = () => {
                                 {/* Text Section */}
                                 <div className='space-y-2'>
                                     <div className='flex flex-col items-center justify-center '>
-                                        <h1 className='mb-2 font-bold leading-tight text-gray-900 text-md'>
+                                        <h1 className='mb-2 text-sm font-bold leading-tight text-gray-900'>
                                             {slide.title}
                                         </h1>
-                                        <h2 className='font-medium text-gray-600 text-md'>{slide.subtitle}</h2>
-                                        <p className='text-xs leading-relaxed text-gray-500'>{slide.description}</p>
+                                        <h2 className='text-xs leading-relaxed text-center text-gray-500'>
+                                            {slide.subtitle}
+                                        </h2>
+                                        <p className='text-xs leading-relaxed text-center text-gray-500'>
+                                            {slide.description}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
