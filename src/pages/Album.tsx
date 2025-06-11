@@ -26,6 +26,8 @@ import images_icon from '../assets/icons/images_icon.png'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import { ApiResponse } from '../types'
 
+
+
 // const mockClusters = [
 //     {
 //         clusterId: 1,
@@ -48,6 +50,7 @@ import { ApiResponse } from '../types'
 //         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
 //     },
 // ]
+
 
 interface Cluster {
     clusterId: string | number
@@ -88,29 +91,54 @@ const Album = () => {
     const [albumData, setAlbumData] = useState<AlbumData>()
 
     const [isLoading, setIsLoading] = useState(true)
-    const [showRightIndicator, setShowRightIndicator] = useState(true)
+    // 카테고리와 인물 분류 섹션 각각의 인디케이터 상태 분리
+    const [showCategoryRightIndicator, setShowCategoryRightIndicator] = useState(true)
+    const [showClusterRightIndicator, setShowClusterRightIndicator] = useState(true)
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
     const { setPicturesAndCategorize, tagCollections, allCollection, duplicatedCollection, shakyCollection } =
         useCollectionStore()
+
+
     const [clusters, setClusters] = useState<Cluster[]>([])
+
     /**
-     * 스크롤 이벤트 처리
+     * 카테고리 섹션 스크롤 이벤트 처리
      * @param e
      */
-    const handleScroll = (e: React.UIEvent) => {
+    const handleCategoryScroll = (e: React.UIEvent) => {
         const container = e.target as HTMLDivElement
         const isScrollEnd = container.scrollWidth - container.scrollLeft <= container.clientWidth + 10
 
         if (isScrollEnd) {
-            setShowRightIndicator(false)
+            setShowCategoryRightIndicator(false)
         } else {
-            setShowRightIndicator(true)
+            setShowCategoryRightIndicator(true)
+        }
+    }
+
+
+    /**
+     * 인물 분류 섹션 스크롤 이벤트 처리
+     * @param e
+     */
+    const handleClusterScroll = (e: React.UIEvent) => {
+        const container = e.target as HTMLDivElement
+        const isScrollEnd = container.scrollWidth - container.scrollLeft <= container.clientWidth + 10
+
+        if (isScrollEnd) {
+            setShowClusterRightIndicator(false)
+        } else {
+            setShowClusterRightIndicator(true)
         }
     }
 
     const handleSettingClick = () => {
         openModal('설정')
+    }
+
+    const onchangeName = () => {
+        console.log('클러스터 이름 변경 알림')
     }
 
     useEffect(() => {
@@ -130,8 +158,9 @@ const Album = () => {
                     const pictures: Picture[] = response.data.picture
                     await setPicturesAndCategorize(albumId, pictures)
                 }
+
                 setClusters(response.data.cluster)
-                // setClusters(mockClusters)
+                //setClusters(mockClusters)
 
                 setIsLoading(false)
             } catch (error) {
@@ -170,14 +199,15 @@ const Album = () => {
                 <div className='relative'>
                     <div
                         className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
-                        onScroll={handleScroll}
+                        onScroll={handleCategoryScroll}
                     >
                         {tagCollections &&
                             tagCollections.map((category: Category, index: number) => (
                                 <Category title={category.name} pictures={category.pictures} albumId={albumId} />
                             ))}
+
                     </div>
-                    {showRightIndicator && (
+                    {showCategoryRightIndicator && (
                         <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
                             <div className='flex items-center justify-center w-8 h-8 mr-2 bg-white rounded-full shadow-sm bg-opacity-70'>
                                 <svg
@@ -200,11 +230,42 @@ const Album = () => {
                 </div>
             </div>
             <div className='m-4 mt-6'>
-                {clusters ? <div className='ml-4 font-sans text-md'>인물 분류</div> : ' '}
-                <div className='flex gap-4 mt-6'>
-                    {clusters && clusters.map((cluster: Cluster, index) => <Cluster cluster={cluster} />)}
+                {clusters.length !== 0 ? <div className='ml-4 font-sans text-md'>인물 분류</div> : ' '}
+                <div className='relative'>
+                    <div
+                        className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
+                        onScroll={handleClusterScroll}
+                    >
+                        {clusters &&
+                            clusters.map((cluster: Cluster, index) => (
+                                <Cluster albumId={albumId} cluster={cluster} onNameChange={onchangeName} />
+                            ))}
+
+                    </div>
+                    {clusters.length !== 0 && showClusterRightIndicator && (
+                        <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
+                            <div className='flex items-center justify-center w-8 h-8 mr-2 bg-white rounded-full shadow-sm bg-opacity-70'>
+                                <svg
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    className='w-5 h-5 text-gray-500'
+                                    fill='none'
+                                    viewBox='0 0 24 24'
+                                    stroke='currentColor'
+                                >
+                                    <path
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth={2}
+                                        d='M9 5l7 7-7 7'
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+
+
             <div className='m-4 mt-6'>
                 <div className='ml-4 font-sans text-md'>검토해줘 </div>
 
