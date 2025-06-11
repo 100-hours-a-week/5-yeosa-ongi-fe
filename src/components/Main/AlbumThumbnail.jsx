@@ -22,7 +22,7 @@ const AlbumThumbnail = ({ id }) => {
     }
 
     return (
-        <div className='relative w-full h-full border-solid' onClick={handleSelect}>
+        <div data-album-thumbnail='true' className='relative w-full h-full border-solid' onClick={handleSelect}>
             <img
                 className='absolute inset-0 object-cover w-full h-full'
                 src={album?.thumbnailURL || '/default-thumbnail.jpg'}
