@@ -28,24 +28,82 @@ import { ApiResponse } from '../types'
 
 // const mockClusters = [
 //     {
-//         clusterId: 1,
+//         clusterId: 9,
 //         clusterName: '사람-1',
-//         representativePicture: 'https://cdn.ongi.today/image1.jpg',
-//         bboxX1: 0,
-//         bboxY1: 0,
-//         bboxX2: 0,
-//         bboxY2: 0,
-//         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 2622,
+//         bboxY1: 1375,
+//         bboxX2: 2932,
+//         bboxY2: 1712,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
 //     },
 //     {
-//         clusterId: 1,
-//         clusterName: '사람-1',
-//         representativePicture: 'https://cdn.ongi.today/image1.jpg',
-//         bboxX1: 0,
-//         bboxY1: 0,
-//         bboxX2: 0,
-//         bboxY2: 0,
-//         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
+//         clusterId: 10,
+//         clusterName: '사람-2',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 3345,
+//         bboxY1: 1087,
+//         bboxX2: 4032,
+//         bboxY2: 1983,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 11,
+//         clusterName: '사람-3',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 1247,
+//         bboxY1: 1024,
+//         bboxX2: 1679,
+//         bboxY2: 1531,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 12,
+//         clusterName: '사람-4',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 514,
+//         bboxY1: 395,
+//         bboxX2: 908,
+//         bboxY2: 850,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 13,
+//         clusterName: '사람-5',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 1192,
+//         bboxY1: 591,
+//         bboxX2: 1444,
+//         bboxY2: 862,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 14,
+//         clusterName: '사람-6',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 2173,
+//         bboxY1: 800,
+//         bboxX2: 2399,
+//         bboxY2: 1083,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
 //     },
 // ]
 
@@ -201,7 +259,10 @@ const Album = () => {
             </div>
             <div className='m-4 mt-6'>
                 {clusters ? <div className='ml-4 font-sans text-md'>인물 분류</div> : ' '}
-                <div className='flex gap-4 mt-6'>
+                <div
+                    className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
+                    onScroll={handleScroll}
+                >
                     {clusters && clusters.map((cluster: Cluster, index) => <Cluster cluster={cluster} />)}
                 </div>
             </div>
