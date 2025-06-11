@@ -72,20 +72,28 @@ const Login = () => {
     }
 
     return (
-        <div className='container relative flex flex-col items-center justify-center h-full'>
+        <div className='relative flex flex-col min-h-screen'>
             {/* Logo positioned at top-left */}
-            <img className='absolute w-12 top-4 left-4' src={ongiLogo}></img>
-
-            {/* Onboarding Contents */}
-            <div className='flex flex-col items-center justify-center px-16 mx-auto mt-10'>
-                <OnboardingUI />
+            <div className='absolute z-10 top-4 left-4'>
+                <img className='w-12' src={ongiLogo} alt='Ongi Logo' />
             </div>
 
-            {/* OAuth */}
-            <div className='mt-5'></div>
-            <button onClick={handleLogin}>
-                <img className='hover:cursor-pointer' src={kakaoLoginButton}></img>
-            </button>
+            {/* Main Content Container */}
+            <div className='flex flex-col items-center justify-center flex-1 gap-8 px-4 py-8'>
+                {/* Onboarding Contents */}
+                <div className='w-full max-w-md mx-auto my-8'>
+                    <OnboardingUI />
+                </div>
+
+                {/* OAuth Button */}
+                <button onClick={handleLogin} className='mt-4'>
+                    <img
+                        className='h-8 transition-opacity hover:cursor-pointer hover:opacity-90'
+                        src={kakaoLoginButton}
+                        alt='Kakao Login'
+                    />
+                </button>
+            </div>
         </div>
     )
 }
