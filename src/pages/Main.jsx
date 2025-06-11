@@ -8,7 +8,7 @@ import Month from '../components/Main/Month'
 import OnboardingScreen from '../components/Main/OnboardingScreen'
 
 // Stores
-import { useAlbumStore } from '@/stores/mainPageStore'
+import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 // API
 import { fetchAlbumData } from '../api/album'
 // Hooks
@@ -34,7 +34,7 @@ const Main = () => {
     const lastAttemptedYearMonth = useRef(null)
 
     const [listHeight, setListHeight] = useState(0)
-
+    const { clearSelection } = useMainPageStore()
     const handleListHeightChange = useCallback(height => {
         setListHeight(height)
     }, [])
@@ -177,7 +177,12 @@ const Main = () => {
                                 {/* 스크롤 가능한 컨텐츠 영역 */}
                                 <div className='flex-1 overflow-y-auto'>
                                     {Object.keys(albumsByMonth).map((month, index) => (
-                                        <Month key={month} title={month} albumIds={albumsByMonth[month]} />
+                                        <Month
+                                            key={month}
+                                            title={month}
+                                            albumIds={albumsByMonth[month]}
+                                            handleOutsideClick={clearSelection}
+                                        />
                                     ))}
                                     {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
                                     <div ref={observerRef} style={{ height: '10px' }} />

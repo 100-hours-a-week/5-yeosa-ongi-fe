@@ -10,7 +10,7 @@ const useMainPageStore = create((set, get) => ({
     getSelectedId: () => get().selectedId,
     getSelectedAlbumSummary: () => get().selectedAlbumSummary,
     // 선택 취소 함수
-    clearSelection: () => set({ selectedId: null }),
+    clearSelection: () => set({ selectedId: null, selectedAlbumSummary: null }),
 }))
 
 const useAlbumStore = create((set, get) => ({
