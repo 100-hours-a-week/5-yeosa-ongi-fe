@@ -1,3 +1,4 @@
+
 import { changeClusterTitle } from '@/api/album'
 import { useEffect, useState } from 'react'
 import TextInput from '../common/TextInput'
@@ -219,6 +220,7 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
                         </h2>
                     </button>
                 )}
+
             </div>
         </div>
     )
