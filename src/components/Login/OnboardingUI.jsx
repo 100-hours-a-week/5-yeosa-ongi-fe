@@ -192,7 +192,7 @@ const OnboardingUI = () => {
                                     <img
                                         src={slide.image}
                                         alt={slide.title}
-                                        className='w-full transition-transform duration-300 h-52 rounded-2xl group-hover:scale-105'
+                                        className='w-full h-56 transition-transform duration-300 rounded-2xl group-hover:scale-105'
                                         draggable={false}
                                     />
                                 </div>
@@ -221,7 +221,7 @@ const OnboardingUI = () => {
                             onClick={() => goToSlide(index)}
                             className={`h-2 rounded-full transition-all duration-300 ${
                                 index === currentSlide
-                                    ? 'w-8 bg-gradient-to-r from-purple-500 to-blue-500'
+                                    ? 'w-8 bg-gradient-to-r from-primaryBold to-primary'
                                     : 'w-2 bg-gray-300 hover:bg-gray-400'
                             }`}
                         />
