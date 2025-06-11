@@ -6,7 +6,6 @@ const ResizableList = ({
     showHeightIndicator = false,
     onHeightChange, // 높이 변경 콜백 추가
 }) => {
-    // 3단계 높이 정의 (헤더 56px만 제외, 배너도 가릴 수 있도록)
     const headerHeight = 56
     const screenHeight = window.innerHeight - headerHeight
 
@@ -16,7 +15,7 @@ const ResizableList = ({
 
     const heights = [minHeight, midHeight, maxHeight]
 
-    const [currentHeightIndex, setCurrentHeightIndex] = useState(0) // 0: min, 1: mid, 2: max
+    const [currentHeightIndex, setCurrentHeightIndex] = useState(1)
     const [isResizing, setIsResizing] = useState(false)
     const [tempHeight, setTempHeight] = useState(heights[0])
 
@@ -161,37 +160,6 @@ const ResizableList = ({
                         {getCurrentHeight()}px ({getHeightLabel()})
                     </div>
                 )}
-
-                {/* 단계 인디케이터 - 드래그 중에는 마그넷 효과 표시 */}
-                <div className='absolute flex gap-1 transform -translate-x-1/2 left-1/2 mt-7'>
-                    {heights.map((height, index) => {
-                        if (isResizing) {
-                            // 드래그 중: 마그넷 효과 표시
-                            const diff = Math.abs(tempHeight - height)
-                            const threshold = 50 // 마그넷 효과 임계값
-                            const isClose = diff < threshold
-
-                            return (
-                                <div
-                                    key={index}
-                                    className={`w-2 h-2 rounded-full transition-all duration-150 ${
-                                        isClose ? 'bg-blue-500 scale-125' : 'bg-gray-300'
-                                    }`}
-                                />
-                            )
-                        } else {
-                            // 드래그 중이 아닐 때: 현재 단계 표시
-                            return (
-                                <div
-                                    key={index}
-                                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                                        currentHeightIndex === index ? 'bg-blue-500' : 'bg-gray-300'
-                                    }`}
-                                />
-                            )
-                        }
-                    })}
-                </div>
             </div>
 
             {/* 리스트 컨테이너 */}
