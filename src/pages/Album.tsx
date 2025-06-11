@@ -189,6 +189,10 @@ const Album = () => {
         openModal('설정')
     }
 
+    const onchangeName = () => {
+        console.log('클러스터 이름 변경 알림')
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -281,7 +285,10 @@ const Album = () => {
                         className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
                         onScroll={handleClusterScroll}
                     >
-                        {clusters && clusters.map((cluster: Cluster, index) => <Cluster cluster={cluster} />)}
+                        {clusters &&
+                            clusters.map((cluster: Cluster, index) => (
+                                <Cluster albumId={albumId} cluster={cluster} onNameChange={onchangeName} />
+                            ))}
                     </div>
                     {clusters.length !== 0 && showClusterRightIndicator && (
                         <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
