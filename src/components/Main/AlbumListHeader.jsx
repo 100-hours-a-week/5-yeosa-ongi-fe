@@ -7,8 +7,10 @@ import { getTotalData } from '@/api/user'
 import communityIcon from '@/assets/icons/community_icon.png'
 import albumIcon from '@/assets/icons/images_icon.png'
 import locationIcon from '@/assets/icons/location_icon.png'
+import { useNavigate } from 'react-router-dom'
 
 const AlbumListHeader = () => {
+    const navigate = useNavigate()
     const [counts, setCounts] = useState({
         albums: 0,
         locations: 0,
@@ -41,20 +43,17 @@ const AlbumListHeader = () => {
                     <div className='text-sm'>{counts.albums}</div>
                 </div>
                 <div className='absolute flex flex-row items-center gap-2 left-1/4'>
-                    <img
-                        className='size-4'
-                        src={locationIcon}
-                        alt='Location icon'
-                    />
+                    <img className='size-4' src={locationIcon} alt='Location icon' />
                     <div className='text-sm '>{counts.locations}</div>
                 </div>
-                <div className='absolute flex flex-row items-center gap-1 right-4 '>
-                    <div className='text-sm text-primary'>community</div>
-                    <img
-                        className='size-4'
-                        src={communityIcon}
-                        alt='Community icon'
-                    />
+                <div>
+                    <button
+                        className='absolute flex flex-row items-center gap-1 right-4'
+                        onClick={() => navigate('/community')}
+                    >
+                        <div className='text-sm text-primary'>community</div>
+                        <img className='size-4' src={communityIcon} alt='Community icon' />
+                    </button>
                 </div>
             </div>
         </div>
