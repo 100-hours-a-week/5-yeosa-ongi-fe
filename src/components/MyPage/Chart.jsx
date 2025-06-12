@@ -20,6 +20,25 @@ const formatNumber = num => {
     return num.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
 }
 
+// 날짜 포맷팅 함수
+const formatDate = dateString => {
+    // 이미 포맷된 라벨인 경우 그대로 반환
+    if (!dateString.includes('-') || dateString.length < 8) {
+        return dateString
+    }
+
+    try {
+        const date = new Date(dateString)
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+
+        // DD일
+        return `${day}일`
+    } catch (error) {
+        return dateString // 에러 시 원본 반환
+    }
+}
+
 const IncomeChart = () => {
     const [data, setData] = useState(null)
     const [selectedOption, setSelectedOption] = useState(0)
@@ -42,7 +61,7 @@ const IncomeChart = () => {
                     '30days': {
                         total: 100,
                         data: {
-                            labels: Object.keys(response.data.dailyImageCount),
+                            labels: Object.keys(response.data.dailyImageCount).map(date => formatDate(date)),
                             photos: Object.values(response.data.dailyImageCount),
                         },
                     },
@@ -131,6 +150,7 @@ const IncomeChart = () => {
                     display: false,
                 },
                 ticks: {
+                    maxTicksLimit: 7,
                     color: '#6b7280',
                 },
             },
