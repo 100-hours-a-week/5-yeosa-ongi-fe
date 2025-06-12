@@ -26,32 +26,86 @@ import images_icon from '../assets/icons/images_icon.png'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import { ApiResponse } from '../types'
 
-
-
 // const mockClusters = [
 //     {
-//         clusterId: 1,
+//         clusterId: 9,
 //         clusterName: '사람-1',
-//         representativePicture: 'https://cdn.ongi.today/image1.jpg',
-//         bboxX1: 0,
-//         bboxY1: 0,
-//         bboxX2: 0,
-//         bboxY2: 0,
-//         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 2622,
+//         bboxY1: 1375,
+//         bboxX2: 2932,
+//         bboxY2: 1712,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
 //     },
 //     {
-//         clusterId: 1,
-//         clusterName: '사람-1',
-//         representativePicture: 'https://cdn.ongi.today/image1.jpg',
-//         bboxX1: 0,
-//         bboxY1: 0,
-//         bboxX2: 0,
-//         bboxY2: 0,
-//         clusterPicture: ['https://cdn.ongi.today/image1.jpg', 'https://cdn.ongi.today/image2.jpg'],
+//         clusterId: 10,
+//         clusterName: '사람-2',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 3345,
+//         bboxY1: 1087,
+//         bboxX2: 4032,
+//         bboxY2: 1983,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 11,
+//         clusterName: '사람-3',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 1247,
+//         bboxY1: 1024,
+//         bboxX2: 1679,
+//         bboxY2: 1531,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 12,
+//         clusterName: '사람-4',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 514,
+//         bboxY1: 395,
+//         bboxX2: 908,
+//         bboxY2: 850,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 13,
+//         clusterName: '사람-5',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 1192,
+//         bboxY1: 591,
+//         bboxX2: 1444,
+//         bboxY2: 862,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
+//     },
+//     {
+//         clusterId: 14,
+//         clusterName: '사람-6',
+//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//         bboxX1: 2173,
+//         bboxY1: 800,
+//         bboxX2: 2399,
+//         bboxY2: 1083,
+//         clusterPicture: [
+//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
+//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
+//         ],
 //     },
 // ]
-
-
 interface Cluster {
     clusterId: string | number
     clusterName: string
@@ -96,9 +150,14 @@ const Album = () => {
     const [showClusterRightIndicator, setShowClusterRightIndicator] = useState(true)
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
-    const { setPicturesAndCategorize, tagCollections, allCollection, duplicatedCollection, shakyCollection } =
-        useCollectionStore()
-
+    const {
+        setPicturesAndCategorize,
+        tagCollections,
+        allCollection,
+        duplicatedCollection,
+        shakyCollection,
+        setClusterCollections,
+    } = useCollectionStore()
 
     const [clusters, setClusters] = useState<Cluster[]>([])
 
@@ -116,7 +175,6 @@ const Album = () => {
             setShowCategoryRightIndicator(true)
         }
     }
-
 
     /**
      * 인물 분류 섹션 스크롤 이벤트 처리
@@ -160,7 +218,9 @@ const Album = () => {
                 }
 
                 setClusters(response.data.cluster)
-                //setClusters(mockClusters)
+                setClusterCollections(albumId, response.data.cluster)
+                // setClusters(mockClusters)
+                // setClusterCollections(albumId, mockClusters)
 
                 setIsLoading(false)
             } catch (error) {
@@ -205,7 +265,6 @@ const Album = () => {
                             tagCollections.map((category: Category, index: number) => (
                                 <Category title={category.name} pictures={category.pictures} albumId={albumId} />
                             ))}
-
                     </div>
                     {showCategoryRightIndicator && (
                         <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
@@ -240,7 +299,6 @@ const Album = () => {
                             clusters.map((cluster: Cluster, index) => (
                                 <Cluster albumId={albumId} cluster={cluster} onNameChange={onchangeName} />
                             ))}
-
                     </div>
                     {clusters.length !== 0 && showClusterRightIndicator && (
                         <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
@@ -264,7 +322,6 @@ const Album = () => {
                     )}
                 </div>
             </div>
-
 
             <div className='m-4 mt-6'>
                 <div className='ml-4 font-sans text-md'>검토해줘 </div>
