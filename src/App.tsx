@@ -1,16 +1,11 @@
 import { ReactNode, useCallback, useEffect } from 'react'
-import {
-    BrowserRouter,
-    Navigate,
-    Route,
-    Routes,
-    useNavigate,
-} from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import Album from './pages/Album'
 import AlbumEditor from './pages/AlbumEditor'
 import KakaoCallback from './pages/auth/KakaoCallback'
 import Collection from './pages/Collection'
+import Community from './pages/Community'
 import Invite from './pages/Invite'
 import Login from './pages/LoginPage'
 import Main from './pages/Main'
@@ -79,13 +74,7 @@ function AppRoutes() {
         }
 
         initializeAuth()
-    }, [
-        isAuthenticated,
-        getRefreshToken,
-        getAccessToken,
-        refreshAccessToken,
-        handleLogout,
-    ])
+    }, [isAuthenticated, getRefreshToken, getAccessToken, refreshAccessToken, handleLogout])
 
     return (
         <Routes>
@@ -144,6 +133,15 @@ function AppRoutes() {
                 element={
                     <ProtectedRoute isAuthenticated={isAuthenticated}>
                         <MyActivities />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path='/community'
+                element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                        <Community />
                     </ProtectedRoute>
                 }
             />
