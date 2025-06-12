@@ -27,7 +27,7 @@ const IncomeChart = () => {
 
     const options = [
         { label: 'Last 30 Days', value: '30days' },
-        { label: 'This Year', value: 'year' },
+        // { label: 'This Year', value: 'year' },
     ]
 
     const currentDate = options[selectedOption].value
@@ -58,14 +58,14 @@ const IncomeChart = () => {
                             income: [85000, 92000, 78000, 95000],
                         },
                     },
-                    year: {
-                        total: 3874561,
-                        upDown: 15.6,
-                        data: {
-                            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                            income: [950000, 1150000, 1270000, 1400000],
-                        },
-                    },
+                    // year: {
+                    //     total: 3874561,
+                    //     upDown: 15.6,
+                    //     data: {
+                    //         labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    //         income: [950000, 1150000, 1270000, 1400000],
+                    //     },
+                    // },
                 })
             }
         }
@@ -73,10 +73,10 @@ const IncomeChart = () => {
         fetchData()
     }, [])
 
-    const handleOptionSelect = index => {
-        setSelectedOption(index)
-        setShowDropdown(false)
-    }
+    // const handleOptionSelect = index => {
+    //     setSelectedOption(index)
+    //     setShowDropdown(false)
+    // }
 
     if (!data) {
         return (
@@ -143,9 +143,9 @@ const IncomeChart = () => {
     }
 
     return (
-        <div className='flex items-center justify-center min-h-screen px-5 py-5 bg-gray-50 min-w-screen'>
-            <div className='w-full px-6 py-6 text-gray-700 bg-white border border-gray-200 rounded-lg shadow-lg lg:w-1/2'>
-                <div className='flex flex-wrap items-end'>
+        <>
+            <div className='w-full px-6 py-6 text-gray-700 bg-white shadow-lg lg:w-1/2'>
+                {/* <div className='flex flex-wrap items-end'>
                     <div className='relative'>
                         <button
                             className='h-6 text-xs text-gray-600 hover:text-gray-800 focus:outline-none'
@@ -177,10 +177,10 @@ const IncomeChart = () => {
                             </div>
                         )}
                     </div>
-                </div>
+                </div> */}
 
                 <div className='flex flex-wrap items-end mb-5'>
-                    <h4 className='inline-block mr-2 font-semibold leading-tight text-gray-900 text-md lg:text-3xl'>
+                    <h4 className='inline-block mr-2 text-gray-900 text-md '>
                         이번 달에는 총 {formatNumber(currentData.total)}개의 사진을 업로드 했습니다.
                     </h4>
                 </div>
@@ -192,7 +192,7 @@ const IncomeChart = () => {
 
             {/* 드롭다운 외부 클릭 시 닫기 */}
             {showDropdown && <div className='fixed inset-0 z-20' onClick={() => setShowDropdown(false)}></div>}
-        </div>
+        </>
     )
 }
 
