@@ -1,6 +1,6 @@
-
 import { changeClusterTitle } from '@/api/album'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import TextInput from '../common/TextInput'
 
 const Cluster = ({ cluster, albumId, onNameChange }) => {
@@ -10,6 +10,7 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
     const [newName, setNewName] = useState(cluster.clusterName)
     const [originalName, setOriginalName] = useState(cluster.clusterName)
     const [isLoading, setSaveLoading] = useState(false)
+    const navigate = useNavigate()
 
     const handleEditClick = () => {
         setIsEditing(true)
@@ -184,11 +185,13 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
 
     return (
         <div className='flex flex-col items-center space-y-3 cursor-pointer group'>
-            <div className='relative p-1 rounded-full bg-gradient-to-tr from-[#F3D0D7] to-[#F3D0D7]'>
-                <div className='bg-white rounded-full'>
-                    <div className='relative' style={style} />
+            <button onClick={() => navigate(`/album/${albumId}/${cluster.clusterId}`)}>
+                <div className='relative p-1 rounded-full bg-gradient-to-tr from-[#F3D0D7] to-[#F3D0D7]'>
+                    <div className='bg-white rounded-full'>
+                        <div className='relative' style={style} />
+                    </div>
                 </div>
-            </div>
+            </button>
 
             <div className='text-center max-w-20 sm:max-w-24'>
                 {isEditing ? (
@@ -220,7 +223,6 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
                         </h2>
                     </button>
                 )}
-
             </div>
         </div>
     )
