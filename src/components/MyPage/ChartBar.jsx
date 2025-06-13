@@ -1,14 +1,30 @@
 import { getPlaceStatistic } from '@/api/user'
+import useAuthStore from '@/stores/userStore'
 import { useEffect, useRef, useState } from 'react'
 
-function StorageWidget({ maxMemory = 21 }) {
+function StorageWidget() {
+    const [place, setPlace] = useState({})
+    const [maxMemory, setMaxMemory] = useState(0)
     const [data, setData] = useState([])
+    const { getUser } = useAuthStore()
 
     useEffect(() => {
         const getUserData = async () => {
             const response = await getPlaceStatistic('')
             console.log(response.data)
-            setData([{ name: response.data.tags, id: '1', memory: 1, color: 'cyan' }])
+            setData(
+                response.data.tags.map((element, index) => {
+                    return {
+                        name: response.data.tags[index].tag,
+                        id: index.toString(),
+                        memory: response.data.tags[index].count,
+                        color: index.toString(),
+                    }
+                })
+            )
+            console.log(getUser())
+            setPlace({ city: response.data.city, district: response.data.district, town: response.data.town })
+            setMaxMemory(Object.values(response.data.tags).reduce((a, b) => a + b))
         }
         getUserData()
     }, [])
@@ -18,14 +34,7 @@ function StorageWidget({ maxMemory = 21 }) {
         memoryUsed += cat.memory
     }
 
-    const cats = [
-        ...data,
-        {
-            id: '0',
-            name: 'Free',
-            memory: maxMemory - memoryUsed,
-        },
-    ]
+    const cats = [...data]
     const memoryOnly = cats.map(cat => cat.memory)
     const memoryCompounded = []
 
@@ -35,10 +44,14 @@ function StorageWidget({ maxMemory = 21 }) {
     }
 
     return (
-        <div className='px-5 py-5 transition bg-white border-y'>
+        <div className='px-3 py-3 m-2 transition bg-gray-100 box-shadow rounded-xl'>
             <div className='mb-2'>
-                <div>00 님이 4월에 가장 많이 방문한 곳은</div>
-                <div className='font-semibold text-gray-600 truncate transition-colors dark:text-gray-400'>판교</div>
+                <div>
+                    {getUser().nickname} 님이 {new Date().getMonth() + 1}월에 가장 많이 기록한 곳은
+                </div>
+                <div className='text-lg font-semibold text-gray-600 truncate transition-colors dark:text-gray-400'>
+                    {place.town}
+                </div>
             </div>
             <StorageWidgetBarGraph>
                 {cats.map((cat, i) => {
@@ -121,7 +134,7 @@ function StorageWidgetBar({ color, percent = 0, offset = 0, forEmpty, ariaLabel 
 }
 
 function StorageWidgetBarGraph({ children }) {
-    return <div className='relative h-5 mb-5'>{children}</div>
+    return <div className='relative h-4 mb-5 backdrop-blur-md box-shadow drop-shadow'>{children}</div>
 }
 
 function StorageWidgetCategory({ color, name, memory = 0 }) {
@@ -129,10 +142,10 @@ function StorageWidgetCategory({ color, name, memory = 0 }) {
 
     return (
         <div className='flex items-center gap-2'>
-            <div className={`${catColor} rounded-sm w-4 h-3 transition-colors`}></div>
+            <div className={`${catColor} rounded-sm w-3 h-3 transition-colors`}></div>
             <span className='flex gap-x-1.5'>
-                <strong className='font-semibold text-gray-900 transition-colors dark:text-gray-100'>{name}</strong>
-                <span className='text-gray-600 transition-colors dark:text-gray-400'>{memory}</span>
+                <strong className='text-xs font-light text-gray-600 transition-colors '>{name}</strong>
+                <span className='text-xs font-light text-gray-600 transition-colors'>{memory}</span>
             </span>
         </div>
     )
@@ -149,8 +162,8 @@ class Utils {
      */
     static fillColor(color) {
         const colorKeys = {
-            red: 'bg-red-500',
-            yellow: 'bg-yellow-500',
+            0: 'bg-primaryBold',
+            1: 'bg-primary',
             green: 'bg-green-500',
             cyan: 'bg-cyan-500',
             blue: 'bg-blue-500',
