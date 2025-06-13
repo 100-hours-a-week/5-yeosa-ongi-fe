@@ -16,7 +16,7 @@ import KakaoMap from '@/components/Main/KakaoMap'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import useInfiniteScroll from '../hooks/infiniteScroll'
 
-import bannerImage from '@/assets/banners/banner01.png'
+import BannerSlider from '@/components/Main/BannerSlider'
 import ResizableList from '@/components/Main/ResizableList'
 const Main = () => {
     const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
@@ -154,7 +154,7 @@ const Main = () => {
                 {/* 배너와 지도를 포함한 전체 컨테이너 */}
                 <div className='relative' style={{ height: 'calc(100vh - 56px)' }}>
                     {/* 배너 */}
-                    <img src={bannerImage} className='h-[72px] w-full relative z-0'></img>
+                    <BannerSlider />
 
                     {/* 지도를 배경에 깔기 */}
                     <div className='absolute inset-0 top-[72px] border-t border-solid'>
