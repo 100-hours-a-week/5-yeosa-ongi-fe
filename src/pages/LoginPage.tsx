@@ -20,6 +20,15 @@ const Login = () => {
     const KAKAO_CLIENT_ID: string = import.meta.env.VITE_KAKAO_REST_API_KEY
     const REDIRECT_URI: string = import.meta.env.VITE_KAKAO_REDIRECT_URI
 
+    // 스크롤 막기
+    useEffect(() => {
+        document.body.classList.add('overflow-hidden')
+
+        return () => {
+            document.body.classList.remove('overflow-hidden')
+        }
+    }, [])
+
     useEffect(() => {
         const state = analyzeAuthContext()
         setAuthState(state)
@@ -46,7 +55,7 @@ const Login = () => {
             return {
                 type: 'invite',
                 inviteCode: invite,
-                redirectUrl: redirect || '/dashboard', // 기본 대시보드로
+                redirectUrl: redirect || '/dashboard',
             }
         }
 
