@@ -18,6 +18,7 @@ import { deleteAlbum, getAlbumAccess, getAlbumDetail } from '../api/album'
 import useCollectionStore from '../stores/collectionStore'
 
 //Assets
+import AlbumTitle from '@/components/Album/AlbumTitle'
 import Cluster from '@/components/Album/Cluster'
 import Arrow_Right from '../assets/icons/Arrow Right.png'
 import iconDuplicated from '../assets/icons/icon_duplicated.png'
@@ -243,7 +244,7 @@ const Album = () => {
     return (
         <>
             <Header />
-            <div className='mt-2 ml-4 font-sans text-lg'>{albumData?.title}</div>
+            <AlbumTitle title={albumData?.title} />
             <Card />
             <div className='m-4 mt-6'>
                 <div className='flex items-center justify-between'>
