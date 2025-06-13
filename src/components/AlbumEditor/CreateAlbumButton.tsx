@@ -4,11 +4,12 @@ interface CreateAlbumButtonProps {
     disabled: any
     onClick: () => void
     children?: any
+    description: string
 }
 
-const CreateAlbumButton: FC<CreateAlbumButtonProps> = ({ disabled, onClick }) => (
+const CreateAlbumButton: FC<CreateAlbumButtonProps> = ({ disabled, onClick, description }) => (
     <div className='fixed bottom-0 left-0 right-0 flex justify-center w-full mb-4'>
-        <div className='w-full max-w-[528px] px-4'>
+        <div className='w-full max-w-[440px] px-4'>
             <button
                 className={`
           h-14 w-full
@@ -20,7 +21,7 @@ const CreateAlbumButton: FC<CreateAlbumButtonProps> = ({ disabled, onClick }) =>
                 disabled={disabled}
                 onClick={onClick}
             >
-                앨범 생성하기
+                {description}
             </button>
         </div>
     </div>
