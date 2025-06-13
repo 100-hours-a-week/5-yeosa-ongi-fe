@@ -26,6 +26,7 @@ const useCollectionStore = create((set, get) => ({
         // 클러스터 데이터를 컬렉션 형태로 변환
         const clusterCollections = clusters.map(cluster => ({
             name: cluster.clusterId.toString(),
+            alt: cluster.clusterName,
             pictures:
                 cluster.clusterPicture.map(picture => {
                     return { pictureURL: picture }
@@ -218,7 +219,7 @@ const useCollectionStore = create((set, get) => ({
         if (tagCollection) return tagCollection
 
         // 클러스터 컬렉션에서 찾기
-        return state.clusterCollections.find(c => c.name === collectionName)
+        return state.clusterCollections.find(c => (c.alt ? c.alt : c.name) === collectionName)
     },
 
     getClusterCollections: () => {
