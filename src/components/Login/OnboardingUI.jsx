@@ -189,7 +189,7 @@ const OnboardingUI = () => {
                                     <img
                                         src={slide.image}
                                         alt={slide.title}
-                                        className='h-40 transition-transform duration-300 rounded-2xl group-hover:scale-105'
+                                        className='h-40 mt-1 transition-transform duration-300 rounded-2xl group-hover:scale-105'
                                         draggable={false}
                                     />
                                 </div>
