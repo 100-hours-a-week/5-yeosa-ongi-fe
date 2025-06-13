@@ -218,6 +218,7 @@ const Collection = () => {
                 handleClick={handleClick}
                 handleRecoverClick={handleRecoverClick}
                 isCollectionShaky={isCollectionShaky}
+                hasButtons={currentCollection.alt ? false : true}
             />
 
             <Grid col={3} items={formattedPictures} />
