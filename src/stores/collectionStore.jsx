@@ -219,7 +219,7 @@ const useCollectionStore = create((set, get) => ({
         if (tagCollection) return tagCollection
 
         // 클러스터 컬렉션에서 찾기
-        return state.clusterCollections.find(c => (c.alt ? c.alt : c.name) === collectionName)
+        return state.clusterCollections.find(c => c.name === collectionName)
     },
 
     getClusterCollections: () => {

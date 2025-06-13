@@ -204,7 +204,7 @@ const Collection = () => {
                 <button onClick={() => navigate(-1)} className='absolute h-1/2 left-4 top-1/4'>
                     <img src={arrowLeft} className='h-1/2 left-4 top-1/4' alt='뒤로가기' />
                 </button>
-                <div className='text-center'>{currentCollection?.name || '컬렉션'}</div>
+                <div className='text-center'>{currentCollection?.alt || currentCollection?.name || '컬렉션'}</div>
             </div>
 
             <CollectionHeader
