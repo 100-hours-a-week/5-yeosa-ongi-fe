@@ -36,6 +36,19 @@ export const addAlbumPicture = async (albumId: number, albumData: any): Promise<
     }
 }
 
+export const changeAlbumName = async (albumId: string, albumName: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}}`
+        return await authenticatedFetch(apiUrl, {
+            method: 'PUT',
+            body: JSON.stringify({ albumName: albumName }),
+        })
+    } catch (error) {
+        console.error('앨범 이름 수정 실패:', (error as Error).message)
+        throw error
+    }
+}
+
 /**
  * 앨범 생성
  * @param data
