@@ -44,7 +44,7 @@ function StorageWidget() {
     }
 
     return (
-        <div className='px-3 py-3 m-2 transition bg-gray-100 box-shadow rounded-xl'>
+        <div className='px-3 py-3 m-2 transition bg-gray-100 shadow-md box-shadow rounded-xl'>
             <div className='mb-2'>
                 <div>
                     {getUser().nickname} 님이 {new Date().getMonth() + 1}월에 가장 많이 기록한 곳은
