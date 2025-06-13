@@ -79,10 +79,14 @@ const AlbumEditor: FC = () => {
 
     return (
         <div className='flex flex-col min-h-screen'>
-            <AlbumEditorHeader title={'앨범 생성'} />
+            <AlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
-            <AlbumTitleForm initialTitle={albumUI.albumTitle} onTitleChange={albumUI.handleTitleChange} />
+            {albumId ? (
+                ' '
+            ) : (
+                <AlbumTitleForm initialTitle={albumUI.albumTitle} onTitleChange={albumUI.handleTitleChange} />
+            )}
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
@@ -98,8 +102,12 @@ const AlbumEditor: FC = () => {
 
             {/* 푸터 (앨범 생성 버튼) */}
             <footer className='px-4 py-3 mt-auto'>
-                <CreateAlbumButton disabled={albumUI.isButtonDisabled} onClick={albumUI.handleCreateAlbum}>
-                    {loading ? '생성 중...' : '앨범 생성'}
+                <CreateAlbumButton
+                    disabled={albumUI.isButtonDisabled}
+                    onClick={albumUI.handleCreateAlbum}
+                    description={albumId ? '사진 추가 ' : '앨범 생성'}
+                >
+                    {loading ? '생성 중...' : ' '}
                 </CreateAlbumButton>
 
                 {/* 로딩 인디케이터 */}
