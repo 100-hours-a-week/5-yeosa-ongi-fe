@@ -164,7 +164,7 @@ const IncomeChart = () => {
 
     return (
         <>
-            <div className='w-full px-6 py-6 text-gray-700 bg-white shadow-lg lg:w-1/2'>
+            <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
                 {/* <div className='flex flex-wrap items-end'>
                     <div className='relative'>
                         <button
