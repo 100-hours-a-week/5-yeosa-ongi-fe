@@ -66,7 +66,7 @@ const useAlbumStore = create((set, get) => ({
             // 앨범 객체 추가
             updatedAlbums[album.albumId.toString()] = {
                 albumName: album.albumName,
-                thumbnailURL: album.thumbnailURL,
+                thumbnailURL: album.thumbnailPictureURL,
                 latitude: album.latitude,
                 longitude: album.longitude,
                 createdAt: album.createdAt,
