@@ -1,20 +1,21 @@
-// AlbumEditor.tsx (파일 교체 지원 최종 버전)
-
-import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
-import { FC, useCallback } from 'react'
+import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
+
+// Components
+import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
+import FileManager from '@/components/AlbumEditor/FileManager'
+import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
-// 커스텀 컴포넌트와 훅
-import FileManager from '@/components/AlbumEditor/FileManager'
+// Hooks
 import { useAlbumCreationUI } from '@/hooks/useAlbumCreationUI'
 import useFileUpload from '@/hooks/useFileUpload'
-import { FileItem } from '@/types/upload'
-import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
-// import { useAlbumTitle } from '../hooks/useAlbumTitle'
 
-const AlbumEditor: FC = () => {
+// Types
+import { FileItem } from '@/types/upload'
+
+const AlbumEditor = () => {
     const { albumId } = useParams<{ albumId?: string }>()
 
     const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
@@ -100,7 +101,6 @@ const AlbumEditor: FC = () => {
                 />
             </main>
 
-            {/* 푸터 (앨범 생성 버튼) */}
             <footer className='px-4 py-3 mt-auto'>
                 <CreateAlbumButton
                     disabled={albumUI.isButtonDisabled}
@@ -109,14 +109,6 @@ const AlbumEditor: FC = () => {
                 >
                     {loading ? '생성 중...' : ' '}
                 </CreateAlbumButton>
-
-                {/* 로딩 인디케이터 */}
-                {loading && (
-                    <div className='mt-2 text-center text-gray-600'>이미지 업로드 중입니다. 잠시만 기다려주세요...</div>
-                )}
-
-                {/* 에러 표시 */}
-                {albumError && <div className='mt-2 text-center text-red-600'>에러: {albumError}</div>}
             </footer>
         </div>
     )
