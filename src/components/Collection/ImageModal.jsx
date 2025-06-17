@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 const ImageModal = ({ idx, pictures }) => {
     const [index, setIndex] = useState(idx)
     const [isDownloading, setIsDownloading] = useState(false)
-
+    const [downloadUrl, setDownloadUrl] = useState(null)
+    const [isPreparingDownload, setIsPreparingDownload] = useState(true)
     // Event Handlers
 
     /**
@@ -87,12 +88,34 @@ const ImageModal = ({ idx, pictures }) => {
     const handleMoveRight = () => {
         setIndex(index + 1)
     }
-    // const handleDelete = () => {
-    //     // 삭제 기능
-    //     console.log('삭제')
-    // }
 
-    useEffect(() => {}, [])
+    // 이미지가 변경될 때마다 다운로드 링크를 새로 생성
+    useEffect(() => {
+        setIsPreparingDownload(true)
+        setDownloadUrl(null)
+
+        const currentImageUrl = pictures[index].pictureURL
+        prepareDownload(currentImageUrl).finally(() => {
+            setIsPreparingDownload(false)
+        })
+
+        // cleanup: 이전 다운로드 URL 해제
+        return () => {
+            if (downloadUrl) {
+                window.URL.revokeObjectURL(downloadUrl)
+            }
+        }
+    }, [index, pictures])
+
+    // 컴포넌트 언마운트 시 다운로드 URL 해제
+    useEffect(() => {
+        return () => {
+            if (downloadUrl) {
+                window.URL.revokeObjectURL(downloadUrl)
+            }
+        }
+    }, [downloadUrl])
+
     return (
         <div className='flex flex-col h-full'>
             {/* 상단 투명 여백 */}
