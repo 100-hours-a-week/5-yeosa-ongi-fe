@@ -14,6 +14,8 @@ export interface Toast {
     title?: string
     duration?: number
     createdAt: number
+    showCountdown?: boolean // ✅ 카운트다운 표시 여부
+    pausable?: boolean
 }
 
 /**
