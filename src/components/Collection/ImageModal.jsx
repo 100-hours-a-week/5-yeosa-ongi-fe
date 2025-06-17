@@ -6,6 +6,13 @@ const ImageModal = ({ idx, pictures }) => {
     const [index, setIndex] = useState(idx)
     const [isDownloading, setIsDownloading] = useState(false)
 
+    // Event Handlers
+
+    /**
+     * 다운로드 링크 사전 생성
+     * @param {*} imageUrl
+     * @returns
+     */
     const prepareDownload = async imageUrl => {
         const proxies = [
             `https://api.allorigins.win/raw?url=${encodeURIComponent(imageUrl)}`,
