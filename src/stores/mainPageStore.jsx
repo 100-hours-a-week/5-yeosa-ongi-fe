@@ -38,8 +38,12 @@ const useAlbumStore = create((set, get) => ({
             }
             albumsByMonth[monthKey].push(album.albumId.toString())
         })
-        // console.log(albums);
-        // console.log(albumsByMonth);
+
+        // 각 월별 배열을 역순으로 정렬
+        Object.keys(albumsByMonth).forEach(monthKey => {
+            albumsByMonth[monthKey].reverse()
+        })
+
         set({
             albums,
             albumsByMonth,
@@ -79,7 +83,10 @@ const useAlbumStore = create((set, get) => ({
             }
         })
 
-        // console.log("추가된 앨범:", updatedAlbums);
+        // 각 월별 배열을 역순으로 정렬
+        Object.keys(albumsByMonth).forEach(monthKey => {
+            albumsByMonth[monthKey].reverse()
+        })
 
         // 상태 업데이트
         set({
