@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { getAlbumAccess, getSharingLink } from '../../api/album'
-import TextInput from '../common/TextInput'
+import TextField from '../common/TextField'
 import AlbumShare from './AlbumShare'
 import CoworkerManager from './CoworkerManager'
 
@@ -66,8 +66,7 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
                         </div>
 
                         <div className='flex-grow p-5'>
-                            <TextInput
-                                className='w-full px-2 py-1 my-2 transition-colors border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 '
+                            <TextField
                                 placeholder={albumName || '앨범 이름을 입력해주세요.'}
                                 maxLength={12}
                                 label={`삭제할 앨범 : ${albumName}`}
@@ -99,6 +98,7 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
                             </button>
                             <button
                                 onClick={handleDelete}
+                                disabled={!isValid}
                                 className={`px-4 py-2 font-medium text-white transition-colors rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                                     isValid
                                         ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 cursor-pointer'
