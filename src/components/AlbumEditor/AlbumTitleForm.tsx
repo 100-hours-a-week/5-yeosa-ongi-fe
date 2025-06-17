@@ -1,13 +1,13 @@
 import { ChangeEvent, useRef, useState } from 'react'
 
 interface AlbumTitleFormProps {
-    initialTitle: string
-    onTitleChange: (title: string) => void
+    value: string
+    onChange: (title: string) => void
 }
 
-const AlbumTitleForm = ({ initialTitle, onTitleChange }: AlbumTitleFormProps) => {
+const AlbumTitleForm = ({ value, onChange }: AlbumTitleFormProps) => {
     const titleRef = useRef<HTMLInputElement>(null)
-    const [title, setTitle] = useState(initialTitle)
+    const [title, setTitle] = useState(value)
     const [isValid, setIsValid] = useState(true)
     const [validationMessage, setValidationMessage] = useState('')
 
@@ -34,14 +34,14 @@ const AlbumTitleForm = ({ initialTitle, onTitleChange }: AlbumTitleFormProps) =>
 
     const handleBlur = () => {
         if (validateTitle()) {
-            onTitleChange(title)
+            onChange(title)
         }
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newTitle = e.target.value
         setTitle(newTitle)
-        onTitleChange(newTitle)
+        onChange(newTitle)
 
         // 입력 중 유효성 메시지는 지우기
         if (!isValid) {

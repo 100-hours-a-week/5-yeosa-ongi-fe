@@ -120,7 +120,7 @@ const AlbumEditor = () => {
             <AlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
-            {albumId ? ' ' : <AlbumTitleForm initialTitle={albumTitle} onTitleChange={handleTitleChange} />}
+            {albumId ? ' ' : <AlbumTitleForm value={albumTitle} onChange={handleTitleChange} />}
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
