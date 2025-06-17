@@ -15,8 +15,12 @@ import { useAlbumCreation } from '../hooks/useAlbumCreation'
 // Types
 import { FileItem } from '@/types/upload'
 
+/**
+ * 앨범 편집 컴포넌트
+ * 새 앨범 생성 또는 기존 앨범에 사진 추가 기능 제공
+ */
 const AlbumEditor = () => {
-    const { albumId } = useParams<{ albumId?: string }>()
+    const { albumId } = useParams()
 
     const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
 
