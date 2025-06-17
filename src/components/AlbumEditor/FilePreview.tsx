@@ -1,9 +1,11 @@
 // components/FilePreview.tsx (초안정 버전)
 
 import { ConversionCacheManager } from '@/utils/conversionCache'
+import { getFileTypeDisplay, isHEICFile } from '@/utils/fileHelpers'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import crossIcon from '../../assets/cross_icon.png'
 import { FileItem } from '../../types/upload'
+import PureFilePreview from './PureFilePreview'
 
 interface FilePreviewProps {
     file: FileItem
@@ -32,24 +34,15 @@ const FilePreview = memo(
         // 실행 상태 추적 (절대 변경되지 않는 ref들)
         const isInitialized = useRef(false)
         const isDestroyed = useRef(false)
-
         // 변환 상태 관리 (안전한 초기화)
+
         const [conversionState, setConversionState] = useState<ConversionState>(() => {
-            // HEIC 파일인지 먼저 확인
-            const isHeic =
-                file.file.type === 'image/heic' ||
-                file.file.type === 'image/heif' ||
-                file.file.name?.toLowerCase().endsWith('.heic') ||
-                file.file.name?.toLowerCase().endsWith('.heif')
-
             let initialPreviewUrl = ''
-            let initialFileType = file.file.type?.split('/')[1]?.toUpperCase() || 'Unknown'
 
-            if (isHeic) {
+            if (isHEICFile(file.file)) {
                 // HEIC 파일은 변환이 필요하므로 preview URL 생성하지 않음
                 console.log('HEIC 파일 감지, 변환 대기:', file.file.name)
                 initialPreviewUrl = '' // 빈 문자열로 시작
-                initialFileType = 'HEIC'
             } else {
                 // 일반 이미지 파일만 preview URL 생성
                 if (file.preview && typeof file.preview === 'string') {
@@ -66,9 +59,9 @@ const FilePreview = memo(
 
             return {
                 previewUrl: initialPreviewUrl,
-                isConverting: isHeic, // HEIC 파일이면 변환 중 상태로 시작
+                isConverting: isHEICFile(file.file),
                 conversionError: null,
-                fileType: initialFileType,
+                fileType: getFileTypeDisplay(file.file),
             }
         })
 
@@ -305,56 +298,21 @@ const FilePreview = memo(
                 </div>
             )
         }
+        const handleImageLoad = useCallback(() => {
+            console.log('[TEST] 이미지 로드 성공:', file.file.name)
+        }, [file.file.name])
 
         return (
-            <div className='relative w-full h-full'>
-                {/* 메인 이미지 - 조건부 렌더링 */}
-                {conversionState.previewUrl ? (
-                    <img
-                        src={conversionState.previewUrl}
-                        alt={`Preview ${file.id}`}
-                        className='absolute inset-0 object-cover w-full h-full'
-                        onError={handleImageError}
-                        onLoad={() => console.log('이미지 로드 성공:', file.file.name)}
-                    />
-                ) : (
-                    <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
-                        <span className='text-gray-400'>미리보기 준비 중...</span>
-                    </div>
-                )}
-
-                {/* 삭제 버튼 */}
-                <button
-                    className='absolute z-10 top-2 right-2'
-                    onClick={handleDelete}
-                    disabled={conversionState.isConverting}
-                >
-                    <img className='w-4 h-4' src={crossIcon} alt='삭제' />
-                </button>
-
-                {/* 변환 중 오버레이 */}
-                {conversionState.isConverting && (
-                    <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-                        <div className='text-sm text-white'>변환 중...</div>
-                    </div>
-                )}
-
-                {/* 에러 표시 */}
-                {conversionState.conversionError && (
-                    <div className='absolute bottom-2 left-2 right-2'>
-                        <div className='px-2 py-1 text-xs text-white bg-red-500 rounded'>
-                            {conversionState.conversionError}
-                        </div>
-                    </div>
-                )}
-
-                {/* 파일 형식 표시 */}
-                <div className='absolute top-2 left-2'>
-                    <span className='px-1 py-0.5 text-xs text-white bg-black bg-opacity-50 rounded'>
-                        {conversionState.fileType}
-                    </span>
-                </div>
-            </div>
+            <PureFilePreview
+                previewUrl={file.preview}
+                fileName={file.file.name}
+                fileType={getFileTypeDisplay(file.file)}
+                isConverting={false} // 테스트용으로 일단 false
+                conversionError={null}
+                onDelete={handleDelete}
+                onImageError={handleImageError}
+                onImageLoad={handleImageLoad}
+            />
         )
     },
     (prevProps, nextProps) => {
