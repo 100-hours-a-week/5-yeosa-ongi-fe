@@ -3,8 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { AlbumUploadService } from '../services/albumUploadService'
 import { FileItem } from '../types/upload'
 
-export const useAlbumCreation = () => {
-    const [loading, setLoading] = useState(false)
+interface useAlbumCreationReturn {
+    loading: boolean
+    error: string | null
+    createAlbumWithFiles: (albumTitle: string, files: FileItem[], albumId: string) => Promise<void>
+    clearError: () => void
+}
+
+export const useAlbumCreation = (): useAlbumCreationReturn => {
+    const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const navigate = useNavigate()
 
