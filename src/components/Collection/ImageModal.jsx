@@ -54,10 +54,22 @@ const ImageModal = ({ idx, pictures }) => {
         }
     }
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (!downloadUrl) {
-            alert('다운로드 링크가 준비되지 않았습니다.')
-            return
+            if (isPreparingDownload) {
+                console.log('다운로드 준비 중입니다. 잠시만 기다려주세요.')
+                return
+            }
+
+            // 다운로드 링크 생성 재시도
+            setIsPreparingDownload(true)
+            await prepareDownload(pictures[index].pictureURL)
+            setIsPreparingDownload(false)
+
+            if (!downloadUrl) {
+                alert('다운로드 링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요.')
+                return
+            }
         }
 
         setIsDownloading(true)
