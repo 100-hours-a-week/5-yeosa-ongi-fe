@@ -1,65 +1,69 @@
+// components/FilePreview/PureFilePreview.tsx (새 파일)
 import crossIcon from '@/assets/cross_icon.png'
-import { useFileConversion } from '@/hooks/useFileConversion'
-import { FileItem } from '@/types/upload'
-import React, { useCallback } from 'react'
-import PureFilePreview from './PureFilePreview'
 
 interface FilePreviewProps {
-    file: FileItem
-    onDelete: (fileId: string) => void
-    onConverted?: (originalFile: File, convertedFile: File) => void
+    previewUrl: string
+    fileName: string
+    fileType: string
+    isConverting: boolean
+    conversionError: string | null
+    onDelete: () => void
+    onImageError?: () => void
+    onImageLoad?: () => void
 }
 
-const FilePreview = React.memo<FilePreviewProps>(
-    ({ file, onDelete, onConverted }) => {
-        // 변환 로직은 훅에 완전히 위임
-        const conversionState = useFileConversion(file.file, onConverted)
-
-        // 간단한 액션 핸들러들 (컴포넌트 고유 책임)
-        const handleDelete = useCallback(() => {
-            onDelete(file.id)
-        }, [file.id, onDelete])
-
-        const handleImageError = useCallback(() => {
-            console.warn('이미지 로드 실패:', file.file.name)
-        }, [file.file.name])
-
-        const handleImageLoad = useCallback(() => {
-            console.log('이미지 로드 성공:', file.file.name)
-        }, [file.file.name])
-
-        // 안전성 체크
-        if (!file?.file) {
-            return (
-                <div className='relative flex items-center justify-center w-full h-full bg-gray-200'>
-                    <span className='text-gray-500'>파일 오류</span>
-                    <button className='absolute z-10 top-2 right-2' onClick={handleDelete}>
-                        <img className='w-4 h-4' src={crossIcon} alt='삭제' />
-                    </button>
+const FilePreview = ({
+    previewUrl,
+    fileName,
+    fileType,
+    isConverting,
+    conversionError,
+    onDelete,
+    onImageError,
+    onImageLoad,
+}: FilePreviewProps) => {
+    return (
+        <div className='relative w-full h-full'>
+            {/* 메인 이미지 또는 로딩 상태 */}
+            {previewUrl ? (
+                <img
+                    src={previewUrl}
+                    alt={fileName}
+                    className='absolute inset-0 object-cover w-full h-full'
+                    onError={onImageError}
+                    onLoad={onImageLoad}
+                />
+            ) : (
+                <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
+                    <span className='text-gray-400'>미리보기 준비 중...</span>
                 </div>
-            )
-        }
+            )}
 
-        // 순수 컴포넌트에 상태와 핸들러 전달
-        return (
-            <PureFilePreview
-                previewUrl={conversionState.previewUrl}
-                fileName={file.file.name}
-                fileType={conversionState.fileType}
-                isConverting={conversionState.isConverting}
-                conversionError={conversionState.error}
-                onDelete={handleDelete}
-                onImageError={handleImageError}
-                onImageLoad={handleImageLoad}
-            />
-        )
-    },
-    (prevProps, nextProps) => {
-        // props 비교 최적화 (기존과 동일)
-        return prevProps.file.id === nextProps.file.id && prevProps.onDelete === nextProps.onDelete
-    }
-)
+            {/* 삭제 버튼 */}
+            <button className='absolute z-10 top-2 right-2' onClick={onDelete} disabled={isConverting}>
+                <img className='w-4 h-4' src={crossIcon} alt='삭제' />
+            </button>
 
-FilePreview.displayName = 'FilePreview'
+            {/* 변환 중 오버레이 */}
+            {isConverting && (
+                <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50'>
+                    <div className='text-sm text-white'>변환 중...</div>
+                </div>
+            )}
+
+            {/* 에러 오버레이 */}
+            {conversionError && (
+                <div className='absolute bottom-2 left-2 right-2'>
+                    <div className='px-2 py-1 text-xs text-white bg-red-500 rounded'>{conversionError}</div>
+                </div>
+            )}
+
+            {/* 파일 형식 표시 디버깅 용*/}
+            <div className='absolute top-2 left-2'>
+                <span className='px-1 py-0.5 text-xs text-white bg-black bg-opacity-50 rounded'>{fileType}</span>
+            </div>
+        </div>
+    )
+}
 
 export default FilePreview
