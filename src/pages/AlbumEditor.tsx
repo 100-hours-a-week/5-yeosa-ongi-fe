@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
 // Components
@@ -8,11 +8,12 @@ import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // Hooks
-import { useAlbumCreationUI } from '@/hooks/useAlbumCreationUI'
+//import { useAlbumCreationUI } from '@/hooks/useAlbumCreationUI'
 import useFileUpload from '@/hooks/useFileUpload'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
 // Types
+import { useAlbumTitle } from '@/hooks/useAlbumTitle'
 import { FileItem } from '@/types/upload'
 
 /**
@@ -21,18 +22,48 @@ import { FileItem } from '@/types/upload'
  */
 const AlbumEditor = () => {
     const { albumId } = useParams()
-
+    const titleData = useAlbumTitle()
+    const albumData = useAlbumCreation()
     const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
 
     // 통합된 파일 관리
     const fileManager = useFileUpload({ maxFiles: 30 })
 
-    // 앨범 UI 로직
-    const albumUI = useAlbumCreationUI({
-        files: fileManager.files,
-        isProcessing: fileManager.isProcessing,
+    const handleCreateAlbum = useCallback(async (): Promise<void> => {
+        // 생성 조건 검사 (1장 이상으로 변경)
+        if (fileManager.files.length < 1 || albumData.loading || fileManager.isProcessing) {
+            return
+        }
+
+        try {
+            await albumData.createAlbumWithFiles(titleData.albumTitle, fileManager.files, albumId as string)
+        } catch (error) {
+            console.error('앨범 생성 중 오류:', error)
+        }
+    }, [
+        fileManager.files,
+        albumData.loading,
+        albumData.createAlbumWithFiles,
+        fileManager.isProcessing,
+        titleData.albumTitle,
         albumId,
-    })
+    ])
+
+    const isButtonDisabled = useMemo((): boolean => {
+        // 제목이 비어있거나, 파일이 1장 미만이거나, 로딩 중이거나, 처리 중일 때 비활성화
+        console.log(
+            titleData.albumTitle.trim() === '',
+            fileManager.files.length < 1,
+            albumData.loading,
+            fileManager.isProcessing
+        )
+        return (
+            titleData.albumTitle.trim() === '' ||
+            fileManager.files.length < 1 ||
+            albumData.loading ||
+            fileManager.isProcessing
+        )
+    }, [titleData.albumTitle, fileManager.files.length, albumData.loading, fileManager.isProcessing])
 
     // 파일 변환 완료 핸들러 (메타데이터 보존하면서 파일만 교체)
     const handleFileConverted = useCallback(
@@ -90,7 +121,7 @@ const AlbumEditor = () => {
             {albumId ? (
                 ' '
             ) : (
-                <AlbumTitleForm initialTitle={albumUI.albumTitle} onTitleChange={albumUI.handleTitleChange} />
+                <AlbumTitleForm initialTitle={titleData.albumTitle} onTitleChange={titleData.handleTitleChange} />
             )}
 
             {/* 메인 콘텐츠 */}
@@ -107,8 +138,8 @@ const AlbumEditor = () => {
 
             <footer className='px-4 py-3 mt-auto'>
                 <CreateAlbumButton
-                    disabled={albumUI.isButtonDisabled}
-                    onClick={albumUI.handleCreateAlbum}
+                    disabled={isButtonDisabled}
+                    onClick={handleCreateAlbum}
                     description={albumId ? '사진 추가 ' : '앨범 생성'}
                 >
                     {loading ? '생성 중...' : ' '}
