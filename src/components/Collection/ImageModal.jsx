@@ -1,12 +1,12 @@
 import RightArrow from '@/assets/icons/Arrow Right.png'
 import LeftArrow from '@/assets/icons/Arrow_Left.png'
 import downloadIcon from '@/assets/icons/download.png'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 const ImageModal = ({ idx, pictures }) => {
     const [index, setIndex] = useState(idx)
     const [isDownloading, setIsDownloading] = useState(false)
 
-    const handleDownload = async imageUrl => {
+    const prepareDownload = async imageUrl => {
         const proxies = [
             `https://api.allorigins.win/raw?url=${encodeURIComponent(imageUrl)}`,
             `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`,
@@ -16,7 +16,6 @@ const ImageModal = ({ idx, pictures }) => {
 
         for (let i = 0; i < proxies.length; i++) {
             try {
-                setIsDownloading(true)
                 console.log(`프록시 ${i + 1} 시도 중...`)
 
                 const response = await fetch(proxies[i])
@@ -32,28 +31,45 @@ const ImageModal = ({ idx, pictures }) => {
                 }
 
                 const url = window.URL.createObjectURL(blob)
-                const link = document.createElement('a')
-                link.href = url
-                link.download = `image_${Date.now()}.jpg`
-                link.style.display = 'none'
-
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                window.URL.revokeObjectURL(url)
-
-                console.log('다운로드 성공!')
+                setDownloadUrl(url)
+                console.log('다운로드 링크 생성 성공!')
                 return // 성공하면 루프 종료
             } catch (error) {
                 console.error(`프록시 ${i + 1} 실패:`, error)
 
                 // 마지막 프록시도 실패하면 에러 표시
                 if (i === proxies.length - 1) {
-                    alert('모든 다운로드 방법이 실패했습니다.')
+                    console.error('모든 다운로드 링크 생성 방법이 실패했습니다.')
+                    setDownloadUrl(null)
                 }
-            } finally {
-                setIsDownloading(false)
             }
+        }
+    }
+
+    const handleDownload = () => {
+        if (!downloadUrl) {
+            alert('다운로드 링크가 준비되지 않았습니다.')
+            return
+        }
+
+        setIsDownloading(true)
+
+        try {
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = `image_${Date.now()}.jpg`
+            link.style.display = 'none'
+
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+
+            console.log('다운로드 시작!')
+        } catch (error) {
+            console.error('다운로드 실패:', error)
+            alert('다운로드에 실패했습니다.')
+        } finally {
+            setIsDownloading(false)
         }
     }
 
@@ -69,6 +85,7 @@ const ImageModal = ({ idx, pictures }) => {
     //     console.log('삭제')
     // }
 
+    useEffect(() => {}, [])
     return (
         <div className='flex flex-col h-full'>
             {/* 상단 투명 여백 */}
