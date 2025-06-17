@@ -32,6 +32,11 @@ export interface ToastContextValue {
 
     /** 모든 토스트 제거 함수 */
     clearAllToasts: () => void
+
+    success: (message: string, options?: Partial<Toast>) => string
+    error: (message: string, options?: Partial<Toast>) => string
+    warning: (message: string, options?: Partial<Toast>) => string
+    info: (message: string, options?: Partial<Toast>) => string
 }
 
 /**
