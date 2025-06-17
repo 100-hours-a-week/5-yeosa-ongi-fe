@@ -1,7 +1,5 @@
 // components/FilePreview/PureFilePreview.tsx (새 파일)
 import crossIcon from '@/assets/cross_icon.png'
-import ConversionOverlay from './ConversionOverlay'
-import ErrorOverlay from './ErrorOverlay'
 
 interface PureFilePreviewProps {
     previewUrl: string
@@ -47,10 +45,18 @@ const PureFilePreview = ({
             </button>
 
             {/* 변환 중 오버레이 */}
-            {isConverting && <ConversionOverlay />}
+            {isConverting && (
+                <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50'>
+                    <div className='text-sm text-white'>변환 중...</div>
+                </div>
+            )}
 
             {/* 에러 오버레이 */}
-            {conversionError && <ErrorOverlay message={conversionError} />}
+            {conversionError && (
+                <div className='absolute bottom-2 left-2 right-2'>
+                    <div className='px-2 py-1 text-xs text-white bg-red-500 rounded'>{conversionError}</div>
+                </div>
+            )}
 
             {/* 파일 형식 표시 디버깅 용*/}
             <div className='absolute top-2 left-2'>
