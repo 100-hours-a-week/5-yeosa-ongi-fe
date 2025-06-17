@@ -4,7 +4,7 @@ import { FileItem } from '@/types/upload'
 import { FC, useCallback, useMemo } from 'react'
 import { GridWithChildren } from '../common/GridWithChildren'
 import FileInput from './FileInput'
-import FilePreview from './FilePreview'
+import FilePreviewContainer from './FilePreviewContainer'
 
 interface FileManagerProps {
     files: FileItem[]
@@ -196,7 +196,7 @@ const FileManager: FC<FileManagerProps> = ({
                     }
 
                     return (
-                        <FilePreview
+                        <FilePreviewContainer
                             key={file.id}
                             file={file}
                             onDelete={handleFileDelete}
