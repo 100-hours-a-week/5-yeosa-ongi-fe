@@ -44,7 +44,6 @@ const FileInput = ({
             e.target.value = ''
             return
         }
-        console.log(selectedFiles)
         setProcessing(true)
         try {
             // 파일 개수 검증
@@ -67,16 +66,10 @@ const FileInput = ({
             const validFiles = validationResult.validFiles
             console.log('검증 통과한 파일들:', validFiles)
 
-            // 파일 전달 - 단일 파일은 File, 다중 파일은 File[]
             if (validFiles.length === 1) {
                 await onFileSelect(validFiles[0])
             } else {
                 await onFileSelect(validFiles)
-            }
-            if (validFiles.length === 1) {
-                onFileSelect(validFiles[0])
-            } else {
-                onFileSelect(validFiles)
             }
         } catch (error) {
             console.error('파일 처리 중 오류 발생:', error)
