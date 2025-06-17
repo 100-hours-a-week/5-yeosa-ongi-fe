@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 // Components
@@ -13,7 +13,6 @@ import useFileUpload from '@/hooks/useFileUpload'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
 // Types
-import { useAlbumTitle } from '@/hooks/useAlbumTitle'
 import { FileItem } from '@/types/upload'
 
 /**
@@ -21,14 +20,22 @@ import { FileItem } from '@/types/upload'
  * 새 앨범 생성 또는 기존 앨범에 사진 추가 기능 제공
  */
 const AlbumEditor = () => {
+    const [albumTitle, setAlbumTitle] = useState('이름 없는 앨범')
     const { albumId } = useParams()
-    const titleData = useAlbumTitle()
+
     const albumData = useAlbumCreation()
     const { loading, error: albumError, createAlbumWithFiles } = useAlbumCreation()
 
     // 통합된 파일 관리
     const fileManager = useFileUpload({ maxFiles: 30 })
 
+    const handleTitleChange = useCallback((newTitle: string) => {
+        setAlbumTitle(newTitle)
+    }, [])
+
+    /**
+     * 앨범 생성 핸들러
+     */
     const handleCreateAlbum = useCallback(async (): Promise<void> => {
         // 생성 조건 검사 (1장 이상으로 변경)
         if (fileManager.files.length < 1 || albumData.loading || fileManager.isProcessing) {
@@ -36,7 +43,7 @@ const AlbumEditor = () => {
         }
 
         try {
-            await albumData.createAlbumWithFiles(titleData.albumTitle, fileManager.files, albumId as string)
+            await albumData.createAlbumWithFiles(albumTitle, fileManager.files, albumId as string)
         } catch (error) {
             console.error('앨범 생성 중 오류:', error)
         }
@@ -45,27 +52,13 @@ const AlbumEditor = () => {
         albumData.loading,
         albumData.createAlbumWithFiles,
         fileManager.isProcessing,
-        titleData.albumTitle,
+        albumTitle,
         albumId,
     ])
 
-    const isButtonDisabled = useMemo((): boolean => {
-        // 제목이 비어있거나, 파일이 1장 미만이거나, 로딩 중이거나, 처리 중일 때 비활성화
-        console.log(
-            titleData.albumTitle.trim() === '',
-            fileManager.files.length < 1,
-            albumData.loading,
-            fileManager.isProcessing
-        )
-        return (
-            titleData.albumTitle.trim() === '' ||
-            fileManager.files.length < 1 ||
-            albumData.loading ||
-            fileManager.isProcessing
-        )
-    }, [titleData.albumTitle, fileManager.files.length, albumData.loading, fileManager.isProcessing])
-
-    // 파일 변환 완료 핸들러 (메타데이터 보존하면서 파일만 교체)
+    /**
+     * 파일 변환 핸들러
+     */
     const handleFileConverted = useCallback(
         async (originalFile: File, convertedFile: File) => {
             console.log(
@@ -113,16 +106,21 @@ const AlbumEditor = () => {
         [fileManager]
     )
 
+    /**
+     * 버튼 비활성화 여부
+     */
+    const isButtonDisabled = useMemo((): boolean => {
+        // 제목이 비어있거나, 파일이 1장 미만이거나, 로딩 중이거나, 처리 중일 때 비활성화
+        console.log(albumTitle.trim() === '', fileManager.files.length < 1, albumData.loading, fileManager.isProcessing)
+        return albumTitle.trim() === '' || fileManager.files.length < 1 || albumData.loading || fileManager.isProcessing
+    }, [albumTitle, fileManager.files.length, albumData.loading, fileManager.isProcessing])
+
     return (
         <div className='flex flex-col min-h-screen'>
             <AlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
-            {albumId ? (
-                ' '
-            ) : (
-                <AlbumTitleForm initialTitle={titleData.albumTitle} onTitleChange={titleData.handleTitleChange} />
-            )}
+            {albumId ? ' ' : <AlbumTitleForm initialTitle={albumTitle} onTitleChange={handleTitleChange} />}
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
