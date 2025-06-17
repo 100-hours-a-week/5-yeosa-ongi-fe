@@ -1,5 +1,3 @@
-import { FC } from 'react'
-
 interface CreateAlbumButtonProps {
     disabled: any
     onClick: () => void
@@ -7,7 +5,7 @@ interface CreateAlbumButtonProps {
     description: string
 }
 
-const CreateAlbumButton: FC<CreateAlbumButtonProps> = ({ disabled, onClick, description }) => (
+const CreateAlbumButton = ({ disabled, onClick, description }: CreateAlbumButtonProps) => (
     <div className='fixed bottom-0 left-0 right-0 flex justify-center w-full mb-4'>
         <div className='w-full max-w-[440px] px-4'>
             <button
