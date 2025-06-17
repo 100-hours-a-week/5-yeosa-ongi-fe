@@ -57,9 +57,13 @@ const IncomeChart = () => {
             try {
                 const response = await getPictureStatistic('')
                 console.log(response.data.dailyImageCount)
+                let sum = 0
+                Object.values(response.data.dailyImageCount).forEach(num => {
+                    sum += num
+                })
                 setData({
                     '30days': {
-                        total: 100,
+                        total: sum,
                         data: {
                             labels: Object.keys(response.data.dailyImageCount).map(date => formatDate(date)),
                             photos: Object.values(response.data.dailyImageCount),

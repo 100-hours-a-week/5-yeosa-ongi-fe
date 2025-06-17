@@ -38,7 +38,7 @@ export const addAlbumPicture = async (albumId: number, albumData: any): Promise<
 
 export const changeAlbumName = async (albumId: string, albumName: string) => {
     try {
-        const apiUrl = API_BASE_URL + `/api/album/${albumId}}`
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, {
             method: 'PUT',
             body: JSON.stringify({ albumName: albumName }),
