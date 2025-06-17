@@ -17,9 +17,9 @@ const ToastContainer: React.FC = () => {
     }
 
     return (
-        <div className='fixed z-50 flex flex-col gap-3 pointer-events-none top-4 right-4'>
+        <div className='fixed top-0 left-0 right-0 z-50 pointer-events-none'>
             {/* pointer-events-none으로 컨테이너는 클릭 방지, 개별 토스트만 클릭 가능 */}
-            <div className='pointer-events-auto'>
+            <div className='flex flex-col gap-3 px-4 pt-4 pointer-events-auto'>
                 {toasts.map(toast => (
                     <div key={toast.id} className='mb-2'>
                         <ToastItem toast={toast} />
