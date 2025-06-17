@@ -1,3 +1,4 @@
+import ToastContainer from '@/components/common/Toast/ToastContainer'
 import { Toast, ToastContextValue, ToastProviderProps } from '@/types/toast.type'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
@@ -190,10 +191,7 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
     return (
         <ToastContext.Provider value={contextValue}>
             {children}
-            {/*
-            TODO: 나중에 여기에 ToastContainer 추가 예정
-            지금은 Context 구조만 만드는 중
-            */}
+            <ToastContainer />
         </ToastContext.Provider>
     )
 }
