@@ -3,8 +3,8 @@
 import { FileItem } from '@/types/upload'
 import { FC, useCallback, useMemo } from 'react'
 import { GridWithChildren } from '../common/GridWithChildren'
+import FileInput from './FileInput'
 import FilePreview from './FilePreview'
-import Input from './Input'
 
 interface FileManagerProps {
     files: FileItem[]
@@ -173,7 +173,7 @@ const FileManager: FC<FileManagerProps> = ({
             {/* 파일 그리드 */}
             <GridWithChildren col={4}>
                 {/* 파일 입력 컴포넌트 */}
-                <Input
+                <FileInput
                     onFileSelect={handleFileAdded}
                     disabled={isFull}
                     setProcessing={setProcessing}
