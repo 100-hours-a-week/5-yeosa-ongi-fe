@@ -1,7 +1,12 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export const useAlbumTitle = (initialTitle = '이름 없는 앨범') => {
+interface useAlbumTitleReturn {
+    albumTitle: string
+    handleTitleChange: (newTitle: string) => void
+}
+
+export const useAlbumTitle = (initialTitle = '이름 없는 앨범'): useAlbumTitleReturn => {
     const [albumTitle, setAlbumTitle] = useState(initialTitle)
     const navigate = useNavigate()
 
