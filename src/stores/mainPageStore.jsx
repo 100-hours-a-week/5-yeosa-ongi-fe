@@ -39,9 +39,13 @@ const useAlbumStore = create((set, get) => ({
             albumsByMonth[monthKey].push(album.albumId.toString())
         })
 
-        // 각 월별 배열을 역순으로 정렬
+        // 각 월별 배열을 createdAt 기준으로 내림차순 정렬
         Object.keys(albumsByMonth).forEach(monthKey => {
-            albumsByMonth[monthKey].reverse()
+            albumsByMonth[monthKey].sort((a, b) => {
+                const dateA = new Date(albums[a].createdAt)
+                const dateB = new Date(albums[b].createdAt)
+                return dateB - dateA // 내림차순 (최신순)
+            })
         })
 
         set({
@@ -49,6 +53,7 @@ const useAlbumStore = create((set, get) => ({
             albumsByMonth,
         })
     },
+
     addAlbums: albumData => {
         // 현재 상태 가져오기
         const { albums, albumsByMonth } = get()
@@ -56,6 +61,9 @@ const useAlbumStore = create((set, get) => ({
         // 새로운 앨범 데이터와 기존 데이터를 병합할 객체 생성
         const updatedAlbums = { ...albums }
         const updatedAlbumsByMonth = { ...albumsByMonth }
+
+        // 새 앨범이 추가된 월들을 추적
+        const affectedMonths = new Set()
 
         // 새 앨범 데이터 처리
         albumData.forEach(album => {
@@ -80,12 +88,17 @@ const useAlbumStore = create((set, get) => ({
             // 앨범 ID가 해당 월에 없는 경우에만 추가 (중복 방지)
             if (!updatedAlbumsByMonth[monthKey].includes(album.albumId.toString())) {
                 updatedAlbumsByMonth[monthKey].push(album.albumId.toString())
+                affectedMonths.add(monthKey) // 변경된 월 추가
             }
         })
 
-        // 각 월별 배열을 역순으로 정렬
-        Object.keys(albumsByMonth).forEach(monthKey => {
-            albumsByMonth[monthKey].reverse()
+        // 새 앨범이 추가된 월들만 정렬
+        affectedMonths.forEach(monthKey => {
+            updatedAlbumsByMonth[monthKey].sort((a, b) => {
+                const dateA = new Date(updatedAlbums[a].createdAt)
+                const dateB = new Date(updatedAlbums[b].createdAt)
+                return dateB - dateA // 내림차순 (최신순)
+            })
         })
 
         // 상태 업데이트
