@@ -2,14 +2,17 @@ import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
 import { getAlubmSummary } from '../../api/album'
 
-const AlbumThumbnail = ({ id }) => {
+interface AlbumThumbnailProps {
+    id: string
+}
+const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
     const navigate = useNavigate()
-    const hasCoworkers = false
     const { albums } = useAlbumStore()
     const album = albums[id.toString()]
 
     const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
     const isSelected = selectedId === id
+
     const handleSelect = async () => {
         if (isSelected) {
             console.log('앨범 상세페이지로 이동 : ', id)
@@ -35,7 +38,7 @@ const AlbumThumbnail = ({ id }) => {
             )}
             {album?.memberProfileImageURL.length !== 0 && (
                 <div className='absolute flex bottom-2 right-2'>
-                    {album?.memberProfileImageURL.map((url, index) => (
+                    {album?.memberProfileImageURL.map((url: string, index: number) => (
                         <div
                             key={index}
                             className='overflow-hidden rounded-full'
