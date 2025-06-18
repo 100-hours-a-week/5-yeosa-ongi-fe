@@ -1,11 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+
+interface ResizableListProps {
+    children: ReactNode
+    className: string
+    showHeightIndicator: boolean
+    onHeightChange: (height: number) => void
+}
 
 const ResizableList = ({
     children,
     className = '',
     showHeightIndicator = false,
-    onHeightChange, // 높이 변경 콜백 추가
-}) => {
+    onHeightChange,
+}: ResizableListProps) => {
     const headerHeight = 56
     const screenHeight = window.innerHeight - headerHeight
 
@@ -27,7 +34,7 @@ const ResizableList = ({
 
     // 높이 변경 시 부모에게 알림
     const notifyHeightChange = useCallback(
-        height => {
+        (height: number) => {
             if (onHeightChange) {
                 onHeightChange(height)
             }
@@ -41,7 +48,7 @@ const ResizableList = ({
     }, [tempHeight, currentHeightIndex, isResizing, notifyHeightChange])
 
     // 가장 가까운 높이 단계 찾기
-    const findClosestHeightIndex = height => {
+    const findClosestHeightIndex = (height: number) => {
         let closestIndex = 0
         let minDiff = Math.abs(height - heights[0])
 
@@ -57,7 +64,7 @@ const ResizableList = ({
 
     // 드래그 시작
     const handleMouseDown = useCallback(
-        e => {
+        (e: React.MouseEvent<HTMLDivElement>) => {
             setIsResizing(true)
             startY.current = e.clientY
             // getCurrentHeight() 대신 직접 계산
@@ -65,7 +72,7 @@ const ResizableList = ({
             startHeight.current = currentHeight
             setTempHeight(currentHeight)
 
-            const handleMouseMove = e => {
+            const handleMouseMove = (e: MouseEvent) => {
                 const deltaY = startY.current - e.clientY
                 const newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight.current + deltaY))
                 setTempHeight(newHeight)
@@ -93,7 +100,7 @@ const ResizableList = ({
 
     // 터치 이벤트 처리
     const handleTouchStart = useCallback(
-        e => {
+        (e: React.TouchEvent<HTMLDivElement>) => {
             setIsResizing(true)
             startY.current = e.touches[0].clientY
             // getCurrentHeight() 대신 직접 계산
@@ -101,7 +108,7 @@ const ResizableList = ({
             startHeight.current = currentHeight
             setTempHeight(currentHeight)
 
-            const handleTouchMove = e => {
+            const handleTouchMove = (e: TouchEvent) => {
                 e.preventDefault()
                 const deltaY = startY.current - e.touches[0].clientY
                 const newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight.current + deltaY))
