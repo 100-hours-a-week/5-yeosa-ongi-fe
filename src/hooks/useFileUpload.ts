@@ -1,7 +1,7 @@
+import { useToast } from '@/contexts/ToastContext'
 import { FileItem } from '@/types/upload'
 import { extractHEICMetadata, isHEICFile } from '@/utils/metadata'
 import { useCallback, useEffect, useState } from 'react'
-
 interface UseFileUploadOptions {
     maxFiles?: number
 }
@@ -31,6 +31,8 @@ const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadReturn 
     const [files, setFiles] = useState<FileItem[]>([])
     const [error, setError] = useState<string>('')
     const [isProcessing, setProcessing] = useState<boolean>(false)
+
+    const { success, error: errorToast, warning, info } = useToast()
 
     /**
      * 입력 파일 정규화
@@ -137,6 +139,7 @@ const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadReturn 
             } catch (error) {
                 console.error('[addAllFiles] 전체 파일 추가 실패:', error)
                 setError('파일 처리 중 오류가 발생했습니다.')
+                errorToast('파일 처리 중 오류가 발생했습니다.')
                 return false
             }
         },
