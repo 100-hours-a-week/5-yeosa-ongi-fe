@@ -2,42 +2,41 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Components
 import AlbumListHeader from '@/components/Main/AlbumListHeader'
+import BannerSlider from '@/components/Main/BannerSlider'
+import KakaoMap from '@/components/Main/KakaoMap'
+import ResizableList from '@/components/Main/ResizableList'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
+import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import Month from '../components/Main/Month'
 import OnboardingScreen from '../components/Main/OnboardingScreen'
 
 // Stores
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
+
 // API
 import { fetchAlbumData } from '../api/album'
+
 // Hooks
-import KakaoMap from '@/components/Main/KakaoMap'
-import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import useInfiniteScroll from '../hooks/infiniteScroll'
 
-import BannerSlider from '@/components/Main/BannerSlider'
-import ResizableList from '@/components/Main/ResizableList'
-const Main = () => {
-    const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
+type yearMonth = string | null
 
-    // 로딩
+const Main = () => {
+    // States ========================================
     // 초기 로딩 관련
-    const [isInitialLoading, setIsInitialLoading] = useState(false)
-    const [initialLoadFailed, setInitialLoadFailed] = useState(false)
-    const [hasData, setHasData] = useState(false)
+    const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false)
+    const [initialLoadFailed, setInitialLoadFailed] = useState<boolean>(false)
+    const [hasData, setHasData] = useState<boolean>(false)
 
     //무한 스크롤 관련
-    const [nextYearMonth, setNextYearMonth] = useState(null)
-    const scrollContainerRef = useRef(null) // 스크롤 컨테이너
-    const [page, setPage] = useState(1) // 현재 페이지 번호
-    const lastAttemptedYearMonth = useRef(null)
+    const [nextYearMonth, setNextYearMonth] = useState<yearMonth>(null)
+    const lastAttemptedYearMonth = useRef<yearMonth>(null)
 
     const [listHeight, setListHeight] = useState(0)
     const { clearSelection } = useMainPageStore()
-    const handleListHeightChange = useCallback(height => {
-        setListHeight(height)
-    }, [])
+
+    const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
 
     // 지도의 실제 높이 계산
     const getMapHeight = () => {
@@ -62,8 +61,9 @@ const Main = () => {
             return false
         }
 
-        // 현재 시도하는 yearMonth 저장
         lastAttemptedYearMonth.current = nextYearMonth
+
+        // 현재 시도하는 yearMonth 저장
 
         try {
             console.log('api 요청 시도 !!! ')
@@ -87,8 +87,6 @@ const Main = () => {
                 return false
             }
 
-            setPage(prevPage => prevPage + 1)
-
             // 더 로드할 데이터가 있는지 반환
             const hasNextData = response.data.hasNext === 'true' || response.data.hasNext === true
             console.log('hasNext 체크:', hasNextData, response.data.hasNext)
@@ -98,8 +96,11 @@ const Main = () => {
             return false // 오류 발생 시 더 이상 로드하지 않음
         }
     }, [nextYearMonth, addAlbums, initialLoadFailed])
-
     const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(fetchMoreAlbums, true)
+
+    const handleListHeightChange = useCallback((height: number) => {
+        setListHeight(height)
+    }, [])
 
     useEffect(() => {
         let isMounted = true
@@ -108,7 +109,7 @@ const Main = () => {
             try {
                 setIsInitialLoading(true)
                 setInitialLoadFailed(false)
-                const result = await fetchAlbumData()
+                const result = await fetchAlbumData('')
 
                 if (isMounted && result && result.data) {
                     console.log('초기 데이터 로드:', result)
@@ -156,13 +157,12 @@ const Main = () => {
                     {/* 배너 */}
                     <BannerSlider />
 
-                    {/* 지도를 배경에 깔기 */}
-                    <div className='absolute inset-0 top-[72px] border-t border-solid'>
-                        <KakaoMap height={getMapHeight()} />
-                    </div>
-
                     {hasData || hasNext ? (
                         <>
+                            {/* 지도를 배경에 깔기 */}
+                            <div className='absolute inset-0 top-[72px] border-t border-solid'>
+                                <KakaoMap height={getMapHeight()} />
+                            </div>
                             {/* ResizableList - absolute로 하단에서 올라오도록 */}
                             <ResizableList
                                 showHeightIndicator={false}
