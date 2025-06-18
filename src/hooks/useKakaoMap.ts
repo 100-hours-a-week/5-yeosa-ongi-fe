@@ -1,17 +1,60 @@
-import { useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 
-/**
- * 카카오맵 초기화 및 기본 기능 훅
- */
-export const useKakaoMap = (mapContainer) => {
-    const mapInstance = useRef(null)
-    const [isMapReady, setIsMapReady] = useState(false)
-    const initializationRef = useRef(false)
+declare global {
+    interface Window {
+        kakao: {
+            maps: {
+                LatLng: new (lat: number, lng: number) => KakaoLatLng
+                LatLngBounds: new () => KakaoLatLngBounds
+                Map: new (container: HTMLElement, options: KakaoMapOptions) => KakaoMap
+                load: (callback: () => void) => void
+            }
+        }
+    }
+}
+
+interface KakaoLatLng {
+    getLat: () => number
+    getLng: () => number
+}
+
+interface KakaoLatLngBounds {
+    extend: (latLng: KakaoLatLng) => void
+}
+
+interface KakaoMapOptions {
+    center: KakaoLatLng
+    level: number
+}
+
+interface KakaoMap {
+    panTo: (latLng: KakaoLatLng) => void
+    setBounds: (bounds: KakaoLatLngBounds) => void
+    getLevel: () => number
+    setLevel: (level: number) => void
+}
+
+interface Location {
+    latitude: number
+    longitude: number
+}
+
+interface UseKakaoMapReturn {
+    mapInstance: RefObject<KakaoMap | null>
+    isMapReady: boolean
+    panTo: (x: number, y: number) => void
+    setBounds: (locations: Location[], minLevel?: number) => void
+}
+
+export const useKakaoMap = (mapContainer: RefObject<HTMLElement | null>): UseKakaoMapReturn => {
+    const [isMapReady, setIsMapReady] = useState<boolean>(false)
+    const mapInstance = useRef<KakaoMap | null>(null)
+    const initializationRef = useRef<boolean>(false)
 
     /**
      * 지도 이동 함수
      */
-    const panTo = (x, y) => {
+    const panTo = (x: number, y: number) => {
         if (mapInstance.current) {
             const moveLatLon = new window.kakao.maps.LatLng(x, y)
             mapInstance.current.panTo(moveLatLon)
@@ -22,7 +65,7 @@ export const useKakaoMap = (mapContainer) => {
     /**
      * 지도 범위 설정 함수
      */
-    const setBounds = (locations, minLevel = 3) => {
+    const setBounds = (locations: Location[], minLevel = 3) => {
         if (!mapInstance.current || !locations.length) return
 
         const bounds = new window.kakao.maps.LatLngBounds()
@@ -76,22 +119,24 @@ export const useKakaoMap = (mapContainer) => {
                 // 카카오 스크립트 로드 확인
                 if (!window.kakao || !window.kakao.maps) {
                     console.log('카카오 스크립트 로딩 중...')
-                    await new Promise((resolve, reject) => {
-                        const existingScript = document.querySelector('script[src*="dapi.kakao.com"]')
+                    await new Promise<void>((resolve, reject) => {
+                        const existingScript = document.querySelector(
+                            'script[src*="dapi.kakao.com"]'
+                        ) as HTMLScriptElement
 
                         if (existingScript) {
                             if (window.kakao && window.kakao.maps) {
                                 resolve()
                             } else {
-                                existingScript.onload = resolve
-                                existingScript.onerror = reject
+                                existingScript.onload = () => resolve()
+                                existingScript.onerror = () => reject(new Error('스크립트 로드 실패'))
                             }
                         } else {
                             const script = document.createElement('script')
                             script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=f15dee0d63f581e725ea42d340e6dbb5&libraries=clusterer&autoload=false`
                             script.async = true
-                            script.onload = resolve
-                            script.onerror = reject
+                            script.onload = () => resolve()
+                            script.onerror = () => reject(new Error('스크립트 로드 실패'))
                             document.head.appendChild(script)
                         }
                     })
@@ -141,6 +186,6 @@ export const useKakaoMap = (mapContainer) => {
         mapInstance,
         isMapReady,
         panTo,
-        setBounds
+        setBounds,
     }
 }
