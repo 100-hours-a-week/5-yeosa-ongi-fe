@@ -8,13 +8,15 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
     // States
     const [toasts, setToasts] = useState<Toast[]>([])
     const timersRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
+    const removeTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
+
     /**
      * 새로운 토스트 추가 함수
      * @param toastData
      * @returns
      */
     const addToast = useCallback(
-        (toastData: Omit<Toast, 'id' | 'createdAt'>): string => {
+        (toastData: Omit<Toast, 'id' | 'createdAt' | 'isRemoving'>): string => {
             const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
             const duration = toastData.duration ?? defaultDuration
 
@@ -23,6 +25,7 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
                 id,
                 createdAt: Date.now(),
                 duration,
+                isRemoving: false, // 새로 추가된 플래그
             }
 
             console.log('[ToastProvider] 토스트 추가:', {
@@ -72,17 +75,43 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
     )
 
     /**
-     * 토스트 제거 함수
+     * 토스트 제거 시작 함수 (애니메이션 트리거)
      * @param id
      */
     const removeToast = useCallback((id: string): void => {
-        console.log('[ToastProvider] 토스트 제거 요청:', id)
+        console.log('[ToastProvider] 토스트 제거 애니메이션 시작:', id)
 
+        // 기존 타이머 정리
         const timer = timersRef.current.get(id)
         if (timer) {
             clearTimeout(timer)
             timersRef.current.delete(id)
-            console.log('[ToastProvider] 타이머 정리:', id)
+            console.log('[ToastProvider] 기존 타이머 정리:', id)
+        }
+
+        // isRemoving 플래그 설정 (애니메이션 트리거)
+        setToasts(prevToasts => prevToasts.map(toast => (toast.id === id ? { ...toast, isRemoving: true } : toast)))
+
+        // 2초 후 실제 제거
+        const removeTimer = setTimeout(() => {
+            actuallyRemoveToast(id)
+        }, 1000)
+
+        removeTimersRef.current.set(id, removeTimer)
+    }, [])
+
+    /**
+     * 토스트 실제 제거 함수 (DOM에서 완전 제거)
+     * @param id
+     */
+    const actuallyRemoveToast = useCallback((id: string): void => {
+        console.log('[ToastProvider] 토스트 실제 제거:', id)
+
+        // 제거 타이머 정리
+        const removeTimer = removeTimersRef.current.get(id)
+        if (removeTimer) {
+            clearTimeout(removeTimer)
+            removeTimersRef.current.delete(id)
         }
 
         // 상태에서 제거
@@ -99,11 +128,18 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
     const clearAllToasts = useCallback((): void => {
         console.log('[ToastProvider] 모든 토스트 제거')
 
+        // 모든 타이머 정리
         timersRef.current.forEach((timer, id) => {
             clearTimeout(timer)
             console.log('[ToastProvider] 타이머 정리:', id)
         })
         timersRef.current.clear()
+
+        removeTimersRef.current.forEach((timer, id) => {
+            clearTimeout(timer)
+            console.log('[ToastProvider] 제거 타이머 정리:', id)
+        })
+        removeTimersRef.current.clear()
 
         // 모든 토스트 제거
         setToasts([])
@@ -185,6 +221,11 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
                 clearTimeout(timer)
             })
             timersRef.current.clear()
+
+            removeTimersRef.current.forEach(timer => {
+                clearTimeout(timer)
+            })
+            removeTimersRef.current.clear()
         }
     }, [])
 

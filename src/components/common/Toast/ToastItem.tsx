@@ -10,14 +10,14 @@ const ToastItem = ({ toast }: ToastItemProps) => {
     const { removeToast } = useToast()
 
     const [isVisible, setIsVisible] = useState(false)
-    const [isExiting, setIsExiting] = useState(false)
 
     //카운트 다운 상태
-    const [remainingTime, setRemainingTime] = useState(toast.duration || 0)
     const [isPaused, setIsPaused] = useState(false)
     const [progress, setProgress] = useState(100)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const startTimeRef = useRef<number>(Date.now())
+
+    // toast.isRemoving이 Context에서 관리되므로 로컬 isExiting 상태 제거
 
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 10)
@@ -25,7 +25,7 @@ const ToastItem = ({ toast }: ToastItemProps) => {
     }, [])
 
     useEffect(() => {
-        if (!toast.duration || toast.duration <= 0 || isPaused) return
+        if (!toast.duration || toast.duration <= 0 || isPaused || toast.isRemoving) return
 
         const startTime = startTimeRef.current
         const totalDuration = toast.duration
@@ -35,80 +35,65 @@ const ToastItem = ({ toast }: ToastItemProps) => {
             const remaining = Math.max(0, totalDuration - elapsed)
             const progressPercent = (remaining / totalDuration) * 100
 
-            setRemainingTime(remaining)
             setProgress(progressPercent)
 
             if (remaining <= 0) {
                 handleRemove()
             }
-        }, 100) // 100ms마다 업데이트로 부드러운 애니메이션
+        }, 20)
 
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current)
             }
         }
-    }, [toast.duration, isPaused])
+    }, [toast.duration, isPaused, toast.isRemoving])
 
     /**
      * 토스트 제거 시 애니메이션을 포함한 처리
      */
     const handleRemove = () => {
-        console.log('[ToastItem] 제거 애니메이션 시작:', toast.id)
+        if (toast.isRemoving) return // 이미 제거 중이면 중복 실행 방지
 
-        // 1. 제거 애니메이션 시작
-        setIsExiting(true)
-
-        // 2. 300ms 후 실제 제거 (CSS transition과 맞춤)
-        setTimeout(() => {
-            removeToast(toast.id)
-        }, 300)
-    }
-
-    const handlePauseToggle = () => {
-        setIsPaused(!isPaused)
-        if (!isPaused) {
-            // 일시정지 시 현재 시간을 새로운 시작 시간으로 설정
-            startTimeRef.current = Date.now() - (toast.duration! - remainingTime)
-        }
+        console.log('[ToastItem] 제거 요청:', toast.id)
+        removeToast(toast.id)
     }
 
     /**
      * 토스트 타입별 스타일 클래스 반환
      */
     const getContainerStyles = (): string => {
-        const baseStyles =
-            'relative bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ease-out transform'
-
+        const baseStyles = 'relative bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transform'
         const sizeStyles = 'max-h-16'
 
-        const animationStyles = isExiting
-            ? 'translate-x-full opacity-0 scale-95'
-            : isVisible
-              ? 'translate-x-0 opacity-100 scale-100'
-              : 'translate-x-full opacity-0 scale-95'
-
-        return `${baseStyles} ${sizeStyles} ${animationStyles}`
+        // Context의 isRemoving 플래그 사용
+        if (toast.isRemoving) {
+            return `${baseStyles} ${sizeStyles} opacity-0 scale-95 transition-all duration-[2000ms] ease-out`
+        } else if (isVisible) {
+            return `${baseStyles} ${sizeStyles} opacity-100 scale-100 transition-all duration-300 ease-out`
+        } else {
+            return `${baseStyles} ${sizeStyles} opacity-0 scale-95`
+        }
     }
 
     const getIconStyles = (): string => {
         const iconStyles = {
-            success: 'bg-green-500',
+            success: 'bg-primary',
             error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500',
+            warning: 'bg-primary',
+            info: 'bg-primary',
         }
-        return `w-6 h-6 rounded-full flex items-center justify-center text-white text-sm ${iconStyles[toast.type]}`
+        return `w-4 h-4 rounded-full flex items-center justify-center text-white text-sm ${iconStyles[toast.type]}`
     }
 
     const getProgressBarStyles = (): string => {
         const progressStyles = {
-            success: 'bg-green-500',
+            success: 'bg-primary',
             error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500',
+            warning: 'bg-primary',
+            info: 'bg-primary',
         }
-        return `absolute bottom-0 left-0 h-1 transition-all duration-100 ease-linear ${progressStyles[toast.type]}`
+        return `absolute bottom-0 right-0 h-1 transition-all duration-100 ease-linear ${progressStyles[toast.type]}`
     }
 
     const getIcon = (): string => {
@@ -121,42 +106,19 @@ const ToastItem = ({ toast }: ToastItemProps) => {
         return icons[toast.type]
     }
 
-    const formatTime = (ms: number): number => {
-        return Math.ceil(ms / 1000)
-    }
-
     return (
         <div className={getContainerStyles()}>
             {/* 메인 콘텐츠 */}
-            <div className='p-4'>
-                <div className='flex items-start justify-between'>
+            <div className='p-2'>
+                <div className='flex items-center justify-between'>
                     {/* 왼쪽: 아이콘 + 메시지 */}
-                    <div className='flex items-start flex-1 min-w-0 space-x-3'>
+                    <div className='flex items-center flex-1 min-w-0 mb-1 space-x-3'>
                         {/* 아이콘 */}
                         <div className={getIconStyles()}>{getIcon()}</div>
 
                         {/* 메시지 내용 */}
                         <div className='flex-1 min-w-0'>
-                            <div className='text-lg font-semibold text-gray-900'>{toast.title || 'Changes saved'}</div>(
-                            <div className='mt-2 text-sm leading-relaxed text-gray-600'>
-                                {toast.showCountdown && remainingTime > 0 && (
-                                    <>
-                                        This message will close in{' '}
-                                        <span className='font-semibold text-gray-900'>{formatTime(remainingTime)}</span>{' '}
-                                        seconds.{' '}
-                                        {toast.pausable && (
-                                            <button
-                                                onClick={handlePauseToggle}
-                                                className='font-semibold text-gray-900 underline hover:text-gray-700'
-                                            >
-                                                {isPaused ? 'Resume' : 'Click to stop'}.
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-                                {!toast.showCountdown && toast.message}
-                            </div>
-                            )
+                            <div className='text-sm text-gray-900'>{toast.message || 'Changes saved'}</div>
                         </div>
                     </div>
 
@@ -182,7 +144,7 @@ const ToastItem = ({ toast }: ToastItemProps) => {
             </div>
 
             {/* 진행 바 */}
-            {toast.duration && toast.duration > 0 && !isPaused && (
+            {toast.duration && toast.duration > 0 && !isPaused && !toast.isRemoving && (
                 <div className={getProgressBarStyles()} style={{ width: `${progress}%` }} />
             )}
         </div>
