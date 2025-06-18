@@ -11,11 +11,9 @@ export interface Toast {
     id: string
     type: ToastType
     message: string
-    title?: string
     duration?: number
     createdAt: number
-    showCountdown?: boolean // ✅ 카운트다운 표시 여부
-    pausable?: boolean
+    isRemoving?: boolean
 }
 
 /**
