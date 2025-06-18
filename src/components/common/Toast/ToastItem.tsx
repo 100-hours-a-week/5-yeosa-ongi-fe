@@ -68,7 +68,7 @@ const ToastItem = ({ toast }: ToastItemProps) => {
 
         // Context의 isRemoving 플래그 사용
         if (toast.isRemoving) {
-            return `${baseStyles} ${sizeStyles} opacity-0 scale-95 transition-all duration-[2000ms] ease-out`
+            return `${baseStyles} ${sizeStyles} opacity-0 scale-95 transition-all duration-[1000ms] ease-out`
         } else if (isVisible) {
             return `${baseStyles} ${sizeStyles} opacity-100 scale-100 transition-all duration-300 ease-out`
         } else {
