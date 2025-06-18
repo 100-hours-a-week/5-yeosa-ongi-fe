@@ -1,19 +1,36 @@
 import Grid from '@/components/common/Grid'
+import { GridItem } from '@/types'
 import { useEffect, useRef } from 'react'
 import AlbumThumbnail from './AlbumThumbnail'
 
-const Month = ({ albumIds, title, handleOutsideClick }) => {
-    const monthRef = useRef(null)
-    const gridRef = useRef(null)
-    const debounceTimeout = useRef(null)
+interface MonthProps {
+    albumIds: string[]
+    title: string
+    handleOutsideClick: () => void
+}
 
-    let items = []
+interface item {
+    ElementType: any
+    element: string
+    id: any
+}
+
+const Month = ({ albumIds, title, handleOutsideClick }: MonthProps) => {
+    const monthRef = useRef<HTMLDivElement>(null)
+    const gridRef = useRef<HTMLDivElement>(null)
+    const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+
+    let items: GridItem[] = []
     albumIds.forEach(id => {
-        items.push({ ElementType: AlbumThumbnail, element: id, id })
+        items.push({ ElementType: AlbumThumbnail, element: id as any, id })
     })
 
     useEffect(() => {
-        const handleClick = event => {
+        const handleClick = (event: MouseEvent) => {
+            if (!event.target || !(event.target instanceof Element)) {
+                return
+            }
+
             const clickedInsideMonth = monthRef.current && monthRef.current.contains(event.target)
             const clickedInsideGrid = gridRef.current && gridRef.current.contains(event.target)
 
