@@ -8,7 +8,7 @@ export interface ApiResponse<T = any> {
 }
 
 export interface GridItem {
-    ElementType: FC
+    ElementType: FC<any> | React.ComponentType<any>
     element: number
     id?: string
     props?: {}
