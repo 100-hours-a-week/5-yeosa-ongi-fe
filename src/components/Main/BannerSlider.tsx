@@ -5,7 +5,6 @@ import banner01 from '@/assets/banners/banner01.png'
 import banner02 from '@/assets/banners/pumati_banner1.png'
 
 const BannerSlider = () => {
-    // 배너 데이터 (실제 사용시 props로 받거나 외부에서 관리)
     const banners = [
         {
             id: 1,
@@ -41,7 +40,7 @@ const BannerSlider = () => {
         if (isAutoPlay) {
             const interval = setInterval(() => {
                 setCurrentIndex(prevIndex => (prevIndex === banners.length - 1 ? 0 : prevIndex + 1))
-            }, 4000) // 3초마다 자동 슬라이드
+            }, 4000)
 
             return () => clearInterval(interval)
         }
@@ -55,11 +54,6 @@ const BannerSlider = () => {
     // 다음 배너
     const goToNext = () => {
         setCurrentIndex(currentIndex === banners.length - 1 ? 0 : currentIndex + 1)
-    }
-
-    // 특정 배너로 이동
-    const goToSlide = index => {
-        setCurrentIndex(index)
     }
 
     // 마우스 오버시 자동재생 멈춤

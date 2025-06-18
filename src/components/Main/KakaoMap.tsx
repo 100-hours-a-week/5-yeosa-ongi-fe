@@ -3,20 +3,18 @@ import { useKakaoMap } from '@/hooks/useKakaoMap'
 import { useRef } from 'react'
 import { useAlbumStore, useMainPageStore } from '../../stores/mainPageStore'
 
-const KakaoMap = ({ height }) => {
+interface KakaoMapProps {
+    height: number
+}
+
+const KakaoMap = ({ height }: KakaoMapProps) => {
     const mapContainer = useRef(null)
 
-    // Zustand 스토어에서 상태 가져오기
+    // Hooks
     const { selectedId } = useMainPageStore()
     const { albums } = useAlbumStore()
-
-    console.log('=== KakaoMap 렌더링 ===')
-    console.log('selectedId:', selectedId)
-
-    // 지도 초기화
     const { mapInstance, isMapReady, panTo, setBounds } = useKakaoMap(mapContainer)
 
-    // 앨범 클러스터 마커 관리 (포커스 모드로 변경)
     useAlbumClusterMarkers({
         albums,
         isMapReady,
@@ -33,7 +31,7 @@ const KakaoMap = ({ height }) => {
                 <div
                     style={{
                         position: 'absolute',
-                        top: '50%',
+                        top: '25%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         zIndex: 1000,

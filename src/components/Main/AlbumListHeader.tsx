@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // APIs
 import { getTotalData } from '@/api/user'
@@ -7,7 +8,6 @@ import { getTotalData } from '@/api/user'
 import communityIcon from '@/assets/icons/community_icon.png'
 import albumIcon from '@/assets/icons/images_icon.png'
 import locationIcon from '@/assets/icons/location_icon.png'
-import { useNavigate } from 'react-router-dom'
 
 const AlbumListHeader = () => {
     const navigate = useNavigate()
@@ -29,10 +29,7 @@ const AlbumListHeader = () => {
                 console.error(error)
             }
         }
-
-        // Call the function immediately
         loadInitialData()
-        // No need to call it again here
     }, [])
 
     return (
