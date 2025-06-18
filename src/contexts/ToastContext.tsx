@@ -95,7 +95,7 @@ export const ToastProvider = ({ children, defaultDuration = 3000, maxToasts = 5 
         // 2초 후 실제 제거
         const removeTimer = setTimeout(() => {
             actuallyRemoveToast(id)
-        }, 1000)
+        }, 2000)
 
         removeTimersRef.current.set(id, removeTimer)
     }, [])
