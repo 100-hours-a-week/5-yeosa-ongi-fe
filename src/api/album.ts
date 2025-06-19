@@ -124,7 +124,7 @@ export const getAlbumDetail = async (albumId: string): Promise<ApiResponse> => {
  * @param albumId
  * @returns
  */
-export const getCoworkersList = async (albumId: number): Promise<ApiResponse> => {
+export const getCoworkersList = async (albumId: string): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
