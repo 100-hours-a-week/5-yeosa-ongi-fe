@@ -13,3 +13,9 @@ export interface GridItem {
     id?: string
     props?: {}
 }
+
+export interface Picture {
+    id: string | number
+    url: string
+    name?: string
+}
