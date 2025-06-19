@@ -1,13 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { getAlbumAccess, getCoworkersList } from '../../api/album'
-import Coworker from './Coworker'
+import { getAlbumAccess, getCoworkersList } from '../../api/album.ts'
+import Coworker from './Coworker.tsx'
 
-const CoworkerManager = ({ albumId }) => {
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
-    const [coworkerList, setCoworkerList] = useState([])
-    const [userRole, setUserRole] = useState(null)
+interface CoworkerManagerProps {
+    albumId: string
+}
+
+interface Coworker {
+    userId: string
+    nickname: string
+    profileImageURL: string
+    role: string
+    isOwner: string
+}
+const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
+    const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
+    const [coworkerList, setCoworkerList] = useState<Coworker[]>([])
+    const [userRole, setUserRole] = useState<string>('')
     useEffect(() => {
         const fetchCoworkers = async () => {
             try {
@@ -29,14 +40,12 @@ const CoworkerManager = ({ albumId }) => {
     }, [])
 
     const handleRemove = useCallback(
-        userId => {
+        (userId: string) => {
             const deleteCoworker = async () => {
                 try {
-                    const result = await deleteCoworker(albumId, userId)
+                    const result = await deleteCoworker()
                     console.log('삭제 성공!', result)
-                    setCoworkerList(prev =>
-                        prev.filter(coworker => coworker.userId !== userId)
-                    )
+                    setCoworkerList(prev => prev.filter(coworker => coworker.userId !== userId))
                 } catch (error) {
                     console.error('삭제 실패:', error)
                     // 사용자에게 에러 알림 표시
@@ -51,9 +60,7 @@ const CoworkerManager = ({ albumId }) => {
         <>
             <div className='relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg shadow-lg'>
                 <div className='p-5 border-b'>
-                    <h3 className='text-lg font-medium text-gray-800'>
-                        공동 작업자
-                    </h3>
+                    <h3 className='text-lg font-medium text-gray-800'>공동 작업자</h3>
                 </div>
                 <div>
                     {coworkerList.map((element, index) => {
