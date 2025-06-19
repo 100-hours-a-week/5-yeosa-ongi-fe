@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
-import { Picture } from '@/types'
+import { RawPicture } from '@/types'
 
 interface CategoryProps {
-    pictures: Picture[]
+    pictures: RawPicture[]
     title: string
     albumId: string
 }
