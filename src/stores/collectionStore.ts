@@ -1,7 +1,48 @@
+import Cluster from '@/components/Album/Cluster'
 import { create } from 'zustand'
 
-const useCollectionStore = create((set, get) => ({
-    // 기본 상태
+interface RawPicture {
+    pictureId: string
+    tag: string
+    isDuplicated: boolean
+    isShaky: boolean
+}
+
+interface Collection {
+    name: string
+    pictures: RawPicture[]
+    count: number
+}
+interface ClusterCollection {
+    clusterId: string
+    name: string
+    alt?: string
+    pictures: { pictureURL: string }[]
+    count: number
+}
+interface CollectionState {
+    currentAlbumId: string | null
+    rawPictures: RawPicture[]
+    allCollection: Collection | null
+    shakyCollection: Collection | null
+    duplicatedCollection: Collection | null
+    tagCollections: Collection[] | []
+    clusterCollections: ClusterCollection[]
+
+    setClusterCollections: (albumId: string, clusters: Cluster[]) => void
+    setPicturesAndCategorize: (albumId: string, pictures: RawPicture[]) => void
+    categorizePhotos: () => void
+    removePictures: (pictureIds: string[]) => void
+    updateClusterCollectionsAfterRemove: (removedPictureIds: string[]) => void
+    recoverPictures: (pictureIds: string[]) => void
+    recoverFromShaky: (pictureIds: string[]) => void
+    recoverFromDuplicated: (pictureIds: string[]) => void
+    getCollectionByName: (collectionName: string) => ClusterCollection | Collection | null | undefined
+    getClusterById: (clusterId: string) => ClusterCollection | undefined
+    updateClusterCollection: (clusterId: string, updates: Cluster[]) => void
+}
+
+const useCollectionStore = create<CollectionState>((set, get) => ({
     currentAlbumId: null,
     rawPictures: [],
     allCollection: null,
@@ -25,6 +66,7 @@ const useCollectionStore = create((set, get) => ({
 
         // 클러스터 데이터를 컬렉션 형태로 변환
         const clusterCollections = clusters.map(cluster => ({
+            clusterId: cluster.clusterId.toString(),
             name: cluster.clusterId.toString(),
             alt: cluster.clusterName,
             pictures:
@@ -118,7 +160,7 @@ const useCollectionStore = create((set, get) => ({
             const updatedClusterCollections = state.clusterCollections
                 .map(cluster => {
                     const updatedPictures = cluster.pictures.filter(
-                        pictureUrl => !removedPictureIds.includes(pictureUrl)
+                        (item: { pictureURL: string }) => !removedPictureIds.includes(item.pictureURL)
                     )
 
                     return {
@@ -166,7 +208,7 @@ const useCollectionStore = create((set, get) => ({
         set(state => {
             const updatedRawPictures = [...state.rawPictures]
 
-            pictureIds.forEach(pictureId => {
+            pictureIds.forEach((pictureId: string) => {
                 const pictureIndex = updatedRawPictures.findIndex(p => p.pictureId === pictureId)
 
                 if (pictureIndex !== -1) {
