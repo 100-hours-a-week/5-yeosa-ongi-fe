@@ -15,6 +15,12 @@ import { useAlbumCreation } from '../hooks/useAlbumCreation'
 // Types
 import { FileItem } from '@/types/upload'
 
+interface ButtonState {
+    isAlbumTitleValid: boolean
+    isFileUploadValid: boolean
+    isLoading: boolean
+    isProcessing: boolean
+}
 /**
  * 앨범 편집 컴포넌트
  * 새 앨범 생성 또는 기존 앨범에 사진 추가 기능 제공
@@ -109,10 +115,20 @@ const AlbumEditor = () => {
     /**
      * 버튼 비활성화 여부
      */
-    const isButtonDisabled = useMemo((): boolean => {
+    const isButtonDisabled = useMemo((): ButtonState => {
         // 제목이 비어있거나, 파일이 1장 미만이거나, 로딩 중이거나, 처리 중일 때 비활성화
-        console.log(albumTitle.trim() === '', fileManager.files.length < 1, albumData.loading, fileManager.isProcessing)
-        return albumTitle.trim() === '' || fileManager.files.length < 1 || albumData.loading || fileManager.isProcessing
+        console.log(
+            albumTitle.trim() !== '',
+            fileManager.files.length >= 1,
+            albumData.loading,
+            fileManager.isProcessing
+        )
+        return {
+            isAlbumTitleValid: albumTitle.trim() !== '',
+            isFileUploadValid: fileManager.files.length >= 1,
+            isLoading: albumData.loading,
+            isProcessing: fileManager.isProcessing,
+        }
     }, [albumTitle, fileManager.files.length, albumData.loading, fileManager.isProcessing])
 
     return (
@@ -135,13 +151,7 @@ const AlbumEditor = () => {
             </main>
 
             <footer className='px-4 py-3 mt-auto'>
-                <CreateAlbumButton
-                    disabled={isButtonDisabled}
-                    onClick={handleCreateAlbum}
-                    description={albumId ? '사진 추가 ' : '앨범 생성'}
-                >
-                    {loading ? '생성 중...' : ' '}
-                </CreateAlbumButton>
+                <CreateAlbumButton buttonState={isButtonDisabled} onClick={handleCreateAlbum}></CreateAlbumButton>
             </footer>
         </div>
     )
