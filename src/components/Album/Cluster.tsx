@@ -1,10 +1,32 @@
 import { changeClusterTitle } from '@/api/album'
-import { useEffect, useState } from 'react'
+
+import { ChangeEvent, CSSProperties, FocusEvent, KeyboardEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextInput from '../common/TextInput'
 
-const Cluster = ({ cluster, albumId, onNameChange }) => {
-    const [style, setStyle] = useState(null)
+interface Cluster {
+    bboxX1: number
+    bboxX2: number
+    bboxY1: number
+    bboxY2: number
+    clusterId: string
+    clusterName: string
+    clusterPicture: string[]
+}
+
+interface ClusterProps {
+    cluster: Cluster
+    albumId: string
+}
+
+interface Vailidation {
+    isValid: boolean
+    errorMessage: string
+    hasBeenValidated: boolean
+    value: string
+}
+const Cluster = ({ cluster, albumId }: ClusterProps) => {
+    const [style, setStyle] = useState<CSSProperties>()
     const [isEditing, setIsEditing] = useState(false)
     const [isValid, setIsValid] = useState(false)
     const [newName, setNewName] = useState(cluster.clusterName)
@@ -19,17 +41,14 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
         setIsValid(false) // 편집 시작할 때 초기화
     }
 
-    const handleChange = (newValue, e, inputIsValid) => {
+    const handleChange = (newValue: string, e: ChangeEvent) => {
         setNewName(newValue)
-        // TextInput의 유효성 검사 결과를 그대로 사용하지 않고
-        // 실제 값으로 직접 검증
         const validation = clusterNameValidation(newValue)
         setIsValid(validation.isValid)
     }
 
-    const handleKeyDown = e => {
+    const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
-            // 엔터 키 누를 때 한번 더 검증
             const validation = clusterNameValidation(newName)
             if (validation.isValid && !isLoading) {
                 handleSave()
@@ -39,7 +58,7 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
         }
     }
 
-    const clusterNameValidation = value => {
+    const clusterNameValidation = (value: string) => {
         if (!value || value.trim().length === 0) {
             return { isValid: false, message: '이름을 입력해주세요.' }
         }
@@ -69,8 +88,6 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
             // API 응답 확인
             if (response && response.success) {
                 setIsEditing(false)
-                // 부모 컴포넌트에 변경사항 알림
-                onNameChange?.(cluster.clusterId, trimmedName)
             } else {
                 throw new Error(response?.message || '이름 변경에 실패했습니다.')
             }
@@ -88,14 +105,13 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
     }
 
     // TextInput의 검증 상태 변경 핸들러
-    const handleValidationChange = state => {
-        // TextInput의 검증 결과를 받지만, 우리의 검증 로직을 우선시
+    const handleValidationChange = (state: Vailidation) => {
         const validation = clusterNameValidation(state.value)
         setIsValid(validation.isValid)
     }
 
     // 외부 클릭으로 편집 모드 종료
-    const handleBlur = e => {
+    const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
         // 저장/취소 버튼 클릭이 아닌 경우에만 취소
         if (!e.currentTarget.contains(e.relatedTarget)) {
             // 약간의 지연을 두어 다른 이벤트가 먼저 처리되도록 함
@@ -197,18 +213,21 @@ const Cluster = ({ cluster, albumId, onNameChange }) => {
                 {isEditing ? (
                     <div className='relative flex items-center justify-center' onBlur={handleBlur}>
                         <TextInput
-                            value={newName}
-                            onChange={handleChange}
-                            onKeyDown={handleKeyDown}
-                            onBlur={handleInputBlur}
-                            className='text-xs text-center border-0 border-b rounded-none w-14 border-gray-light focus:border-b-1 focus:outline-none'
-                            autoFocus
-                            maxLength={5}
-                            showCharacterCount={false}
-                            validationFunction={clusterNameValidation}
-                            onValidationChange={handleValidationChange}
-                            disabled={isLoading}
-                            reserveHelperSpace={false}
+                            {...({
+                                value: newName,
+                                onChange: handleChange,
+                                onKeyDown: handleKeyDown,
+                                onBlur: handleInputBlur,
+                                className:
+                                    'text-xs text-center border-0 border-b rounded-none w-14 border-gray-light focus:border-b-1 focus:outline-none',
+                                autoFocus: true,
+                                maxLength: 5,
+                                showCharacterCount: false,
+                                validationFunction: clusterNameValidation,
+                                onValidationChange: handleValidationChange,
+                                disabled: isLoading,
+                                reserveHelperSpace: false,
+                            } as any)}
                         />
                     </div>
                 ) : (
