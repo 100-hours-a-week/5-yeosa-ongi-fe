@@ -1,4 +1,13 @@
-const Coworker = ({ userId, nickname, profileImageURL, role, isOwner, handleRemove }) => {
+interface CoworkerProps {
+    userId: string
+    nickname: string
+    profileImageURL: string
+    role: string
+    isOwner: string
+    handleRemove: (userId: string) => void
+}
+
+const Coworker = ({ userId, nickname, profileImageURL, role, isOwner, handleRemove }: CoworkerProps) => {
     const handleRemoveClick = () => {
         handleRemove(userId)
         // Remove 버튼 클릭 시 로직 추가
