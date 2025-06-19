@@ -139,7 +139,7 @@ export const getCoworkersList = async (albumId: string): Promise<ApiResponse> =>
  * @param albumId
  * @returns
  */
-export const getSharingLink = async (albumId: number): Promise<ApiResponse> => {
+export const getSharingLink = async (albumId: string): Promise<ApiResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/invite/link`
         return await authenticatedFetch(apiUrl, { method: 'POST' })
