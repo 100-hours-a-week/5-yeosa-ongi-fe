@@ -19,3 +19,11 @@ export interface Picture {
     url: string
     name?: string
 }
+
+export interface RawPicture {
+    pictureId: string
+    tag: string
+    isDuplicated: boolean
+    isShaky: boolean
+    url: string
+}
