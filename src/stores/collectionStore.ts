@@ -1,12 +1,6 @@
 import Cluster from '@/components/Album/Cluster'
+import { RawPicture } from '@/types'
 import { create } from 'zustand'
-
-interface RawPicture {
-    pictureId: string
-    tag: string
-    isDuplicated: boolean
-    isShaky: boolean
-}
 
 interface Collection {
     name: string
