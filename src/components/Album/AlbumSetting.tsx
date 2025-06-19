@@ -5,15 +5,20 @@ import TextField from '../common/TextField'
 import AlbumShare from './AlbumShare'
 import CoworkerManager from './CoworkerManager'
 
-const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
+interface AlbumSettingProps {
+    albumId: string
+    albumName: string
+    handleDelete: () => void
+}
+const AlbumSetting = ({ albumId, albumName, handleDelete }: AlbumSettingProps) => {
     const [activeSection, setActiveSection] = useState('sharing')
     const [sharingLink, setSharingLink] = useState('')
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [error, setError] = useState<string | null>(null)
     const [isValid, setIsValid] = useState(false)
     const [userRole, setUserRole] = useState(null)
 
-    const handleOnChange = (newValue, e) => {
+    const handleOnChange = (newValue: string) => {
         const inputValue = newValue
         const expectedValue = albumName
 
@@ -139,7 +144,7 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }) => {
 
                 {/* Content area */}
                 <div className='w-3/4 overflow-auto'>
-                    {sections[activeSection].content}
+                    {sections[activeSection as keyof typeof sections]?.content}
 
                     {/* Footer with action buttons */}
                 </div>
