@@ -2,113 +2,37 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 //Components
+import AlbumTitle from '@/components/Album/AlbumTitle'
+import Cluster from '@/components/Album/Cluster'
 import AlbumSetting from '../components/Album/AlbumSetting'
 import Card from '../components/Album/Card'
 import Category from '../components/Album/Category'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
+import MovingDotsLoader from '../components/common/MovingDotsLoader'
 
 //Custom Hooks
 import useModal from '../hooks/useModal'
 
 //APIs
 import { deleteAlbum, getAlbumAccess, getAlbumDetail } from '../api/album'
+
 //Stores
 import useCollectionStore from '../stores/collectionStore'
 
 //Assets
-import AlbumTitle from '@/components/Album/AlbumTitle'
-import Cluster from '@/components/Album/Cluster'
 import Arrow_Right from '../assets/icons/Arrow Right.png'
 import iconDuplicated from '../assets/icons/icon_duplicated.png'
 import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
-import MovingDotsLoader from '../components/common/MovingDotsLoader'
-import { ApiResponse } from '../types'
 
-// const mockClusters = [
-//     {
-//         clusterId: 9,
-//         clusterName: '사람-1',
-//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//         bboxX1: 2622,
-//         bboxY1: 1375,
-//         bboxX2: 2932,
-//         bboxY2: 1712,
-//         clusterPicture: [
-//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
-//         ],
-//     },
-//     {
-//         clusterId: 10,
-//         clusterName: '사람-2',
-//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//         bboxX1: 3345,
-//         bboxY1: 1087,
-//         bboxX2: 4032,
-//         bboxY2: 1983,
-//         clusterPicture: [
-//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
-//         ],
-//     },
-//     {
-//         clusterId: 11,
-//         clusterName: '사람-3',
-//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//         bboxX1: 1247,
-//         bboxY1: 1024,
-//         bboxX2: 1679,
-//         bboxY2: 1531,
-//         clusterPicture: [
-//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
-//         ],
-//     },
-//     {
-//         clusterId: 12,
-//         clusterName: '사람-4',
-//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//         bboxX1: 514,
-//         bboxY1: 395,
-//         bboxX2: 908,
-//         bboxY2: 850,
-//         clusterPicture: [
-//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
-//         ],
-//     },
-//     {
-//         clusterId: 13,
-//         clusterName: '사람-5',
-//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//         bboxX1: 1192,
-//         bboxY1: 591,
-//         bboxX2: 1444,
-//         bboxY2: 862,
-//         clusterPicture: [
-//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
-//         ],
-//     },
-//     {
-//         clusterId: 14,
-//         clusterName: '사람-6',
-//         representativePicture: 'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//         bboxX1: 2173,
-//         bboxY1: 800,
-//         bboxX2: 2399,
-//         bboxY2: 1083,
-//         clusterPicture: [
-//             'https://cdn.ongi.today/87f49929-aaed-408d-8962-9c3013729a25.jpeg',
-//             'https://cdn.ongi.today/5709524e-d316-44c2-a6bd-bf9a47a9a394.jpeg',
-//         ],
-//     },
-// ]
-interface Cluster {
-    clusterId: string | number
+//Types
+import Background from '@/components/common/Background'
+import { ApiResponse, RawPicture } from '../types'
+
+interface ClusterInterface {
+    clusterId: string
     clusterName: string
     representativePicture: string
     bboxX1: number
@@ -141,16 +65,17 @@ interface AlbumData {
 }
 
 const Album = () => {
-    const navigate = useNavigate()
     const { albumId } = useParams<{ albumId: string }>()
     const [albumData, setAlbumData] = useState<AlbumData>()
 
-    const [isLoading, setIsLoading] = useState(true)
-    // 카테고리와 인물 분류 섹션 각각의 인디케이터 상태 분리
-    const [showCategoryRightIndicator, setShowCategoryRightIndicator] = useState(true)
-    const [showClusterRightIndicator, setShowClusterRightIndicator] = useState(true)
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [showCategoryRightIndicator, setShowCategoryRightIndicator] = useState<boolean>(true)
+    const [showClusterRightIndicator, setShowClusterRightIndicator] = useState<boolean>(true)
+
+    const navigate = useNavigate()
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
+
     const {
         setPicturesAndCategorize,
         tagCollections,
@@ -214,12 +139,12 @@ const Album = () => {
                 // 사진 데이터를 스토어에 전달하고 자동 카테고라이징
                 if (response.data && response.data.picture) {
                     // 스토어에 원본 사진 데이터 전달 - 내부적으로 카테고라이징 실행
-                    const pictures: Picture[] = response.data.picture
-                    await setPicturesAndCategorize(albumId, pictures)
+                    const pictures: RawPicture[] = response.data.picture
+                    await setPicturesAndCategorize(albumId as string, pictures)
                 }
 
                 setClusters(response.data.cluster)
-                setClusterCollections(albumId, response.data.cluster)
+                setClusterCollections(albumId as string, response.data.cluster)
                 // setClusters(mockClusters)
                 // setClusterCollections(albumId, mockClusters)
 
@@ -244,15 +169,23 @@ const Album = () => {
     return (
         <>
             <Header />
-            <AlbumTitle title={albumData?.title} />
-            <Card />
-            <div className='m-4 mt-6'>
+            <div className='absolute inset-0 w-full h-full -z-50'>
+                <Background></Background>
+            </div>
+            <div className='relative'>
+                <AlbumTitle title={albumData?.title || ''} />
+                <Card />
+            </div>
+
+            <div className='m-4 mt-6 bg-transparent'>
                 <div className='flex items-center justify-between'>
                     <div className='ml-4 font-sans text-md'>카테고리 </div>
                     <button onClick={() => navigate(`/album/${albumId}/전체`)} className='px-2'>
                         <div className='flex items-center '>
                             <img src={images_icon} className='h-4'></img>
-                            <div className='px-2 text-xs tracking-tighter'>전체 {allCollection.count} 개 사진 보기</div>
+                            <div className='px-2 text-xs tracking-tighter'>
+                                전체 {allCollection?.count} 개 사진 보기
+                            </div>
                         </div>
                     </button>
                 </div>
@@ -263,8 +196,12 @@ const Album = () => {
                         onScroll={handleCategoryScroll}
                     >
                         {tagCollections &&
-                            tagCollections.map((category: Category, index: number) => (
-                                <Category title={category.name} pictures={category.pictures} albumId={albumId} />
+                            tagCollections.map(category => (
+                                <Category
+                                    title={category.name}
+                                    pictures={category.pictures}
+                                    albumId={albumId as string}
+                                />
                             ))}
                     </div>
                     {showCategoryRightIndicator && (
@@ -298,7 +235,7 @@ const Album = () => {
                     >
                         {clusters &&
                             clusters.map((cluster: Cluster, index) => (
-                                <Cluster albumId={albumId} cluster={cluster} onNameChange={onchangeName} />
+                                <Cluster albumId={albumId as string} cluster={cluster as ClusterInterface} />
                             ))}
                     </div>
                     {clusters.length !== 0 && showClusterRightIndicator && (
@@ -366,7 +303,7 @@ const Album = () => {
             <Modal isOpen={isOpen} onClose={closeModal} title={modalData}>
                 {modalData && (
                     <AlbumSetting
-                        albumId={albumId}
+                        albumId={albumId as string}
                         albumName={albumData?.title || ' '}
                         handleDelete={() => {
                             deleteAlbum(albumId as string)
