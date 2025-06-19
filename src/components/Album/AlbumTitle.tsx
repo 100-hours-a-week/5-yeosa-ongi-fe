@@ -2,12 +2,15 @@ import { changeAlbumName } from '@/api/album'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
 
-const AlbumTitle = ({ title }) => {
+interface AlbumTitleProps {
+    title: string
+}
+
+const AlbumTitle = ({ title }: AlbumTitleProps) => {
     const { albumId } = useParams()
-    const handleSaveName = async newValue => {
-        // 서버 저장 시뮬레이션
+    const handleSaveName = async (newValue: string) => {
         try {
-            const response = await changeAlbumName(albumId, newValue)
+            const response = await changeAlbumName(albumId as string, newValue)
         } catch (error) {
             console.error(error)
         }
