@@ -8,7 +8,6 @@ import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // Hooks
-//import { useAlbumCreationUI } from '@/hooks/useAlbumCreationUI'
 import useFileUpload from '@/hooks/useFileUpload'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
