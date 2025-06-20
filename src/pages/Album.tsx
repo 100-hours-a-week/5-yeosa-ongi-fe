@@ -28,7 +28,6 @@ import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
 
 //Types
-import Background from '@/components/common/Background'
 import { ApiResponse, RawPicture } from '../types'
 
 interface ClusterInterface {
@@ -169,9 +168,9 @@ const Album = () => {
     return (
         <>
             <Header />
-            <div className='absolute inset-0 w-full h-full -z-50'>
+            {/* <div className='absolute inset-0 w-full h-full -z-50'>
                 <Background></Background>
-            </div>
+            </div> */}
             <div className='relative'>
                 <AlbumTitle title={albumData?.title || ''} />
                 <Card />
