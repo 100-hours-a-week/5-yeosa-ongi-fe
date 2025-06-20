@@ -17,7 +17,6 @@ export const useFileConversion = (
     file: File,
     onConverted?: (original: File, converted: File) => void
 ): FileConversionState => {
-    // 상태 초기화 (기존 FilePreview의 초기화 로직과 동일)
     const [state, setState] = useState<FileConversionState>(() => {
         const isHeic = isHEICFile(file)
 
