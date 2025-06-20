@@ -1,5 +1,6 @@
 // components/FileManager.tsx (변환 콜백 버전)
 
+import { useToast } from '@/contexts/ToastContext'
 import { FileItem } from '@/types/upload'
 import { FC, useCallback, useMemo } from 'react'
 import { GridWithChildren } from '../common/GridWithChildren'
@@ -20,11 +21,12 @@ const FileManager: FC<FileManagerProps> = ({
     files = [],
     onFileDelete,
     onFileAdd,
-    onFileConverted, // 새로운 prop
+    onFileConverted,
     isProcessing = false,
     maxFiles = 30,
     className = '',
 }) => {
+    const { success, error: errorToast, warning, info } = useToast()
     // 안전한 파일 목록 필터링
     const safeFiles = useMemo(() => {
         if (!Array.isArray(files)) {
@@ -127,6 +129,7 @@ const FileManager: FC<FileManagerProps> = ({
     // 에러 핸들러
     const handleError = useCallback((error: string) => {
         console.error('FileManager: File input error:', error)
+        errorToast(error)
     }, [])
 
     // processing 상태 설정
@@ -199,8 +202,8 @@ const FileManager: FC<FileManagerProps> = ({
                         <FilePreviewContainer
                             key={file.id}
                             file={file}
-                            onDelete={handleFileDelete}
-                            onConverted={handleFileConverted} // 변환 완료 콜백 전달
+                            onDelete={onFileDelete}
+                            onConverted={onFileConverted} // 변환 완료 콜백 전달
                         />
                     )
                 })}
