@@ -30,8 +30,8 @@ export interface FileItem {
     conversionError?: string
 
     GPS?: {
-        latitude?: number | null
-        longitude?: number | null
+        latitude?: number | null | string
+        longitude?: number | null | string
     }
     isProcessed: boolean
     thumbnail?: string
