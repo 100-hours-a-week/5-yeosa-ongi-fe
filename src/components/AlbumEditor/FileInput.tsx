@@ -60,7 +60,6 @@ const FileInput = ({
 
             if (!validationResult.isValid) {
                 onError(validationResult.error)
-                return
             }
 
             const validFiles = validationResult.validFiles
