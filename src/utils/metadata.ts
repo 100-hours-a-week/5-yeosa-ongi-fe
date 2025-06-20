@@ -2,11 +2,11 @@
 
 // exifr를 정적으로 import
 import { gps, parse } from 'exifr'
-
+import ExifReader from 'exifreader'
 // 기존 타입 정의들...
 export interface GPSMetadata {
-    latitude: number | null
-    longitude: number | null
+    latitude: number | null | string
+    longitude: number | null | string
     altitude?: number | null
     hasGPS: boolean
     accuracy?: {
@@ -103,6 +103,66 @@ export const extractGPSMetadata = async (file: File): Promise<GPSMetadata> => {
             extractionFailed: true,
             error: error instanceof Error ? error.message : 'Unknown error',
         }
+    }
+}
+// GPS DMS(도분초)를 십진수로 변환하는 함수
+const convertDMSToDD = (dmsArray: number[], direction: string): number => {
+    if (!dmsArray || dmsArray.length < 3) return 0
+    const [degrees, minutes, seconds] = dmsArray
+    let dd = degrees + minutes / 60 + seconds / (60 * 60)
+    if (direction === 'S' || direction === 'W') {
+        dd = dd * -1
+    }
+    return dd
+}
+
+// 분수를 소수로 변환 (ExifReader에서 분수 형태로 오는 경우)
+const parseFraction = (fraction: any): number => {
+    if (typeof fraction === 'number') return fraction
+    if (typeof fraction === 'string' && fraction.includes('/')) {
+        const [numerator, denominator] = fraction.split('/').map(Number)
+        return numerator / denominator
+    }
+    return parseFloat(fraction) || 0
+}
+
+export const extractJPEGMetadata = async (file: File): Promise<{ gps?: GPSMetadata; exif?: EXIFMetadata } | null> => {
+    try {
+        // ExifReader로 메타데이터 읽기
+        const tags = await ExifReader.load(file)
+
+        let gpsMetadata: GPSMetadata = { latitude: null, longitude: null, hasGPS: false }
+        let exifMetadata: EXIFMetadata | undefined
+
+        // GPS 정보 처리
+        const gpsLat = tags['GPSLatitude']
+        const gpsLatRef = tags['GPSLatitudeRef']
+        const gpsLon = tags['GPSLongitude']
+        const gpsLonRef = tags['GPSLongitudeRef']
+        const gpsAlt = tags['GPSAltitude']
+
+        if (gpsLat?.value && gpsLatRef?.value && gpsLon?.value && gpsLonRef?.value && gpsMetadata) {
+            const latitude = gpsLat.description
+            const longitude = gpsLon.description
+            gpsMetadata.latitude = latitude
+            gpsMetadata.longitude = longitude
+            gpsMetadata.hasGPS = true
+            // 고도 정보 추가
+            if (gpsAlt?.value) {
+                gpsMetadata.altitude = parseFraction(gpsAlt.value)
+            }
+        }
+
+        if (gpsMetadata) {
+            console.log('정상 추출 완료')
+            return { gps: gpsMetadata }
+        } else {
+            console.log('정상 추출 실패')
+            return null
+        }
+    } catch (error) {
+        console.error('EXIF 데이터 추출 중 오류:', error)
+        return null
     }
 }
 
