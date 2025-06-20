@@ -1,6 +1,6 @@
 import { useToast } from '@/contexts/ToastContext'
 import { FileItem } from '@/types/upload'
-import { extractHEICMetadata, isHEICFile } from '@/utils/metadata'
+import { extractHEICMetadata, extractJPEGMetadata, isHEICFile } from '@/utils/metadata'
 import { useCallback, useEffect, useState } from 'react'
 interface UseFileUploadOptions {
     maxFiles?: number
@@ -83,8 +83,15 @@ const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadReturn 
      */
     const createSingleFileItem = useCallback(async (file: File): Promise<FileItem> => {
         try {
-            const metadata = isHEICFile(file) ? await extractHEICMetadata(file) : null
-
+            let metadata
+            if (isHEICFile(file)) {
+                console.log('HIEC 추출')
+                metadata = await extractHEICMetadata(file)
+            } else {
+                console.log('JPG 추출')
+                metadata = await extractJPEGMetadata(file)
+            }
+            console.log(metadata)
             const fileItem: FileItem = {
                 file,
                 preview: createPreviewURL(file),
