@@ -90,21 +90,19 @@ const AlbumEditor = () => {
     /**
      * 버튼 비활성화 여부
      */
-    const isButtonDisabled = useMemo((): ButtonState => {
-        // 제목이 비어있거나, 파일이 1장 미만이거나, 로딩 중이거나, 처리 중일 때 비활성화
-        console.log(
-            albumTitle.trim() !== '',
-            fileManager.files.length >= 1,
-            albumData.loading,
-            fileManager.isProcessing
-        )
-        return {
-            isAlbumTitleValid: albumTitle.trim() !== '',
-            isFileUploadValid: fileManager.files.length >= 1,
+
+    const isAlbumTitleValid = useMemo(() => albumTitle.trim() !== '', [albumTitle])
+    const isFileUploadValid = useMemo(() => fileManager.files.length >= 1, [fileManager.files.length])
+
+    const buttonState = useMemo(
+        (): ButtonState => ({
+            isAlbumTitleValid,
+            isFileUploadValid,
             isLoading: albumData.loading,
             isProcessing: fileManager.isProcessing,
-        }
-    }, [albumTitle, fileManager.files.length, albumData.loading, fileManager.isProcessing])
+        }),
+        [isAlbumTitleValid, isFileUploadValid, albumData.loading, fileManager.isProcessing]
+    )
 
     return (
         <div className='flex flex-col min-h-screen'>
@@ -126,7 +124,7 @@ const AlbumEditor = () => {
             </main>
 
             <footer className='px-4 py-3 mt-auto'>
-                <CreateAlbumButton buttonState={isButtonDisabled} onClick={handleCreateAlbum}></CreateAlbumButton>
+                <CreateAlbumButton buttonState={buttonState} onClick={handleCreateAlbum}></CreateAlbumButton>
             </footer>
         </div>
     )
