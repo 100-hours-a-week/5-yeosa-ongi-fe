@@ -121,24 +121,30 @@ export const validateImageFile = (file, currentFiles = []) => {
  */
 export const validateImageFiles = files => {
     const validFiles = []
+    let invalidFilesCount = 0
 
     for (const file of files) {
         const result = validateImageFile(file)
 
         if (!result.isValid) {
-            return {
-                isValid: false,
-                error: result.error,
-                validFiles,
-            }
+            invalidFilesCount += 1
+        } else {
+            validFiles.push(file)
         }
 
-        validFiles.push(file)
-    }
 
+    }
+    if (invalidFilesCount !== 0) {
+        return {
+            isValid: false,
+            error: `${invalidFilesCount}장의 사진 검증 실패`,
+            validFiles
+        }
+    }
     return {
         isValid: true,
         error: null,
+        invalidFilesCount,
         validFiles,
     }
 }
