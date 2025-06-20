@@ -8,11 +8,10 @@ import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // Hooks
-import useFileUpload from '@/hooks/useFileUpload'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
 // Types
-import { FileItem } from '@/types/upload'
+import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 
 interface ButtonState {
     isAlbumTitleValid: boolean
@@ -21,6 +20,9 @@ interface ButtonState {
     isProcessing: boolean
 }
 const MemoizedAlbumEditorHeader = memo(AlbumEditorHeader)
+const MemoizedAlbumTitleForm = memo(AlbumTitleForm)
+const MemoizedFileManager = memo(FileManager)
+const MemoizedCreateAlbumButton = memo(CreateAlbumButton)
 
 /**
  * 앨범 편집 컴포넌트
@@ -31,7 +33,11 @@ const AlbumEditor = () => {
     const { albumId } = useParams()
 
     const albumData = useAlbumCreation()
-    const fileManager = useFileUpload({ maxFiles: 30 })
+    // const fileManager = useFileUpload({ maxFiles: 30 })
+
+    const { count, isValid: isFileValid } = useFileCount()
+    const files = useFileStore(fileSelectors.files)
+    const { isProcessing } = useFileProcessing()
 
     const handleTitleChange = useCallback((newTitle: string) => {
         setAlbumTitle(newTitle)
@@ -42,66 +48,29 @@ const AlbumEditor = () => {
      */
     const handleCreateAlbum = useCallback(async (): Promise<void> => {
         // 생성 조건 검사 (1장 이상으로 변경)
-        if (fileManager.files.length < 1 || albumData.loading || fileManager.isProcessing) {
+        if (files.length < 1 || albumData.loading || isProcessing) {
             return
         }
 
         try {
-            await albumData.createAlbumWithFiles(albumTitle, fileManager.files, albumId as string)
+            await albumData.createAlbumWithFiles(albumTitle, files, albumId as string)
         } catch (error) {
             console.error('앨범 생성 중 오류:', error)
         }
-    }, [fileManager.files, albumData.loading, fileManager.isProcessing, albumTitle, albumId])
-
-    /**
-     * 파일 변환 핸들러
-     */
-    const handleFileConverted = useCallback(
-        async (originalFile: File, convertedFile: File) => {
-            try {
-                // files 배열에서 원본 파일 찾기
-                const originalFileItem = fileManager.files?.find(
-                    fileItem =>
-                        fileItem.file === originalFile ||
-                        (fileItem.file.name === originalFile.name &&
-                            fileItem.file.size === originalFile.size &&
-                            fileItem.file.lastModified === originalFile.lastModified)
-                )
-
-                if (!originalFileItem) {
-                    console.error('원본 파일을 찾을 수 없음:', originalFile.name)
-                    return
-                }
-                const updateData: Partial<FileItem> = {
-                    file: convertedFile,
-                    preview: URL.createObjectURL(convertedFile),
-                    isProcessed: true,
-                    GPS: originalFileItem.GPS,
-                }
-
-                fileManager.updateFile(originalFileItem.id, updateData)
-            } catch (error) {
-                console.error('파일 교체 중 오류:', error)
-            }
-        },
-        [fileManager.files, fileManager.updateFile]
-    )
+    }, [files, albumData.loading, isProcessing, albumTitle, albumId])
 
     /**
      * 버튼 비활성화 여부
      */
 
-    const isAlbumTitleValid = useMemo(() => albumTitle.trim() !== '', [albumTitle])
-    const isFileUploadValid = useMemo(() => fileManager.files.length >= 1, [fileManager.files.length])
-
     const buttonState = useMemo(
         (): ButtonState => ({
-            isAlbumTitleValid,
-            isFileUploadValid,
+            isAlbumTitleValid: albumTitle.trim() !== '',
+            isFileUploadValid: count >= 1,
             isLoading: albumData.loading,
-            isProcessing: fileManager.isProcessing,
+            isProcessing: isProcessing,
         }),
-        [isAlbumTitleValid, isFileUploadValid, albumData.loading, fileManager.isProcessing]
+        [albumTitle, albumData.loading, isProcessing]
     )
 
     return (
@@ -109,18 +78,11 @@ const AlbumEditor = () => {
             <MemoizedAlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
-            {albumId ? ' ' : <AlbumTitleForm value={albumTitle} onChange={handleTitleChange} />}
+            {albumId ? ' ' : <MemoizedAlbumTitleForm value={albumTitle} onChange={handleTitleChange} />}
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
-                <FileManager
-                    files={fileManager.files}
-                    onFileDelete={fileManager.removeFile}
-                    onFileAdd={fileManager.addFile}
-                    onFileConverted={handleFileConverted}
-                    isProcessing={fileManager.isProcessing}
-                    maxFiles={30}
-                />
+                <FileManager />
             </main>
 
             <footer className='px-4 py-3 mt-auto'>
