@@ -32,8 +32,6 @@ type LoadingState = 'loading' | 'success' | 'error' | 'empty'
 const Main = () => {
     const [loadingState, setLoadingState] = useState<LoadingState>('loading')
     const [listHeight, setListHeight] = useState(0)
-    const [hasData, setHasData] = useState<boolean>(false)
-
     //무한 스크롤 관련
     const [nextYearMonth, setNextYearMonth] = useState<yearMonth>(null)
     const lastAttemptedYearMonth = useRef<yearMonth>(null)
@@ -43,10 +41,8 @@ const Main = () => {
 
     // 지도의 실제 높이 계산
     const getMapHeight = () => {
-        console.log('맵 높이 다시계산 !!!!!')
-        const totalHeight = window.innerHeight - 56 // 헤더 제외
-        const bannerHeight = 72
-        const availableHeight = totalHeight - bannerHeight
+        const totalHeight = window.innerHeight - CONSTANTS.HEADER_HEIGHT
+        const availableHeight = totalHeight - CONSTANTS.BANNER_HEIGHT
         const mapHeight = availableHeight - listHeight
         return Math.max(0, mapHeight) // 최소 0
     }
@@ -54,6 +50,39 @@ const Main = () => {
     const handleListHeightChange = useCallback((height: number) => {
         setListHeight(height)
     }, [])
+
+    useEffect(() => {
+        let isMounted = true
+
+        const loadInitialData = async () => {
+            try {
+                setLoadingState('loading')
+                const result = await fetchAlbumData('')
+
+                if (isMounted && result && result.data) {
+                    console.log('초기 데이터 로드:', result)
+                    setAlbums(result.data.albumInfo)
+                    setNextYearMonth(result.data.nextYearMonth)
+                    setHasNext(result.data.hasNext)
+                    if (result.data.albumInfo.length > 0) {
+                        setLoadingState('success')
+                    } else {
+                        setLoadingState('empty')
+                    }
+                }
+            } catch (error) {
+                console.error('초기 데이터 로딩 오류:', error)
+                if (isMounted) {
+                    setLoadingState('error')
+                }
+            }
+        }
+        loadInitialData()
+
+        return () => {
+            isMounted = false
+        }
+    }, [setAlbums])
 
     const fetchMoreAlbums = useCallback(async () => {
         console.log('무한 스크롤 로직 시작 = == = = = ==')
@@ -84,7 +113,6 @@ const Main = () => {
 
             console.log('추가 데이터 로드:', response)
             addAlbums(response.data.albumInfo)
-            setHasData(true)
             // 새로운 nextYearMonth 값이 있으면 업데이트
             if (response.data.nextYearMonth && response.data.nextYearMonth !== nextYearMonth) {
                 setNextYearMonth(response.data.nextYearMonth)
@@ -105,40 +133,6 @@ const Main = () => {
     }, [nextYearMonth, addAlbums, loadingState])
     const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(fetchMoreAlbums, true)
 
-    useEffect(() => {
-        let isMounted = true
-
-        const loadInitialData = async () => {
-            try {
-                setLoadingState('loading')
-                const result = await fetchAlbumData('')
-
-                if (isMounted && result && result.data) {
-                    console.log('초기 데이터 로드:', result)
-                    setAlbums(result.data.albumInfo)
-                    setNextYearMonth(result.data.nextYearMonth)
-                    setHasNext(result.data.hasNext)
-                    if (result.data.albumInfo.length > 0) {
-                        setHasData(true)
-                        setLoadingState('success')
-                    } else {
-                        setLoadingState('empty')
-                    }
-                }
-            } catch (error) {
-                console.error('초기 데이터 로딩 오류:', error)
-                if (isMounted) {
-                    setLoadingState('error')
-                }
-            }
-        }
-        loadInitialData()
-
-        return () => {
-            isMounted = false
-        }
-    }, [setAlbums])
-
     if (loadingState === 'loading') {
         return (
             <>
@@ -158,7 +152,7 @@ const Main = () => {
                     {/* 배너 */}
                     <BannerSlider />
 
-                    {hasData || hasNext ? (
+                    {hasNext ? (
                         <>
                             {/* 지도를 배경에 깔기 */}
                             <div className='absolute inset-0 top-[72px] border-t border-solid'>
