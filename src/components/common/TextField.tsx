@@ -170,7 +170,7 @@ const TextField = ({
     const displayMessage = error || validationState.message || helperText
 
     return (
-        <div className='w-full mb-4'>
+        <div className='w-full '>
             {/* 라벨 */}
             {label && (
                 <label className='block mb-1 text-sm font-medium text-gray-700'>
@@ -193,21 +193,14 @@ const TextField = ({
                     onBlur={handleBlur}
                     {...rest}
                 />
-
-                {/* 로딩 인디케이터 */}
-                {isValidating && (
-                    <div className='absolute transform -translate-y-1/2 right-3 top-1/2'>
-                        <div className='w-4 h-4 border-2 border-blue-500 rounded-full animate-spin border-t-transparent'></div>
-                    </div>
-                )}
             </div>
 
-            {/* 도움말 텍스트 또는 에러 메시지 */}
+            {/* 도움말 텍스트 또는 에러 메시지
             <div className='min-h-[1.5rem] mt-1'>
                 {displayMessage && (
                     <div className={`text-xs ${hasError ? 'text-red-600' : 'text-gray-500'}`}>{displayMessage}</div>
                 )}
-            </div>
+            </div> */}
         </div>
     )
 }
