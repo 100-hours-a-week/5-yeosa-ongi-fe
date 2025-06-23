@@ -22,20 +22,23 @@ import useInfiniteScroll from '../hooks/infiniteScroll'
 
 type yearMonth = string | null
 
+const CONSTANTS = {
+    HEADER_HEIGHT: 56,
+    BANNER_HEIGHT: 72,
+}
+
+type LoadingState = 'loading' | 'success' | 'error' | 'empty'
+
 const Main = () => {
-    // States ========================================
-    // 초기 로딩 관련
-    const [isInitialLoading, setIsInitialLoading] = useState<boolean>(false)
-    const [initialLoadFailed, setInitialLoadFailed] = useState<boolean>(false)
+    const [loadingState, setLoadingState] = useState<LoadingState>('loading')
+    const [listHeight, setListHeight] = useState(0)
     const [hasData, setHasData] = useState<boolean>(false)
 
     //무한 스크롤 관련
     const [nextYearMonth, setNextYearMonth] = useState<yearMonth>(null)
     const lastAttemptedYearMonth = useRef<yearMonth>(null)
 
-    const [listHeight, setListHeight] = useState(0)
     const { clearSelection } = useMainPageStore()
-
     const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
 
     // 지도의 실제 높이 계산
@@ -48,12 +51,16 @@ const Main = () => {
         return Math.max(0, mapHeight) // 최소 0
     }
 
+    const handleListHeightChange = useCallback((height: number) => {
+        setListHeight(height)
+    }, [])
+
     const fetchMoreAlbums = useCallback(async () => {
         console.log('무한 스크롤 로직 시작 = == = = = ==')
 
         // 초기 로드에 실패했거나 nextYearMonth가 없으면 더 로드하지 않음
-        console.log(initialLoadFailed, nextYearMonth, initialLoadFailed || !nextYearMonth)
-        if (initialLoadFailed || !nextYearMonth) return false
+        // console.log(initialLoadFailed, nextYearMonth, initialLoadFailed || !nextYearMonth)
+        if (loadingState === 'error' || !nextYearMonth) return false
 
         console.log('last', lastAttemptedYearMonth)
         // 이미 시도했던 yearMonth와 동일하면 재시도하지 않음
@@ -95,20 +102,15 @@ const Main = () => {
             console.error('추가 앨범 로딩 오류:', error)
             return false // 오류 발생 시 더 이상 로드하지 않음
         }
-    }, [nextYearMonth, addAlbums, initialLoadFailed])
+    }, [nextYearMonth, addAlbums, loadingState])
     const { observerRef, isLoading, hasNext, setHasNext } = useInfiniteScroll(fetchMoreAlbums, true)
-
-    const handleListHeightChange = useCallback((height: number) => {
-        setListHeight(height)
-    }, [])
 
     useEffect(() => {
         let isMounted = true
 
         const loadInitialData = async () => {
             try {
-                setIsInitialLoading(true)
-                setInitialLoadFailed(false)
+                setLoadingState('loading')
                 const result = await fetchAlbumData('')
 
                 if (isMounted && result && result.data) {
@@ -118,16 +120,15 @@ const Main = () => {
                     setHasNext(result.data.hasNext)
                     if (result.data.albumInfo.length > 0) {
                         setHasData(true)
+                        setLoadingState('success')
+                    } else {
+                        setLoadingState('empty')
                     }
                 }
             } catch (error) {
                 console.error('초기 데이터 로딩 오류:', error)
                 if (isMounted) {
-                    setInitialLoadFailed(true) // 초기 로드 실패 플래그 설정
-                }
-            } finally {
-                if (isMounted) {
-                    setIsInitialLoading(false)
+                    setLoadingState('error')
                 }
             }
         }
@@ -138,7 +139,7 @@ const Main = () => {
         }
     }, [setAlbums])
 
-    if (isInitialLoading) {
+    if (loadingState === 'loading') {
         return (
             <>
                 <Header />
