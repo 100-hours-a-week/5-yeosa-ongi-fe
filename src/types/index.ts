@@ -25,5 +25,5 @@ export interface RawPicture {
     tag: string
     isDuplicated: boolean
     isShaky: boolean
-    url: string
+    pictureURL: string
 }
