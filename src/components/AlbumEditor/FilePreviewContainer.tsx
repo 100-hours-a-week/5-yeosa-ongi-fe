@@ -42,7 +42,7 @@ const FilePreviewContainer = React.memo<FilePreviewContainerProps>(
 
         // 순수 컴포넌트에 상태와 핸들러 전달
         return (
-            <div className='relative w-full h-full will-change-transform contain-layout'>
+            <div className='relative w-full h-full will-change-transform '>
                 <FilePreview
                     previewUrl={conversionState.previewUrl}
                     fileName={file.file.name}
