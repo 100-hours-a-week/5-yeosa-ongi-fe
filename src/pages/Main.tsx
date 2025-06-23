@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import AlbumListHeader from '@/components/Main/AlbumListHeader'
 import BannerSlider from '@/components/Main/BannerSlider'
 import KakaoMap from '@/components/Main/KakaoMap'
-import ResizableList from '@/components/Main/ResizableList'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
@@ -18,6 +17,7 @@ import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { fetchAlbumData } from '../api/album'
 
 // Hooks
+import ResizableContainer from '@/components/common/ResizableContainer'
 import useInfiniteScroll from '../hooks/infiniteScroll'
 
 type yearMonth = string | null
@@ -152,19 +152,13 @@ const Main = () => {
                     {/* 배너 */}
                     <BannerSlider />
 
-                    {hasNext ? (
+                    {loadingState !== 'empty' || hasNext ? (
                         <>
                             {/* 지도를 배경에 깔기 */}
                             <div className='absolute inset-0 top-[72px] border-t border-solid'>
                                 <KakaoMap height={getMapHeight()} />
                             </div>
-                            {/* ResizableList - absolute로 하단에서 올라오도록 */}
-                            <ResizableList
-                                showHeightIndicator={false}
-                                className=''
-                                onHeightChange={handleListHeightChange}
-                            >
-                                {/* AlbumListHeader를 ResizableList 밖으로 이동하고 고정 */}
+                            <ResizableContainer className='' onHeightChange={handleListHeightChange}>
                                 <div className='z-20 bg-white border-b'>
                                     <AlbumListHeader />
                                 </div>
@@ -182,7 +176,7 @@ const Main = () => {
                                     {/* Intersection Observer 관찰 대상 (페이지 하단에 위치) */}
                                     <div ref={observerRef} style={{ height: '10px' }} />
                                 </div>
-                            </ResizableList>
+                            </ResizableContainer>
                         </>
                     ) : (
                         <OnboardingScreen />
