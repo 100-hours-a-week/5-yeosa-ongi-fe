@@ -1,18 +1,12 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
-interface ResizableListProps {
+interface ResizableContainerProps {
     children: ReactNode
     className: string
-    showHeightIndicator: boolean
     onHeightChange: (height: number) => void
 }
 
-const ResizableList = ({
-    children,
-    className = '',
-    showHeightIndicator = false,
-    onHeightChange,
-}: ResizableListProps) => {
+const ResizableContainer = ({ children, className = '', onHeightChange }: ResizableContainerProps) => {
     const headerHeight = 56
     const screenHeight = window.innerHeight - headerHeight
 
@@ -160,13 +154,6 @@ const ResizableList = ({
                 title='드래그해서 높이 조절'
             >
                 <div className='w-8 h-1 bg-gray-400 rounded'></div>
-
-                {/* 높이 표시 */}
-                {showHeightIndicator && (
-                    <div className='absolute right-3 bg-black bg-opacity-50 text-white px-2 py-0.5 rounded text-xs'>
-                        {getCurrentHeight()}px ({getHeightLabel()})
-                    </div>
-                )}
             </div>
 
             {/* 리스트 컨테이너 */}
@@ -180,4 +167,4 @@ const ResizableList = ({
     )
 }
 
-export default ResizableList
+export default ResizableContainer
