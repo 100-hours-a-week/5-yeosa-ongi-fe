@@ -196,6 +196,7 @@ const TextField = ({
             </div>
 
             {/* 도움말 텍스트 또는 에러 메시지
+
             <div className='min-h-[1.5rem] mt-1'>
                 {displayMessage && (
                     <div className={`text-xs ${hasError ? 'text-red-600' : 'text-gray-500'}`}>{displayMessage}</div>
