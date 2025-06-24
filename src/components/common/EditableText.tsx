@@ -1,5 +1,6 @@
 import { Check, Edit2, Loader2, X } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import TextField from './TextField'
 
 // TextField props 타입 (실제 TextField props와 동일하게)
 interface TextFieldProps {
@@ -53,30 +54,6 @@ interface EditableTextProps {
     renderDisplay?: (value: string, isEmpty: boolean) => React.ReactNode
     renderEditButton?: (onClick: () => void) => React.ReactNode
     renderActionButtons?: (onSave: () => void, onCancel: () => void, isSaving: boolean) => React.ReactNode
-}
-
-// TextField 컴포넌트 (실제로는 별도 파일에서 import)
-const TextField: React.FC<TextFieldProps> = ({
-    value,
-    onChange,
-    className = '',
-    autoFocus,
-    onBlur,
-    onKeyDown,
-    ...props
-}) => {
-    return (
-        <input
-            type='text'
-            value={value || ''}
-            onChange={e => onChange?.(e.target.value)}
-            className={`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${className}`}
-            autoFocus={autoFocus}
-            onBlur={onBlur}
-            onKeyDown={onKeyDown}
-            {...props}
-        />
-    )
 }
 
 const EditableText: React.FC<EditableTextProps> = ({
@@ -211,7 +188,7 @@ const EditableText: React.FC<EditableTextProps> = ({
     }, [value, isEditing])
 
     return (
-        <div className={`editable-text ${className}`}>
+        <div className={`editable-text ${className}h-11`}>
             {/* 라벨 */}
             {label && <label className='block mb-1 text-sm font-medium text-gray-700'>{label}</label>}
 
@@ -225,9 +202,6 @@ const EditableText: React.FC<EditableTextProps> = ({
                                 value={editValue}
                                 onChange={handleTextFieldChange}
                                 onValidationChange={handleValidationChange}
-                                onKeyDown={handleKeyDown}
-                                onBlur={handleBlur}
-                                autoFocus
                                 disabled={isSaving}
                                 className={`w-full ${textFieldProps.className || ''}`}
                             />
