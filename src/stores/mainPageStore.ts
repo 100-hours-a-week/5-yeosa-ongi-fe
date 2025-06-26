@@ -27,7 +27,7 @@ const useMainPageStore = create<MainPageState>((set, get) => ({
     clearSelection: () => set({ selectedId: null, selectedAlbumSummary: null }),
 }))
 
-interface AlbumData {
+export interface AlbumData {
     albumId: number
     albumName: string
     thumbnailPictureURL: string
