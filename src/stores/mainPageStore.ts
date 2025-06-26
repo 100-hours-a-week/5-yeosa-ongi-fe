@@ -34,7 +34,7 @@ export interface AlbumData {
     latitude: number
     longitude: number
     createdAt: string
-    memberProfileImageURL: string
+    memberProfileImageURL: string[]
 }
 
 // 저장되는 앨범 인터페이스
@@ -44,7 +44,7 @@ interface Album {
     latitude: number
     longitude: number
     createdAt: string
-    memberProfileImageURL: string
+    memberProfileImageURL: string[]
 }
 
 interface AlbumState {
