@@ -122,48 +122,50 @@ function OptimizedImage({
     const [hasError, setHasError] = useState<boolean>(false)
     const [currentSrc, setCurrentSrc] = useState<string>('')
 
-    // 이미지 소스 결정
+    // 이미지 소스 결정 - 의존성 배열 최소화
     useEffect(() => {
         if (!isChecked) return
 
+        // 상태 초기화
+        setIsLoaded(false)
+        setHasError(false)
+
         let imageSrc = src
 
+        // WebP 지원 시 webpSrc 사용
         if (supportsWebP && webpSrc) {
             imageSrc = webpSrc
-        } else if (supportsWebP && src && !webpSrc) {
-            // webpSrc가 없으면 자동으로 .webp 확장자로 변경 시도
-            imageSrc = src.replace(/\.(jpg|jpeg|png)$/i, '.webp')
         }
 
         setCurrentSrc(imageSrc)
-    }, [src, webpSrc, supportsWebP, isChecked])
+    }, [src, webpSrc, supportsWebP, isChecked]) // isWebpFailed 제거
 
     const handleLoad = useCallback(() => {
         setIsLoaded(true)
+        setHasError(false)
         onLoad?.()
     }, [onLoad])
 
     const handleError = useCallback(() => {
-        if (supportsWebP && currentSrc.includes('.webp')) {
-            // WebP 로딩 실패 시 원본 이미지로 fallback
+        // WebP 실패 시 즉시 원본으로 전환
+        if (currentSrc.includes('.webp') && currentSrc !== src) {
             setCurrentSrc(src)
             setHasError(false)
         } else {
             setHasError(true)
             onError?.()
         }
-    }, [supportsWebP, currentSrc, src, onError])
+    }, [currentSrc, src, onError])
 
-    // Lazy loading 비활성화 또는 이미 뷰포트에 있는 경우
+    // Lazy loading 체크
     const shouldLoad = !lazy || isInView
 
-    // 플레이스홀더 스타일
+    // 스타일 정의
     const placeholderStyle: CSSProperties = {
         backgroundColor: '#f0f0f0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-
         width: '100%',
         height: '100%',
         position: 'absolute',
@@ -185,7 +187,7 @@ function OptimizedImage({
             style={{ position: 'relative', overflow: 'hidden' }}
         >
             {/* 로딩 플레이스홀더 */}
-            {placeholder && !isLoaded && shouldLoad && (
+            {placeholder && !isLoaded && !hasError && shouldLoad && (
                 <div style={placeholderStyle}>
                     <div
                         style={{
@@ -208,32 +210,17 @@ function OptimizedImage({
             )}
 
             {/* 실제 이미지 */}
-            {shouldLoad && isChecked && currentSrc && (
-                <picture>
-                    {supportsWebP && webpSrc && <source srcSet={webpSrc} type='image/webp' sizes={sizes} />}
-                    <img
-                        src={currentSrc}
-                        alt={alt}
-                        onLoad={handleLoad}
-                        onError={handleError}
-                        style={imageStyle}
-                        loading={lazy ? 'lazy' : 'eager'}
-                        {...props}
-                    />
-                </picture>
+            {shouldLoad && isChecked && currentSrc && !hasError && (
+                <img
+                    src={currentSrc}
+                    alt={alt}
+                    onLoad={handleLoad}
+                    onError={handleError}
+                    style={imageStyle}
+                    loading={lazy ? 'lazy' : 'eager'}
+                    {...props}
+                />
             )}
-
-            {/* CSS 애니메이션 정의
-            <style jsx>{`
-                @keyframes spin {
-                    0% {
-                        transform: rotate(0deg);
-                    }
-                    100% {
-                        transform: rotate(360deg);
-                    }
-                }
-            `}</style> */}
         </div>
     )
 }
