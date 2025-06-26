@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 // APIs
@@ -9,39 +9,33 @@ import communityIcon from '@/assets/icons/community_icon.png'
 import albumIcon from '@/assets/icons/images_icon.png'
 import locationIcon from '@/assets/icons/location_icon.png'
 
+//Types
+import { ApiResponse } from '@/types'
+
+type ResponseValue = {
+    albumCount: string
+    placeCount: string
+}
+
 const AlbumListHeader = () => {
-    const navigate = useNavigate()
-    const [counts, setCounts] = useState({
-        albums: 0,
-        locations: 0,
+    const { data } = useQuery<ApiResponse<ResponseValue>>({
+        queryKey: ['listHeader'],
+        queryFn: getTotalData,
+        staleTime: 1000 * 10,
     })
 
-    useEffect(() => {
-        const loadInitialData = async () => {
-            try {
-                const result = await getTotalData()
-                console.log('리스트 헤더', result.data)
-                setCounts({
-                    albums: result.data.albumCount || 0,
-                    locations: result.data.locationCount || 0,
-                })
-            } catch (error) {
-                console.error(error)
-            }
-        }
-        loadInitialData()
-    }, [])
+    const navigate = useNavigate()
 
     return (
         <div className='h-[48px] relative border-t-2 border-solid  items-center '>
             <div className='p-2'>
                 <div className='absolute flex flex-row items-center gap-2 '>
                     <img className='size-4' src={albumIcon} alt='Album icon' />
-                    <div className='text-sm'>{counts.albums}</div>
+                    <div className='text-sm'>{data?.data?.albumCount}</div>
                 </div>
                 <div className='absolute flex flex-row items-center gap-2 left-1/4'>
                     <img className='size-4' src={locationIcon} alt='Location icon' />
-                    <div className='text-sm '>{counts.locations}</div>
+                    <div className='text-sm '>{data?.data?.placeCount}</div>
                 </div>
                 <div>
                     <button
