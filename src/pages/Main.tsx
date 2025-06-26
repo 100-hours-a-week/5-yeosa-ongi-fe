@@ -2,10 +2,10 @@ import { useCallback, useState } from 'react'
 
 // Components
 import ResizableContainer from '@/components/common/ResizableContainer'
+import AlbumList from '@/components/Main/AlbumList'
 import AlbumListHeader from '@/components/Main/AlbumListHeader'
 import BannerSlider from '@/components/Main/BannerSlider'
 import KakaoMap from '@/components/Main/KakaoMap'
-import List from '@/components/Main/List'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
 
@@ -43,7 +43,7 @@ const Main = () => {
                     </div>
                     <ResizableContainer className='' onHeightChange={handleListHeightChange}>
                         <AlbumListHeader />
-                        <List />
+                        <AlbumList />
                     </ResizableContainer>
                 </div>
             </div>
