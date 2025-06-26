@@ -100,6 +100,7 @@ function useIntersectionObserver(options: IntersectionObserverOptions = {}): Int
 
     return { elementRef, isInView }
 }
+
 // 메인 OptimizedImage 컴포넌트
 function OptimizedImage({
     src,
@@ -121,23 +122,20 @@ function OptimizedImage({
     const [hasError, setHasError] = useState<boolean>(false)
     const [currentSrc, setCurrentSrc] = useState<string>('')
 
-    // 이미지 소스 결정 - 의존성 배열 최소화
+    // 이미지 소스 결정
     useEffect(() => {
         if (!isChecked) return
 
-        // 상태 초기화
         setIsLoaded(false)
         setHasError(false)
 
         let imageSrc = src
-
-        // WebP 지원 시 webpSrc 사용
         if (supportsWebP && webpSrc) {
             imageSrc = webpSrc
         }
 
         setCurrentSrc(imageSrc)
-    }, [src, webpSrc, supportsWebP, isChecked]) // isWebpFailed 제거
+    }, [src, webpSrc, supportsWebP, isChecked])
 
     const handleLoad = useCallback(() => {
         setIsLoaded(true)
@@ -146,7 +144,6 @@ function OptimizedImage({
     }, [onLoad])
 
     const handleError = useCallback(() => {
-        // WebP 실패 시 즉시 원본으로 전환
         if (currentSrc.includes('.webp') && currentSrc !== src) {
             setCurrentSrc(src)
             setHasError(false)
@@ -156,55 +153,21 @@ function OptimizedImage({
         }
     }, [currentSrc, src, onError])
 
-    // Lazy loading 체크
     const shouldLoad = !lazy || isInView
 
-    // 스타일 정의
-    const placeholderStyle: CSSProperties = {
-        backgroundColor: '#f0f0f0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        ...style,
-    }
-
-    const imageStyle: CSSProperties = {
-        opacity: isLoaded ? 1 : 0,
-        transition: 'opacity 0.3s ease-in-out',
-        ...style,
-    }
-
     return (
-        <div
-            ref={elementRef}
-            className={`optimized-image-container ${className}`}
-            style={{ position: 'relative', overflow: 'hidden' }}
-        >
+        <div ref={elementRef} className={`relative w-full h-full overflow-hidden ${className}`} style={style}>
             {/* 로딩 플레이스홀더 */}
             {placeholder && !isLoaded && !hasError && shouldLoad && (
-                <div style={placeholderStyle}>
-                    <div
-                        style={{
-                            width: '40px',
-                            height: '40px',
-                            border: '4px solid #f3f3f3',
-                            borderTop: '4px solid #3498db',
-                            borderRadius: '50%',
-                            animation: 'spin 1s linear infinite',
-                        }}
-                    />
+                <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
+                    <div className='w-8 h-8 border-4 border-gray-300 rounded-full border-t-blue-500 animate-spin' />
                 </div>
             )}
 
             {/* 에러 플레이스홀더 */}
             {hasError && (
-                <div style={placeholderStyle}>
-                    <span style={{ color: '#999', fontSize: '14px' }}>이미지를 불러올 수 없습니다</span>
+                <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
+                    <span className='text-sm text-gray-500'>이미지를 불러올 수 없습니다</span>
                 </div>
             )}
 
@@ -215,7 +178,9 @@ function OptimizedImage({
                     alt={alt}
                     onLoad={handleLoad}
                     onError={handleError}
-                    style={imageStyle}
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${
+                        isLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
                     loading={lazy ? 'lazy' : 'eager'}
                     {...props}
                 />
