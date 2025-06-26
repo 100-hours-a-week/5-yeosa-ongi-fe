@@ -59,7 +59,7 @@ export const GridWithChildren: FC<GridProps> = memo(({ col = 4, children, items 
             {chunkArray.map((array: GridItem[], rowIndex: number) => (
                 <div
                     key={`row-${rowIndex}`}
-                    className='grid'
+                    className='relative grid'
                     style={{
                         gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
                         height: `calc(min(100vw,430px) / ${col})`,
