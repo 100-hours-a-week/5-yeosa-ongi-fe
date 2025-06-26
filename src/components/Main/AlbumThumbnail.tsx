@@ -1,6 +1,7 @@
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
 import { getAlubmSummary } from '../../api/album'
+import OptimizedImage from '../common/OptimizedImage'
 
 interface AlbumThumbnailProps {
     id: string
@@ -24,19 +25,38 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
         }
     }
 
+    const generateWebpSrc = (originalUrl: string | undefined): string | undefined => {
+        if (!originalUrl || originalUrl === '/default-thumbnail.jpg') {
+            return undefined // 기본 이미지는 WebP 변환하지 않음
+        }
+
+        // URL의 확장자를 .webp로 변경
+        return originalUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+    }
+
     return (
         <div data-album-thumbnail='true' className='relative w-full h-full border-solid' onClick={handleSelect}>
-            <img
+            {/* <img
                 className='absolute inset-0 object-cover w-full h-full'
                 src={album?.thumbnailURL || '/default-thumbnail.jpg'}
                 alt='Album thumbnail'
+            /> */}
+            <OptimizedImage
+                src={album?.thumbnailURL || '/default-thumbnail.jpg'}
+                webpSrc={generateWebpSrc(album?.thumbnailURL)}
+                alt='Album thumbnail'
+                className='absolute inset-0 object-cover w-full h-full'
+                lazy={true}
+                placeholder={true}
+                onLoad={() => console.log('상품 이미지 로드됨')}
             />
+
             {isSelected && (
                 <div className='absolute inset-0 z-10 flex items-center justify-center bg-black opacity-55'>
                     <span className='z-20 text-lg text-white'>{album.albumName}</span>
                 </div>
             )}
-            {album?.memberProfileImageURL.length !== 0 && (
+            {album?.memberProfileImageURL.length > 1 && (
                 <div className='absolute flex bottom-2 right-2'>
                     {album?.memberProfileImageURL.map((url: string, index: number) => (
                         <div
