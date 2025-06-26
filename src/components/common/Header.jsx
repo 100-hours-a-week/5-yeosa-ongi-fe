@@ -49,7 +49,7 @@ const Header = ({ showButtons = true }) => {
     }
 
     return (
-        <header className='flex items-center justify-between px-4 shadow-sm h-14'>
+        <header className='flex items-center justify-between px-4 shadow-sm h-14 bg-white-blue'>
             <button onClick={() => navigate('/')}>
                 <img className='h-8' src={ongiLogoFlat} alt='Logo' />
             </button>
@@ -61,23 +61,14 @@ const Header = ({ showButtons = true }) => {
                         aria-label='Notifications'
                         onClick={() => navigate('/notification')}
                     >
-                        <img
-                            className='h-4 md:h-7'
-                            src={bellIcon}
-                            alt='Notifications'
-                        />
+                        <img className='h-4 md:h-7' src={bellIcon} alt='Notifications' />
                     </button>
                     <button
                         className='p-1 transition-colors rounded-full size-8 hover:bg-gray-100'
                         aria-label='Profile'
                         onClick={handleProfileClick}
                     >
-                        <img
-                            src={
-                                userInfo.profileImageURL || defaultProfileImage
-                            }
-                            className='rounded-full size-full'
-                        />
+                        <img src={userInfo.profileImageURL || defaultProfileImage} className='rounded-full size-full' />
                     </button>
                 </div>
             )}
