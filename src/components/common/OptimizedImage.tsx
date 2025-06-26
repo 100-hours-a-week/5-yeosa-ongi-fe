@@ -122,6 +122,29 @@ function OptimizedImage({
     const [hasError, setHasError] = useState<boolean>(false)
     const [currentSrc, setCurrentSrc] = useState<string>('')
 
+<<<<<<< feature/#281
+    // 이미지 소스 결정 - 의존성 배열 최소화
+    useEffect(() => {
+        if (!isChecked) return
+
+        // 상태 초기화
+        setIsLoaded(false)
+        setHasError(false)
+
+        let imageSrc = src
+
+        // WebP 지원 시 webpSrc 사용
+        if (supportsWebP && webpSrc) {
+            imageSrc = webpSrc
+        }
+
+        setCurrentSrc(imageSrc)
+    }, [src, webpSrc, supportsWebP, isChecked]) // isWebpFailed 제거
+
+    const handleLoad = useCallback(() => {
+        setIsLoaded(true)
+        setHasError(false)
+=======
     // 이미지 소스 결정
     useEffect(() => {
         if (!isChecked) return
@@ -140,30 +163,48 @@ function OptimizedImage({
 
     const handleLoad = useCallback(() => {
         setIsLoaded(true)
+>>>>>>> dev
         onLoad?.()
     }, [onLoad])
 
     const handleError = useCallback(() => {
+<<<<<<< feature/#281
+        // WebP 실패 시 즉시 원본으로 전환
+        if (currentSrc.includes('.webp') && currentSrc !== src) {
+=======
         if (supportsWebP && currentSrc.includes('.webp')) {
             // WebP 로딩 실패 시 원본 이미지로 fallback
+>>>>>>> dev
             setCurrentSrc(src)
             setHasError(false)
         } else {
             setHasError(true)
             onError?.()
         }
+<<<<<<< feature/#281
+    }, [currentSrc, src, onError])
+
+    // Lazy loading 체크
+    const shouldLoad = !lazy || isInView
+
+    // 스타일 정의
+=======
     }, [supportsWebP, currentSrc, src, onError])
 
     // Lazy loading 비활성화 또는 이미 뷰포트에 있는 경우
     const shouldLoad = !lazy || isInView
 
     // 플레이스홀더 스타일
+>>>>>>> dev
     const placeholderStyle: CSSProperties = {
         backgroundColor: '#f0f0f0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+<<<<<<< feature/#281
+=======
 
+>>>>>>> dev
         width: '100%',
         height: '100%',
         position: 'absolute',
@@ -185,7 +226,11 @@ function OptimizedImage({
             style={{ position: 'relative', overflow: 'hidden' }}
         >
             {/* 로딩 플레이스홀더 */}
+<<<<<<< feature/#281
+            {placeholder && !isLoaded && !hasError && shouldLoad && (
+=======
             {placeholder && !isLoaded && shouldLoad && (
+>>>>>>> dev
                 <div style={placeholderStyle}>
                     <div
                         style={{
@@ -208,6 +253,19 @@ function OptimizedImage({
             )}
 
             {/* 실제 이미지 */}
+<<<<<<< feature/#281
+            {shouldLoad && isChecked && currentSrc && !hasError && (
+                <img
+                    src={currentSrc}
+                    alt={alt}
+                    onLoad={handleLoad}
+                    onError={handleError}
+                    style={imageStyle}
+                    loading={lazy ? 'lazy' : 'eager'}
+                    {...props}
+                />
+            )}
+=======
             {shouldLoad && isChecked && currentSrc && (
                 <picture>
                     {supportsWebP && webpSrc && <source srcSet={webpSrc} type='image/webp' sizes={sizes} />}
@@ -234,6 +292,7 @@ function OptimizedImage({
                     }
                 }
             `}</style> */}
+>>>>>>> dev
         </div>
     )
 }
