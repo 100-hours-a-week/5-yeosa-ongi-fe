@@ -15,7 +15,7 @@ type AlbumDataResponse = {
 
 type AlbumApiResponse = ApiResponse<AlbumDataResponse>
 
-const List = () => {
+const AlbumList = () => {
     const { clearSelection } = useMainPageStore()
     const [nextYearMonth, setNextYearMonth] = useState<yearMonth>(null)
     const loadMoreTriggerRef = useRef<HTMLDivElement>(null)
@@ -127,4 +127,4 @@ const List = () => {
     )
 }
 
-export default List
+export default AlbumList
