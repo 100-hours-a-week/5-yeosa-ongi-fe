@@ -101,7 +101,6 @@ function useIntersectionObserver(options: IntersectionObserverOptions = {}): Int
     return { elementRef, isInView }
 }
 
-// 메인 OptimizedImage 컴포넌트
 function OptimizedImage({
     src,
     webpSrc,
@@ -110,36 +109,26 @@ function OptimizedImage({
     style = {},
     lazy = true,
     placeholder = true,
-    quality = 75,
     onLoad,
     onError,
-    sizes,
     ...props
 }: OptimizedImageProps) {
     const { supportsWebP, isChecked } = useWebPSupport()
     const { elementRef, isInView } = useIntersectionObserver()
-    const [isLoaded, setIsLoaded] = useState<boolean>(false)
-    const [hasError, setHasError] = useState<boolean>(false)
-    const [currentSrc, setCurrentSrc] = useState<string>('')
+    const [isLoaded, setIsLoaded] = useState(false)
+    const [hasError, setHasError] = useState(false)
+    const [currentSrc, setCurrentSrc] = useState('')
 
-    // 이미지 소스 결정
     useEffect(() => {
         if (!isChecked) return
-
         setIsLoaded(false)
         setHasError(false)
-
-        let imageSrc = src
-        if (supportsWebP && webpSrc) {
-            imageSrc = webpSrc
-        }
-
+        const imageSrc = supportsWebP && webpSrc ? webpSrc : src
         setCurrentSrc(imageSrc)
     }, [src, webpSrc, supportsWebP, isChecked])
 
     const handleLoad = useCallback(() => {
         setIsLoaded(true)
-        setHasError(false)
         onLoad?.()
     }, [onLoad])
 
@@ -155,38 +144,34 @@ function OptimizedImage({
 
     const shouldLoad = !lazy || isInView
 
+    if (hasError) {
+        return (
+            <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
+                <span className='text-sm text-gray-500'>로드 실패</span>
+            </div>
+        )
+    }
+
     return (
-        <div ref={elementRef} className={`relative w-full h-full overflow-hidden ${className}`} style={style}>
-            {/* 로딩 플레이스홀더 */}
-            {placeholder && !isLoaded && !hasError && shouldLoad && (
-                <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
-                    <div className='w-8 h-8 border-4 border-gray-300 rounded-full border-t-blue-500 animate-spin' />
-                </div>
-            )}
-
-            {/* 에러 플레이스홀더 */}
-            {hasError && (
-                <div className='absolute inset-0 flex items-center justify-center bg-gray-100'>
-                    <span className='text-sm text-gray-500'>이미지를 불러올 수 없습니다</span>
-                </div>
-            )}
-
-            {/* 실제 이미지 */}
-            {shouldLoad && isChecked && currentSrc && !hasError && (
+        <>
+            <div ref={elementRef} className='absolute inset-0 pointer-events-none' />
+            {shouldLoad && isChecked && currentSrc ? (
                 <img
                     src={currentSrc}
                     alt={alt}
                     onLoad={handleLoad}
                     onError={handleError}
-                    className={`w-full h-full object-cover transition-opacity duration-300 ${
-                        isLoaded ? 'opacity-100' : 'opacity-0'
-                    }`}
+                    className={className}
+                    style={style}
                     loading={lazy ? 'lazy' : 'eager'}
                     {...props}
                 />
-            )}
-        </div>
+            ) : placeholder ? (
+                <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
+                    <div className='w-8 h-8 border-4 border-gray-300 rounded-full border-t-blue-500 animate-spin' />
+                </div>
+            ) : null}
+        </>
     )
 }
-
 export default OptimizedImage
