@@ -144,6 +144,7 @@ function OptimizedImage({
 
     const shouldLoad = !lazy || isInView
 
+
     if (hasError) {
         return (
             <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
@@ -156,6 +157,7 @@ function OptimizedImage({
         <>
             <div ref={elementRef} className='absolute inset-0 pointer-events-none' />
             {shouldLoad && isChecked && currentSrc ? (
+
                 <img
                     src={currentSrc}
                     alt={alt}
@@ -163,6 +165,7 @@ function OptimizedImage({
                     onError={handleError}
                     className={className}
                     style={style}
+
                     loading={lazy ? 'lazy' : 'eager'}
                     {...props}
                 />
