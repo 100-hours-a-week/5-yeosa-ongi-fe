@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { getPreSignedUrl } from '../api/album'
 
+import { useLogout } from '@/hooks/useAuth'
 import axios from 'axios'
 import { updateUserInfo } from '../api/user'
 import ConfirmModal from '../components/common/ConfirmModal'
@@ -15,7 +16,7 @@ import { Modal } from '../components/common/Modal'
 import TextInput from '../components/common/TextInput'
 import ImageInput from '../components/MyPage/ImageInput'
 import useModal from '../hooks/useModal'
-import useAuthStore from '../stores/userStore'
+import useAuthStore from '../stores/authStore'
 
 const MyPage = () => {
     const navigate = useNavigate()
@@ -26,6 +27,7 @@ const MyPage = () => {
         profileImageURL: null,
         nickname: '사용자',
     })
+    const logoutMutation = useLogout()
 
     const [isLoading, setIsLoading] = useState(true)
     const [isEditing, setIsEditing] = useState(false)
@@ -34,10 +36,14 @@ const MyPage = () => {
     const [previewImageURL, setPreviewImageURL] = useState(null)
     const [isUploading, setIsUploading] = useState(false)
 
+    const refreshToken = useAuthStore(state => state.refreshToken)
     const getUserId = useAuthStore(state => state.getUserId)
     const getUser = useAuthStore(state => state.getUser)
     const setUser = useAuthStore(state => state.setUser)
+    const getRefreshToken = useAuthStore(state => state.getRefreshToken)
     const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+    const logout = useAuthStore(state => state.logout)
+
     const [inputValue, setInputValue] = useState(userInfo.nickname)
     const [isValid, setIsValid] = useState(false)
     const { isOpen, modalData, openModal, closeModal } = useModal()
@@ -45,7 +51,7 @@ const MyPage = () => {
         setIsLoading(true)
         try {
             // 1. 먼저 스토어에서 인증 상태 확인
-            if (isAuthenticated()) {
+            if (isAuthenticated) {
                 const user = getUser()
                 if (user && user.userId) {
                     const updatedInfo = {
@@ -244,6 +250,19 @@ const MyPage = () => {
         await handleProfileImageUpload(file)
     }
 
+    const handleLogout = () => {
+        logoutMutation.mutate(refreshToken || undefined, {
+            onSuccess: () => {
+                logout()
+                navigate('/login')
+            },
+            onError: () => {
+                logout()
+                navigate('/login')
+            },
+        })
+    }
+
     // 안전한 이미지 로드 함수
     const loadImageWithHeaders = async signedUrl => {
         try {
@@ -299,13 +318,11 @@ const MyPage = () => {
 
             const presignedUrl = response.data.presignedFiles[0].presignedUrl
 
-
             // 실제 저장될 영구 URL (S3에 저장된 후의 URL)
             // 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
             // 가정: 응답에 원본 URL이 포함되어 있거나, 패턴을 알고 있는 경우
 
             const permanentImageUrl = response.data.presignedFiles[0].pictureURL || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
-
 
             // 파일 업로드 (S3에 직접 업로드)
             const uploadResponse = await axios.put(presignedUrl, file, {
@@ -314,9 +331,7 @@ const MyPage = () => {
                 },
             })
 
-
             if (uploadResponse.status !== 200) {
-
                 throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
@@ -549,11 +564,7 @@ const MyPage = () => {
                         title={modalData}
                         content={'로그아웃 하시겠습니까?'}
                         closeModal={closeModal}
-                        handleConfirm={() => {
-                            useAuthStore.getState().logout()
-                            closeModal()
-                            navigate('/login')
-                        }}
+                        handleConfirm={handleLogout}
                     />
                 )}
             </Modal>
