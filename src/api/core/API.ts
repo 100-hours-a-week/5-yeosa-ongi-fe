@@ -1,5 +1,6 @@
 import { HTTPHeaders, HTTPMethod, HTTPParams } from '@/types/api.types'
 import axios, { AxiosPromise } from 'axios'
+import { TokenManager } from './TokenManager'
 
 class API {
     readonly method: HTTPMethod
@@ -20,16 +21,14 @@ class API {
         const http = axios.create()
 
         if (this.withCredentials) {
-            http.interceptors.response.use(
-                response => response,
-                error => {
-                    if (error.response && error.response.status === 401) {
-                        // 토큰 만료 시 처리 로직
-                        window.location.href = '/login'
-                    }
-                    return Promise.reject(error)
+            http.interceptors.request.use(async config => {
+                const token = await TokenManager.getValidAccessToken()
+
+                if (token) {
+                    config.headers['Authorization'] = `Bearer ${token}`
                 }
-            )
+                return config
+            })
         }
 
         return http.request({ ...this })
