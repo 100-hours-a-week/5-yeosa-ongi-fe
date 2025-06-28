@@ -8,7 +8,7 @@ import MovingDotsLoader from '../../components/common/MovingDotsLoader'
 
 // Store
 import { useKakaoLogin } from '@/hooks/useAuth'
-import { default as useAuthStore, default as useUserStore } from '../../stores/userStore'
+import useAuthStore from '@/stores/authStore'
 
 interface InviteData {
     type: 'invite'
@@ -20,14 +20,14 @@ const KakaoCallback = () => {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const login = useUserStore(state => state.login)
+    const login = useAuthStore(state => state.login)
 
     const { data, isLoading, isError, error: loginError, isSuccess } = useKakaoLogin(searchParams.get('code') as string)
 
     useEffect(() => {
         if (isSuccess && data) {
             console.log('로그인 성공:', data)
-            useAuthStore.getState().login(data)
+            login(data)
             navigate('/')
         }
     }, [isSuccess, data])
