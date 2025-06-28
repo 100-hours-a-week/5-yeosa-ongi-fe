@@ -17,7 +17,12 @@ export class AuthAPI {
     }
 
     // 로그아웃
-    static logout(refreshToken: string) {
-        return APIBuilder.post(`/api/auth`, { refreshToken }).build().call<APIResponse>
+    static logout(refreshToken?: string) {
+        const payload = refreshToken ? { refreshToken } : {}
+
+        return APIBuilder.post('/api/auth', payload)
+            .withCredentials(true) // 인증 필요
+            .build()
+            .call<APIResponse<void>>()
     }
 }
