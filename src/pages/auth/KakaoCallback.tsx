@@ -1,14 +1,11 @@
 import { useEffect } from 'react'
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 // Components
 import MovingDotsLoader from '../../components/common/MovingDotsLoader'
 
-//APIs
-
-// Store
+// Hooks
 import { useKakaoLogin } from '@/hooks/useAuth'
-import useAuthStore from '@/stores/authStore'
 
 interface InviteData {
     type: 'invite'
@@ -17,75 +14,92 @@ interface InviteData {
 
 const KakaoCallback = () => {
     const [searchParams] = useSearchParams()
-    const location = useLocation()
     const navigate = useNavigate()
 
-    const login = useAuthStore(state => state.login)
+    const code = searchParams.get('code')
+    const state = searchParams.get('state')
 
-    const { data, isLoading, isError, error: loginError, isSuccess } = useKakaoLogin(searchParams.get('code') as string)
+    // 카카오 로그인 hook 사용
+    const kakaoLogin = useKakaoLogin({
+        onSuccess: data => {
+            console.log('로그인 성공:', data)
+
+            // 초대 링크 처리
+            if (state && state !== 'normal_login') {
+                try {
+                    const inviteData: InviteData = JSON.parse(atob(state))
+                    if (inviteData.type === 'invite') {
+                        const url = new URL(inviteData.redirectUrl)
+                        const redirectPath = url.pathname + url.search
+                        navigate(redirectPath, { replace: true })
+                        return
+                    }
+                } catch (error) {
+                    console.error('초대 처리 실패:', error)
+                }
+            }
+
+            // 일반 로그인 - 메인 페이지로 이동
+            navigate('/', { replace: true })
+        },
+        onError: error => {
+            console.error('카카오 로그인 실패:', error)
+
+            // 에러 코드별 처리
+            let errorMessage = '로그인 중 오류가 발생했습니다.'
+
+            switch (error.code) {
+                case 'INVALID_REQUEST':
+                    errorMessage = '인가 코드가 유효하지 않습니다.'
+                    break
+                case 'INTERNAL_SERVER_ERROR':
+                    errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+                    break
+                default:
+                    errorMessage = error.message || '로그인 중 오류가 발생했습니다.'
+            }
+
+            // 에러 페이지로 이동하거나 토스트 메시지 표시
+            alert(errorMessage) // 실제로는 toast 라이브러리 사용
+            navigate('/login', { replace: true })
+        },
+    })
 
     useEffect(() => {
-        if (isSuccess && data) {
-            console.log('로그인 성공:', data)
-            login(data)
-            navigate('/')
+        if (code) {
+            console.log('인증 코드 받음:', code)
+            console.log('초대토큰:', state)
+
+            // 카카오 로그인 실행
+            kakaoLogin.mutate(code)
+        } else {
+            console.error('인가 코드를 찾을 수 없습니다.')
+            alert('인가 코드를 찾을 수 없습니다.')
+            navigate('/login', { replace: true })
         }
-    }, [isSuccess, data])
+    }, [code, state]) // kakaoLogin.mutate는 의존성에서 제외 (안정적인 함수)
 
-    // useEffect(() => {
-    //     const code = searchParams.get('code')
-    //     const state = searchParams.get('state')
-    //     // const code = new URLSearchParams(location.search).get("code");
-    //     console.log('인증 코드 받음:', code)
-    //     console.log('초대토큰 : ', state)
-
-    //     const getKakaoToken = async (code: string) => {
-    //         try {
-    //             const response = ''
-
-    //             if (response) {
-    //                 if (state && state !== 'normal_login') {
-    //                     try {
-    //                         // state에서 초대 정보 디코딩
-    //                         const inviteData = JSON.parse(atob(state))
-    //                         if (inviteData.type === 'invite') {
-    //                             const url = new URL(inviteData.redirectUrl)
-    //                             const redirectPath = url.pathname + url.search
-    //                             navigate(redirectPath, { replace: true })
-    //                             return
-    //                         }
-    //                     } catch (error) {
-    //                         console.error('초대 처리 실패:', error)
-    //                     }
-    //                 }
-    //                 console.log('로그인 과정 완료')
-    //                 navigate('/')
-    //             } else {
-    //                 console.log('로그인 실패')
-    //             }
-    //         } catch (error) {
-    //             console.error('카카오 로그인 에러:', error)
-    //             setError('로그인 처리 중 오류가 발생했습니다.')
-    //         } finally {
-    //             setLoading(false)
-    //         }
-    //     }
-    //     if (code) {
-    //         // 백엔드에 인가 코드를 전송하여 토큰 발급 요청
-    //         getKakaoToken(code)
-    //     } else {
-    //         setError('인가 코드를 찾을 수 없습니다.')
-    //         setLoading(false)
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [location])
-
-    if (isLoading) {
+    // 로딩 상태
+    if (kakaoLogin.isPending) {
         return <MovingDotsLoader />
     }
 
-    if (loginError) {
-        return <div className='self-auto'>오류: {isError}</div>
+    // 에러 상태 (fallback)
+    if (kakaoLogin.isError) {
+        return (
+            <div className='flex flex-col items-center justify-center min-h-screen'>
+                <div className='text-center text-red-500'>
+                    <h2 className='mb-2 text-xl font-semibold'>로그인 실패</h2>
+                    <p className='text-gray-600'>{kakaoLogin.error?.message || '알 수 없는 오류가 발생했습니다.'}</p>
+                    <button
+                        onClick={() => navigate('/login', { replace: true })}
+                        className='px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600'
+                    >
+                        로그인 페이지로 돌아가기
+                    </button>
+                </div>
+            </div>
+        )
     }
 
     return null
