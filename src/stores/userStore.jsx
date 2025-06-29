@@ -12,19 +12,13 @@ const useMemoryAuthStore = create((set, get) => ({
     setAccessToken: token =>
         set({
             accessToken: token,
-            accessTokenExpiresAt: token
-                ? Date.now() + ACCESS_TOKEN_EXPIRY_TIME
-                : null,
+            accessTokenExpiresAt: token ? Date.now() + ACCESS_TOKEN_EXPIRY_TIME : null,
         }),
 
     // 액세스 토큰이 있고, 만료되지 않았다면 반환하고 없다면 null을 반환한다.
     getAccessToken: () => {
         const { accessToken, accessTokenExpiresAt } = get()
-        if (
-            accessToken &&
-            accessTokenExpiresAt &&
-            Date.now() < accessTokenExpiresAt
-        ) {
+        if (accessToken && accessTokenExpiresAt && Date.now() < accessTokenExpiresAt) {
             return accessToken
         }
         return null
@@ -76,14 +70,10 @@ const usePersistAuthStore = create(
 
             // authData를 받아서 구조할당 분해로 선언해주고, 메모리에 엑세스 토큰을 저장한다. 나머지는 영속적으로 저장한다.
             login: authData => {
-                const {
-                    accessToken,
-                    refreshToken,
-                    refreshTokenExpiresIn,
-                    user,
-                } = authData
+                const { accessToken, refreshToken, refreshTokenExpiresIn, user } = authData
                 useMemoryAuthStore.getState().setAccessToken(accessToken)
                 set({
+                    accessToken: state.accessToken,
                     refreshToken,
                     refreshTokenExpiresIn,
                     user,
@@ -118,6 +108,7 @@ const usePersistAuthStore = create(
             name: 'auth-storage',
             storage: createJSONStorage(() => sessionStorage),
             partialize: state => ({
+                accessToken: state.accessToken,
                 refreshToken: state.refreshToken,
                 refreshTokenExpiresIn: state.refreshTokenExpiresIn,
                 user: state.user,
@@ -129,10 +120,8 @@ const usePersistAuthStore = create(
 
 const useAuthStore = create((set, get) => ({
     getAccessToken: () => useMemoryAuthStore.getState().getAccessToken(),
-    setAccessToken: token =>
-        useMemoryAuthStore.getState().setAccessToken(token),
-    isAccessTokenValid: () =>
-        useMemoryAuthStore.getState().isAccessTokenValid(),
+    setAccessToken: token => useMemoryAuthStore.getState().setAccessToken(token),
+    isAccessTokenValid: () => useMemoryAuthStore.getState().isAccessTokenValid(),
 
     getRefreshToken: () => usePersistAuthStore.getState().getRefreshToken(),
 
@@ -178,13 +167,8 @@ const useAuthStore = create((set, get) => ({
 
             const result = await response.json()
             console.log(result)
-            useMemoryAuthStore
-                .getState()
-                .setAccessToken(result.data.accessToken)
-            console.log(
-                '액세스 토큰 갱신 성공',
-                useMemoryAuthStore.getState().getAccessToken()
-            )
+            useMemoryAuthStore.getState().setAccessToken(result.data.accessToken)
+            console.log('액세스 토큰 갱신 성공', useMemoryAuthStore.getState().getAccessToken())
             return true
         } catch (error) {
             console.error('액세스 토큰 갱신 실패:', error)
