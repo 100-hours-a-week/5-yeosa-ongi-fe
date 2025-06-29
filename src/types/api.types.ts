@@ -1,4 +1,5 @@
-// src/types/api.types.ts
+import { User } from './auth.types'
+
 export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 export interface HTTPHeaders {
@@ -9,47 +10,32 @@ export interface HTTPParams {
     [key: string]: string | number | boolean | undefined
 }
 
-// 사용자 관련 타입
-export interface User {
-    userId: string
-    nickname: string
-    profileImageURL: string
-    cacheTtl: number
-}
-
-export interface CreateUserRequest {
-    name: string
-    email: string
-}
-
-export interface UpdateUserRequest {
-    name?: string
-    email?: string
-}
-
 export interface APIResponse<T = any> {
-    data: T
-    message?: string
-    error?: string
-    code?: string
+    code: string
+    message: string
+    data?: T
 }
 
-export interface AuthAPIResponse<T = any> {
-    message?: string
-    error?: string
-    code?: string
-    data?: unknown
-    accessToken?: string
-    refreshTokenExpiresIn?: number
+// 로그인 전용 API 응답
+export interface LoginAPIResponse {
+    code: string
+    message: string
+    accessToken: string
     refreshToken: string
+    refreshTokenExpiresIn: number
     user: User
 }
-// export interface PaginatedResponse<T> {
-//     data: T[]
-//     pagination: {
-//         page: number
-//         limit: number
-//         total: number
-//         totalPages: number
-//     }
-// }
+
+// 토큰 갱신 응답
+export interface TokenRefreshResponse {
+    code: string
+    message: string
+    accessToken: string
+}
+
+export interface APIError {
+    code: string
+    message: string
+    data: null
+    statusCode?: number
+}
