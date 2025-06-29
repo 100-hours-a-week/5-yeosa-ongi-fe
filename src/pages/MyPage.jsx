@@ -9,7 +9,6 @@ import { getPreSignedUrl } from '../api/album'
 
 import { useLogout } from '@/hooks/useAuth'
 import axios from 'axios'
-import { updateUserInfo } from '../api/user'
 import ConfirmModal from '../components/common/ConfirmModal'
 import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
@@ -38,7 +37,7 @@ const MyPage = () => {
 
     const refreshToken = useAuthStore(state => state.refreshToken)
     const getUserId = useAuthStore(state => state.getUserId)
-    const getUser = useAuthStore(state => state.getUser)
+    const getUser = useAuthStore(state => state.user)
     const setUser = useAuthStore(state => state.setUser)
     const getRefreshToken = useAuthStore(state => state.getRefreshToken)
     const isAuthenticated = useAuthStore(state => state.isAuthenticated)
@@ -52,7 +51,7 @@ const MyPage = () => {
         try {
             // 1. 먼저 스토어에서 인증 상태 확인
             if (isAuthenticated) {
-                const user = getUser()
+                const user = getUser
                 if (user && user.userId) {
                     const updatedInfo = {
                         userId: user.userId,

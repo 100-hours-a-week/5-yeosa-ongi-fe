@@ -1,4 +1,4 @@
-import { getPictureStatistic } from '@/api/user'
+import { usePictureStatistics } from '@/hooks/useUser'
 import {
     CategoryScale,
     Chart as ChartJS,
@@ -9,7 +9,7 @@ import {
     Title,
     Tooltip,
 } from 'chart.js'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Line } from 'react-chartjs-2'
 
 // Chart.js 등록
@@ -29,10 +29,7 @@ const formatDate = dateString => {
 
     try {
         const date = new Date(dateString)
-        const month = date.getMonth() + 1
         const day = date.getDate()
-
-        // DD일
         return `${day}일`
     } catch (error) {
         return dateString // 에러 시 원본 반환
@@ -40,7 +37,6 @@ const formatDate = dateString => {
 }
 
 const IncomeChart = () => {
-    const [data, setData] = useState(null)
     const [selectedOption, setSelectedOption] = useState(0)
     const [showDropdown, setShowDropdown] = useState(false)
 
@@ -49,78 +45,79 @@ const IncomeChart = () => {
         // { label: 'This Year', value: 'year' },
     ]
 
-    const currentDate = options[selectedOption].value
+    // 현재 년월 생성 (예: "2025-01")
+    const currentYearMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
 
-    // 데이터 페치
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await getPictureStatistic('')
-                console.log(response.data.dailyImageCount)
-                let sum = 0
-                Object.values(response.data.dailyImageCount).forEach(num => {
-                    sum += num
-                })
-                setData({
-                    '30days': {
-                        total: sum,
-                        data: {
-                            labels: Object.keys(response.data.dailyImageCount).map(date => formatDate(date)),
-                            photos: Object.values(response.data.dailyImageCount),
-                        },
-                    },
-                })
-            } catch (error) {
-                console.error('데이터를 불러오는데 실패했습니다:', error)
-                // 샘플 데이터로 대체
-                setData({
-                    '30days': {
-                        total: 324567,
-                        data: {
-                            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                            income: [85000, 92000, 78000, 95000],
-                        },
-                    },
-                    // year: {
-                    //     total: 3874561,
-                    //     upDown: 15.6,
-                    //     data: {
-                    //         labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                    //         income: [950000, 1150000, 1270000, 1400000],
-                    //     },
-                    // },
-                })
-            }
+    // ✅ React Query 훅을 컴포넌트 최상위에서 호출
+    const { data: pictureStatsData, isLoading, error } = usePictureStatistics(currentYearMonth)
+
+    // 차트 데이터 가공
+    const chartData = useMemo(() => {
+        if (!pictureStatsData?.dailyImageCount) {
+            return null
         }
 
-        fetchData()
-    }, [])
+        const dailyData = pictureStatsData.dailyImageCount
+        const labels = Object.keys(dailyData).map(date => formatDate(date))
+        const photos = Object.values(dailyData)
+        const total = photos.reduce((sum, count) => sum + count, 0)
 
-    // const handleOptionSelect = index => {
-    //     setSelectedOption(index)
-    //     setShowDropdown(false)
-    // }
+        return {
+            total,
+            labels,
+            photos,
+        }
+    }, [pictureStatsData])
 
-    if (!data) {
+    // 로딩 상태
+    if (isLoading) {
         return (
-            <div className='flex items-center justify-center min-h-screen bg-gray-50 min-w-screen'>
-                <div className='text-gray-800'>로딩 중...</div>
+            <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
+                <div className='animate-pulse'>
+                    <div className='w-3/4 h-6 mb-5 bg-gray-300 rounded'></div>
+                    <div className='bg-gray-300 rounded h-80'></div>
+                </div>
             </div>
         )
     }
 
-    const currentData = data[currentDate]
-    console.log(currentData)
+    // 에러 상태
+    if (error) {
+        return (
+            <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
+                <div className='py-10 text-center text-red-500'>
+                    데이터를 불러오는데 실패했습니다.
+                    <br />
+                    <button
+                        onClick={() => window.location.reload()}
+                        className='px-4 py-2 mt-2 text-white bg-red-500 rounded hover:bg-red-600'
+                    >
+                        다시 시도
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // 데이터가 없는 경우
+    if (!chartData || chartData.photos.length === 0) {
+        return (
+            <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
+                <div className='py-10 text-center text-gray-500'>이번 달 업로드된 사진이 없습니다.</div>
+            </div>
+        )
+    }
+
     // Chart.js 데이터 설정
-    const chartData = {
-        labels: currentData.data.labels,
+    const chartJsData = {
+        labels: chartData.labels,
         datasets: [
             {
                 label: 'photos',
                 backgroundColor: '#feb4b8',
                 borderColor: '#feb4b8',
                 pointBackgroundColor: '#feb4b8',
-                data: currentData.data.photos,
+                data: chartData.photos,
                 tension: 0.1,
                 fill: true,
                 pointRadius: 0,
@@ -169,48 +166,14 @@ const IncomeChart = () => {
     return (
         <>
             <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
-                {/* <div className='flex flex-wrap items-end'>
-                    <div className='relative'>
-                        <button
-                            className='h-6 text-xs text-gray-600 hover:text-gray-800 focus:outline-none'
-                            onClick={() => setShowDropdown(!showDropdown)}
-                        >
-                            <span>{options[selectedOption].label}</span>
-                            <span className='ml-1'>▼</span>
-                        </button>
-                        {showDropdown && (
-                            <div className='absolute right-0 top-auto z-30 w-32 min-w-full mt-1 -mr-3 text-sm bg-white border border-gray-200 rounded-lg shadow-lg'>
-                                <span className='absolute top-0 right-0 w-3 h-3 mr-3 -mt-1 transform rotate-45 bg-white border-t border-l border-gray-200'></span>
-                                <div className='relative z-10 w-full py-1 bg-white rounded-lg'>
-                                    <ul className='text-xs list-none'>
-                                        {options.map((item, index) => (
-                                            <li
-                                                key={index}
-                                                className={`px-4 py-2 hover:bg-gray-100 hover:text-gray-800 transition-colors duration-100 cursor-pointer ${
-                                                    index === selectedOption
-                                                        ? 'text-blue-600 bg-blue-50'
-                                                        : 'text-gray-600'
-                                                }`}
-                                                onClick={() => handleOptionSelect(index)}
-                                            >
-                                                <span>{item.label}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div> */}
-
                 <div className='flex flex-wrap items-end mb-5'>
-                    <h4 className='inline-block mr-2 text-gray-900 text-md '>
-                        이번 달에는 총 {formatNumber(currentData.total)}개의 사진을 업로드 했습니다.
+                    <h4 className='inline-block mr-2 text-gray-900 text-md'>
+                        이번 달에는 총 {formatNumber(chartData.total)}개의 사진을 업로드 했습니다.
                     </h4>
                 </div>
 
                 <div className='h-80'>
-                    <Line data={chartData} options={chartOptions} />
+                    <Line data={chartJsData} options={chartOptions} />
                 </div>
             </div>
 
