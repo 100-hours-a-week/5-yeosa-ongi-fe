@@ -13,13 +13,14 @@ class APIBuilder {
             'Content-Type': 'application/json; charset=utf-8',
         }
         this._instance.timeout = 10000
-        this._instance.withCredentials = false
+        this._instance.requiresAuth = false
     }
 
     static get = (url: string) => new APIBuilder('GET', url)
     static put = (url: string, data: unknown) => new APIBuilder('PUT', url, data)
     static post = (url: string, data: unknown) => new APIBuilder('POST', url, data)
     static delete = (url: string) => new APIBuilder('DELETE', url)
+    static patch = (url: string, data: unknown) => new APIBuilder('PATCH', url, data)
 
     baseURL(value: string): APIBuilder {
         this._instance.baseURL = value
@@ -46,9 +47,15 @@ class APIBuilder {
         return this
     }
 
-    withCredentials(value: boolean = true): APIBuilder {
-        this._instance.withCredentials = value
+    // 인증 필요 여부 설정
+    requiresAuth(value: boolean = true): APIBuilder {
+        this._instance.requiresAuth = value
         return this
+    }
+
+    // 레거시 메서드 (하위 호환성)
+    withCredentials(value: boolean = true): APIBuilder {
+        return this.requiresAuth(value)
     }
 
     build(): API {
