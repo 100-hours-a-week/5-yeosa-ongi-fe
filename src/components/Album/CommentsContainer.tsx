@@ -1,12 +1,11 @@
 import { addAlbumComments, getAlbumComments } from '@/api/album'
-import { formatTime } from '@/utils/formatTime'
+import useAuthStore from '@/stores/authStore'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import CommentItem from './CommentItem'
 
 interface Comment {
-    id: string
-    userId: string
-    username: string
-    userAvatar?: string
+    userName: string
+    userProfile?: string
     content: string
     createdAt: string
     replies?: Comment[]
@@ -40,6 +39,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
     const [newComment, setNewComment] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
+    const { user } = useAuthStore()
     const startY = useRef(0)
     const startHeight = useRef(0)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -83,8 +83,14 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
 
         setIsSubmitting(true)
         try {
-            const comment = await addAlbumComments(albumId, newComment.trim())
-            console.log(comments)
+            await addAlbumComments(albumId, newComment.trim())
+            const comment: Comment = {
+                userName: user!.nickname,
+                userProfile: user?.profileImageURL,
+                content: newComment,
+                createdAt: new Date().toLocaleString('sv-SE').replace(' ', 'T'),
+            }
+            console.log(comment)
             setComments(prev => (Array.isArray(prev) ? [...prev, comment] : [comment]))
             setNewComment('')
             if (inputRef.current) {
@@ -230,7 +236,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
 
             {/* 댓글 컨테이너 */}
             <div
-                className={`absolute bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-xl z-50 ${
+                className={`absolute bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-xl z-50 flex flex-col ${
                     isResizing ? '' : 'transition-all duration-300 ease-out'
                 } ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}
                 style={{
@@ -267,32 +273,15 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                 </div>
 
                 {/* 댓글 리스트 */}
-                <div className='flex-1 px-4 py-2 overflow-y-auto'>
+                <div className='flex-1 min-h-0 px-4 py-2 overflow-y-auto'>
                     {isLoading ? (
                         <div className='flex items-center justify-center py-8'>
                             <div className='w-6 h-6 border-2 border-gray-300 rounded-full animate-spin border-t-blue-500'></div>
                         </div>
                     ) : comments.length > 0 ? (
                         <div className='space-y-4'>
-                            {comments.map(comment => (
-                                <div key={comment.id} className='flex items-start space-x-3'>
-                                    <img
-                                        src={comment.userAvatar || '/default-avatar.png'}
-                                        alt={comment.username}
-                                        className='flex-shrink-0 w-8 h-8 rounded-full'
-                                    />
-                                    <div className='flex-1 min-w-0'>
-                                        <div className='flex items-center space-x-2'>
-                                            <span className='text-sm font-semibold text-gray-900'>
-                                                {comment.username}
-                                            </span>
-                                            <span className='text-xs text-gray-500'>
-                                                {formatTime(comment.createdAt)}
-                                            </span>
-                                        </div>
-                                        <p className='mt-1 text-sm text-gray-700 break-words'>{comment.content}</p>
-                                    </div>
-                                </div>
+                            {[...comments].reverse().map(comment => (
+                                <CommentItem comment={comment}></CommentItem>
                             ))}
                         </div>
                     ) : (
@@ -303,9 +292,8 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                 </div>
 
                 {/* 댓글 입력 영역 */}
-                <div className='p-4 border-t border-gray-200'>
+                <div className='flex-shrink-0 p-4 bg-white border-t border-gray-200'>
                     <div className='flex items-center space-x-3'>
-                        <img src='/my-avatar.png' alt='내 프로필' className='flex-shrink-0 w-8 h-8 rounded-full' />
                         <input
                             ref={inputRef}
                             type='text'
