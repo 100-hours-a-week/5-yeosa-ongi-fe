@@ -28,7 +28,10 @@ import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
 
 //Types
-import { ApiResponse, RawPicture } from '../types'
+import CommentsContainer from '@/components/Album/CommentsContainer'
+import SideScrollableSection from '@/components/Album/SideScrollableSection'
+import { APIResponse } from '@/types/api.types'
+import { RawPicture } from '../types'
 
 interface ClusterInterface {
     clusterId: string
@@ -66,7 +69,7 @@ interface AlbumData {
 const Album = () => {
     const { albumId } = useParams<{ albumId: string }>()
     const [albumData, setAlbumData] = useState<AlbumData>()
-
+    const [isCommentsOpen, setIsCommentsOpen] = useState(false)
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [showCategoryRightIndicator, setShowCategoryRightIndicator] = useState<boolean>(true)
     const [showClusterRightIndicator, setShowClusterRightIndicator] = useState<boolean>(true)
@@ -127,7 +130,7 @@ const Album = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result: ApiResponse = await getAlbumAccess(albumId as string)
+                const result: APIResponse = await getAlbumAccess(albumId as string)
                 const role = result.data.role
                 if (role !== 'OWNER' && role !== 'NORMAL') {
                     navigate('/main')
@@ -168,9 +171,6 @@ const Album = () => {
     return (
         <>
             <Header />
-            {/* <div className='absolute inset-0 w-full h-full -z-50'>
-                <Background></Background>
-            </div> */}
             <div className='relative'>
                 <AlbumTitle title={albumData?.title || ''} />
                 <Card />
@@ -189,75 +189,37 @@ const Album = () => {
                     </button>
                 </div>
 
-                <div className='relative'>
-                    <div
-                        className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
-                        onScroll={handleCategoryScroll}
-                    >
-                        {tagCollections &&
-                            tagCollections.map(category => (
-                                <Category
-                                    title={category.name}
-                                    pictures={category.pictures}
-                                    albumId={albumId as string}
-                                />
-                            ))}
-                    </div>
-                    {showCategoryRightIndicator && (
-                        <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
-                            <div className='flex items-center justify-center w-8 h-8 mr-2 bg-white rounded-full shadow-sm bg-opacity-70'>
-                                <svg
-                                    xmlns='http://www.w3.org/2000/svg'
-                                    className='w-5 h-5 text-gray-500'
-                                    fill='none'
-                                    viewBox='0 0 24 24'
-                                    stroke='currentColor'
-                                >
-                                    <path
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth={2}
-                                        d='M9 5l7 7-7 7'
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <SideScrollableSection>
+                    {tagCollections &&
+                        tagCollections.map(category => (
+                            <Category
+                                key={category.name}
+                                title={category.name}
+                                pictures={category.pictures}
+                                albumId={albumId as string}
+                            />
+                        ))}
+                </SideScrollableSection>
             </div>
+
             <div className='m-4 mt-6'>
-                {clusters.length !== 0 ? <div className='ml-4 font-sans text-md'>인물 분류</div> : ' '}
-                <div className='relative'>
-                    <div
-                        className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
-                        onScroll={handleClusterScroll}
-                    >
-                        {clusters &&
-                            clusters.map((cluster: Cluster, index) => (
-                                <Cluster albumId={albumId as string} cluster={cluster as ClusterInterface} />
-                            ))}
-                    </div>
-                    {clusters.length !== 0 && showClusterRightIndicator && (
-                        <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
-                            <div className='flex items-center justify-center w-8 h-8 mr-2 bg-white rounded-full shadow-sm bg-opacity-70'>
-                                <svg
-                                    xmlns='http://www.w3.org/2000/svg'
-                                    className='w-5 h-5 text-gray-500'
-                                    fill='none'
-                                    viewBox='0 0 24 24'
-                                    stroke='currentColor'
-                                >
-                                    <path
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth={2}
-                                        d='M9 5l7 7-7 7'
+                {clusters.length !== 0 ? (
+                    <>
+                        <div className='ml-4 font-sans text-md'>인물 분류</div>
+                        <SideScrollableSection>
+                            {clusters &&
+                                clusters.map((cluster: Cluster, index) => (
+                                    <Cluster
+                                        key={cluster.clusterId || index}
+                                        albumId={albumId as string}
+                                        cluster={cluster as ClusterInterface}
                                     />
-                                </svg>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                                ))}
+                        </SideScrollableSection>
+                    </>
+                ) : (
+                    ' '
+                )}
             </div>
 
             <div className='m-4 mt-6'>
@@ -292,10 +254,46 @@ const Album = () => {
                         <img className='m-2 size-2' src={Arrow_Right} />
                     </button>
                 </div>
+
+                {/* 댓글 버튼 추가 */}
+                <div className='m-4'>
+                    <button
+                        className='flex items-center justify-between w-full transition-colors border-0 border-b border-blue-200 bg-blue-50 hover:bg-blue-100 focus:outline-none'
+                        onClick={() => setIsCommentsOpen(true)}
+                    >
+                        <div className='flex items-center'>
+                            <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 bg-blue-100 rounded-lg'>
+                                <svg
+                                    className='w-4 h-4 text-blue-600'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    viewBox='0 0 24 24'
+                                >
+                                    <path
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth={2}
+                                        d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
                 <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
                     앨범 설정
                 </div>
             </div>
+
+            {/* 댓글 컨테이너 */}
+            <CommentsContainer
+                postId={albumId as string}
+                isOpen={isCommentsOpen}
+                onClose={() => setIsCommentsOpen(false)}
+                onHeightChange={height => console.log('Height changed:', height)}
+            />
+
             <FlottingButton albumId={albumId as string} />
 
             {/*Modal*/}
