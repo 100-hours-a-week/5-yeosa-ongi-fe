@@ -188,7 +188,7 @@ const EditableText: React.FC<EditableTextProps> = ({
     }, [value, isEditing])
 
     return (
-        <div className={`editable-text ${className}h-11`}>
+        <div className={`editable-text ${className} h-11`}>
             {/* 라벨 */}
             {label && <label className='block mb-1 text-sm font-medium text-gray-700'>{label}</label>}
 
@@ -243,13 +243,11 @@ const EditableText: React.FC<EditableTextProps> = ({
                 ) : (
                     /* 표시 모드 */
                     <>
-                        <div className={`flex-1 ${displayClassName}`}>
+                        <div className={`flex-1 `}>
                             {renderDisplay ? (
                                 renderDisplay(value, isEmpty)
                             ) : (
-                                <div className={`py-2 px-3 ${isEmpty ? 'text-gray-400 italic' : 'text-gray-900'}`}>
-                                    {isEmpty ? emptyText : value}
-                                </div>
+                                <div className={`py-2 px-3  ${displayClassName}`}>{isEmpty ? emptyText : value}</div>
                             )}
                         </div>
 

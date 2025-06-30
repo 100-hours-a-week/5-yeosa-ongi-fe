@@ -31,8 +31,9 @@ const AlbumTitle = ({ title }: AlbumTitleProps) => {
     }
 
     return (
-        <div className='p-4'>
+        <div className='p-4 pb-0'>
             <EditableText
+                displayClassName='font-semibold text-gray-600'
                 value={currentTitle}
                 onSave={handleSaveName}
                 textFieldProps={{
