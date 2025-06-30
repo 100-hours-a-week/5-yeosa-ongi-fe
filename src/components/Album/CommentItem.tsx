@@ -2,7 +2,7 @@ import { formatTime } from '@/utils/formatTime'
 import React, { useEffect, useRef, useState } from 'react'
 
 interface Comment {
-    id: string
+    commentId: string
     userName: string
     userProfile?: string
     content: string
@@ -167,7 +167,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
     // 수정 완료
     const handleEditSave = () => {
         if (onEdit && editContent.trim() !== comment.content) {
-            onEdit(comment.id, editContent.trim())
+            onEdit(comment.commentId, editContent.trim())
         }
         setIsEditing(false)
     }
@@ -181,7 +181,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
     // 삭제
     const handleDelete = () => {
         if (onDelete) {
-            onDelete(comment.id)
+            onDelete(comment.commentId)
         }
         closeSlide()
     }
@@ -206,7 +206,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
     }
 
     return (
-        <div ref={commentRef} id={`comment-${comment.id}`} className={`relative overflow-hidden ${className}`}>
+        <div ref={commentRef} id={`comment-${comment.commentId}`} className={`relative overflow-hidden ${className}`}>
             {/* 배경 액션 버튼들 */}
             {isMyComment && (
                 <div className='absolute top-0 bottom-0 right-0 flex items-center'>
