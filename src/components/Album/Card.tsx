@@ -98,11 +98,11 @@ const Card = () => {
                             src={pictures[displayImageIndex]?.pictureURL}
                             alt={`사진 ${displayImageIndex + 1}`}
                         />
-                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded opacity-0 top-2 right-2 group-hover:opacity-100'>
+                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 top-2 right-2 group-hover:opacity-70'>
                             {currentImageIndex + 1} / {pictures.length}
                         </div>
                         {canFlip && currentImageIndex === 0 && (
-                            <div className='absolute px-2 py-1 text-xs text-white bg-black bg-opacity-50 rounded bottom-2 left-2'>
+                            <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 bottom-2 left-2 group-hover:opacity-70'>
                                 클릭해서 다음 사진 보기
                             </div>
                         )}
@@ -125,7 +125,7 @@ const Card = () => {
                             src={pictures[displayImageIndex]?.pictureURL}
                             alt={`사진 ${displayImageIndex + 1}`}
                         />
-                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded opacity-0 top-2 right-2 group-hover:opacity-100'>
+                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 top-2 right-2 group-hover:opacity-70'>
                             {currentImageIndex + 1} / {pictures.length}
                         </div>
                     </div>
