@@ -1,6 +1,9 @@
 import { addAlbumComments, deleteAlbumComments, getAlbumComments, updateAlbumComments } from '@/api/album'
+import useModal from '@/hooks/useModal'
 import useAuthStore from '@/stores/authStore'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import ConfirmModal from '../common/ConfirmModal'
+import { Modal } from '../common/Modal'
 import CommentItem from './CommentItem'
 
 interface Comment {
@@ -45,6 +48,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
     const inputRef = useRef<HTMLInputElement>(null)
     const getCurrentHeight = () => (isResizing ? tempHeight : heights[currentHeightIndex])
 
+    const { isOpen: isModalOpen, modalData, openModal, closeModal } = useModal()
     // 댓글 불러오기
     const loadComments = useCallback(async () => {
         if (!albumId) return
@@ -312,7 +316,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                                     comment={comment}
                                     userName={user?.nickname}
                                     onEdit={handleEditComment}
-                                    onDelete={handleDeleteComment}
+                                    onDelete={openModal}
                                 ></CommentItem>
                             ))}
                         </div>
@@ -346,6 +350,17 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                     </div>
                 </div>
             </div>
+
+            <Modal isOpen={isModalOpen} onClose={closeModal} title={modalData}>
+                {modalData && (
+                    <ConfirmModal
+                        title='댓글 삭제'
+                        content={`댓글을 삭제하시겠습니까?`}
+                        handleConfirm={() => handleDeleteComment(modalData)}
+                        closeModal={closeModal}
+                    />
+                )}
+            </Modal>
         </>
     )
 }
