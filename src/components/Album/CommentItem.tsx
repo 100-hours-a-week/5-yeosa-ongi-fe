@@ -147,10 +147,11 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
 
     // 👉 수정 저장
     const handleEditSave = () => {
-        if (onEdit && editContent.trim() !== comment.content) {
-            onEdit(comment.commentId, editContent.trim())
+        const trimmedContent = editContent.trim()
+        if (onEdit && trimmedContent && trimmedContent !== comment.content) {
+            onEdit(comment.commentId, trimmedContent)
+            setIsEditing(false)
         }
-        setIsEditing(false)
     }
 
     // 👉 수정 취소
@@ -234,7 +235,12 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
                                 <div className='flex justify-end space-x-2'>
                                     <button
                                         onClick={handleEditSave}
-                                        className='px-3 py-1 text-xs text-white rounded bg-primary hover:bg-primaryBold'
+                                        disabled={!editContent.trim() || editContent.trim() === comment.content}
+                                        className={`px-3 py-1 text-xs text-white rounded ${
+                                            !editContent.trim() || editContent.trim() === comment.content
+                                                ? 'bg-primary cursor-not-allowed'
+                                                : 'bg-primaryBold'
+                                        }`}
                                     >
                                         저장
                                     </button>
