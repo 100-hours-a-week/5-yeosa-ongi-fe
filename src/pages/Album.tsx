@@ -288,7 +288,7 @@ const Album = () => {
 
             {/* 댓글 컨테이너 */}
             <CommentsContainer
-                postId={albumId as string}
+                albumId={albumId as string}
                 isOpen={isCommentsOpen}
                 onClose={() => setIsCommentsOpen(false)}
                 onHeightChange={height => console.log('Height changed:', height)}

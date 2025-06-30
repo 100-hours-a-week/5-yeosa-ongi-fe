@@ -1,3 +1,5 @@
+import { addAlbumComments, getAlbumComments } from '@/api/album'
+import { formatTime } from '@/utils/formatTime'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Comment {
@@ -11,22 +13,21 @@ interface Comment {
 }
 
 interface CommentsContainerProps {
-    postId: string // 댓글을 불러올 게시물 ID
+    albumId: string // 댓글을 불러올 게시물 ID
     isOpen: boolean
     onClose: () => void
     onHeightChange?: (height: number) => void
 }
 
-const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: CommentsContainerProps) => {
+const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: CommentsContainerProps) => {
     const headerHeight = 56
     const screenHeight = window.innerHeight - headerHeight
 
     // 인스타그램과 유사한 높이 설정
-    const minHeight = Math.round(screenHeight * 0.4) // 화면의 40%
-    const midHeight = Math.round(screenHeight * 0.7) // 화면의 70%
-    const maxHeight = Math.round(screenHeight * 0.9) // 화면의 90%
+    const minHeight = Math.round(screenHeight * 0.7) // 화면의 70%
+    const maxHeight = Math.round(screenHeight) // 화면의 90%
 
-    const heights = [minHeight, midHeight, maxHeight]
+    const heights = [minHeight, maxHeight]
 
     const [currentHeightIndex, setCurrentHeightIndex] = useState(0)
     const [isResizing, setIsResizing] = useState(false)
@@ -39,76 +40,26 @@ const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: Comments
     const [newComment, setNewComment] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    // API 함수들 - 컴포넌트 내부에서 정의
-    const fetchComments = async (postId: string): Promise<Comment[]> => {
-        try {
-            const response = await fetch(`/api/posts/${postId}/comments`)
-            if (!response.ok) throw new Error('댓글 로딩 실패')
-            return await response.json()
-        } catch (error) {
-            console.error('fetchComments error:', error)
-            throw error
-        }
-    }
-
-    const addComment = async (postId: string, content: string): Promise<Comment> => {
-        try {
-            const response = await fetch(`/api/posts/${postId}/comments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content }),
-            })
-            if (!response.ok) throw new Error('댓글 추가 실패')
-            return await response.json()
-        } catch (error) {
-            console.error('addComment error:', error)
-            throw error
-        }
-    }
-
-    const deleteComment = async (commentId: string): Promise<void> => {
-        try {
-            const response = await fetch(`/api/comments/${commentId}`, {
-                method: 'DELETE',
-            })
-            if (!response.ok) throw new Error('댓글 삭제 실패')
-        } catch (error) {
-            console.error('deleteComment error:', error)
-            throw error
-        }
-    }
-
     const startY = useRef(0)
     const startHeight = useRef(0)
     const inputRef = useRef<HTMLInputElement>(null)
     const getCurrentHeight = () => (isResizing ? tempHeight : heights[currentHeightIndex])
 
-    // 높이 변경 시 부모에게 알림
-    const notifyHeightChange = useCallback(
-        (height: number) => {
-            if (onHeightChange) {
-                onHeightChange(height)
-            }
-        },
-        [onHeightChange]
-    )
-
     // 댓글 불러오기
     const loadComments = useCallback(async () => {
-        if (!postId) return
+        if (!albumId) return
 
         setIsLoading(true)
         try {
-            const commentsData = await fetchComments(postId)
-            setComments(commentsData)
+            const commentsData = await getAlbumComments(albumId)
+            console.log(commentsData.data)
+            setComments(commentsData.data)
         } catch (error) {
             console.error('댓글 로딩 실패:', error)
         } finally {
             setIsLoading(false)
         }
-    }, [postId, fetchComments])
+    }, [albumId])
 
     // 컨테이너 열기/닫기 애니메이션 처리
     useEffect(() => {
@@ -126,21 +77,15 @@ const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: Comments
         }
     }, [isOpen, loadComments])
 
-    // 높이가 변경될 때마다 부모에게 알림
-    useEffect(() => {
-        if (isVisible) {
-            notifyHeightChange(getCurrentHeight())
-        }
-    }, [tempHeight, currentHeightIndex, isResizing, isVisible, notifyHeightChange])
-
     // 댓글 추가 처리
     const handleSubmitComment = async () => {
         if (!newComment.trim() || isSubmitting) return
 
         setIsSubmitting(true)
         try {
-            const comment = await addComment(postId, newComment.trim())
-            setComments(prev => [...prev, comment])
+            const comment = await addAlbumComments(albumId, newComment.trim())
+            console.log(comments)
+            setComments(prev => (Array.isArray(prev) ? [...prev, comment] : [comment]))
             setNewComment('')
             if (inputRef.current) {
                 inputRef.current.focus()
@@ -149,17 +94,6 @@ const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: Comments
             console.error('댓글 추가 실패:', error)
         } finally {
             setIsSubmitting(false)
-        }
-    }
-
-    // 댓글 삭제 처리
-    const handleDeleteComment = async (commentId: string) => {
-        try {
-            await deleteComment(commentId)
-            setComments(prev => prev.filter(comment => comment.id !== commentId))
-        } catch (error) {
-            console.error('댓글 삭제 실패:', error)
-            // 사용자에게 에러 알림 (toast 등)
         }
     }
 
@@ -204,7 +138,7 @@ const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: Comments
                 const deltaY = startY.current - e.clientY
                 const newHeight = Math.max(100, Math.min(maxHeight, startHeight.current + deltaY))
 
-                if (newHeight < minHeight * 0.7) {
+                if (newHeight < minHeight * 0.5) {
                     handleClose()
                     return
                 }
@@ -282,18 +216,6 @@ const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: Comments
         [handleClose]
     )
 
-    // 시간 포맷팅
-    const formatTime = (dateString: string) => {
-        const date = new Date(dateString)
-        const now = new Date()
-        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-        if (diffInSeconds < 60) return '방금 전'
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`
-        return `${Math.floor(diffInSeconds / 86400)}일 전`
-    }
-
     if (!isVisible) return null
 
     return (
@@ -370,16 +292,6 @@ const CommentsContainer = ({ postId, isOpen, onClose, onHeightChange }: Comments
                                         </div>
                                         <p className='mt-1 text-sm text-gray-700 break-words'>{comment.content}</p>
                                     </div>
-                                    {deleteComment && (
-                                        <button
-                                            onClick={() => handleDeleteComment(comment.id)}
-                                            className='p-1 text-gray-400 transition-colors hover:text-red-500'
-                                        >
-                                            <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
-                                                <path d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z' />
-                                            </svg>
-                                        </button>
-                                    )}
                                 </div>
                             ))}
                         </div>
