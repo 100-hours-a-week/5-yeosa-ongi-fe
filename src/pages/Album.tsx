@@ -147,6 +147,16 @@ const Album = () => {
             <div className='relative'>
                 <AlbumTitle title={albumData?.title || ''} />
                 <Card />
+                <div className='flex m-4'>
+                    {/* 좋아요 버튼 */}
+                    <LikeButton albumId={albumId as string} showCount={true} />
+
+                    {/* 댓글 버튼 */}
+                    <CommentButton showCount={false} onClick={() => setIsCommentsOpen(true)} />
+                    <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
+                        앨범 설정
+                    </div>
+                </div>
             </div>
 
             <div className='m-4 mt-6 bg-transparent'>
@@ -226,21 +236,6 @@ const Album = () => {
                         </div>
                         <img className='m-2 size-2' src={Arrow_Right} />
                     </button>
-                </div>
-
-                <div className='flex'>
-                    {/* 좋아요 버튼 */}
-                    <LikeButton albumId={albumId as string} showCount={true} />
-
-                    {/* 댓글 버튼 추가 */}
-                    <CommentButton
-                        commentCount={commentCount}
-                        showCount={true}
-                        onClick={() => setIsCommentsOpen(true)}
-                    />
-                    <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
-                        앨범 설정
-                    </div>
                 </div>
             </div>
 
