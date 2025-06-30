@@ -231,6 +231,30 @@ export const addAlbumComments = async (albumId: string, comment: string) => {
     }
 }
 
+export const updateAlbumComments = async (albumId: string, commentsId: string, comment: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/comments/${commentsId}`
+        return await authenticatedFetch(apiUrl, {
+            method: 'PUT',
+            body: JSON.stringify({ comments: comment }),
+        })
+    } catch (error) {
+        console.error('댓글 수정 실패 : ', (error as Error).message)
+        throw error
+    }
+}
+export const deleteAlbumComments = async (albumId: string, commentsId: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/comments/${commentsId}`
+        return await authenticatedFetch(apiUrl, {
+            method: 'DELETE',
+        })
+    } catch (error) {
+        console.error('댓글 삭제 실패 : ', (error as Error).message)
+        throw error
+    }
+}
+
 export const controllLikes = async (albumId: string) => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/like`
