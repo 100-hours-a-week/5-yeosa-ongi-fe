@@ -186,7 +186,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
                 <div ref={actionButtonsRef} className='absolute top-0 bottom-0 right-0 flex items-center'>
                     <button
                         onClick={handleEditStart}
-                        className='flex items-center justify-center h-full px-4 text-white bg-blue-500 hover:bg-blue-600'
+                        className='flex items-center justify-center h-full px-4 text-white bg-gray-400'
                         style={{ width: '60px' }}
                     >
                         <Edit3 size={16} className='text-blue-100' />
@@ -227,20 +227,20 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
                                 <textarea
                                     value={editContent}
                                     onChange={e => setEditContent(e.target.value)}
-                                    className='w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:outline-none focus:border-blue-500'
+                                    className='w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:outline-none focus:border-primary'
                                     rows={2}
                                     autoFocus
                                 />
-                                <div className='flex space-x-2'>
+                                <div className='flex justify-end space-x-2'>
                                     <button
                                         onClick={handleEditSave}
-                                        className='px-3 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600'
+                                        className='px-3 py-1 text-xs text-white rounded bg-primary hover:bg-primaryBold'
                                     >
                                         저장
                                     </button>
                                     <button
                                         onClick={handleEditCancel}
-                                        className='px-3 py-1 text-xs text-white bg-gray-500 rounded hover:bg-gray-600'
+                                        className='px-3 py-1 text-xs text-white bg-gray-300 rounded hover:bg-gray-400'
                                     >
                                         취소
                                     </button>

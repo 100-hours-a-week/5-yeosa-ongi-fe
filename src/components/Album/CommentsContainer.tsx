@@ -334,12 +334,12 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                             onKeyPress={handleKeyPress}
                             placeholder='댓글을 입력하세요...'
                             disabled={isSubmitting}
-                            className='flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500 disabled:bg-gray-100'
+                            className='flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-primary disabled:bg-gray-100'
                         />
                         <button
                             onClick={handleSubmitComment}
                             disabled={!newComment.trim() || isSubmitting}
-                            className='font-semibold text-blue-500 disabled:text-gray-400 disabled:cursor-not-allowed'
+                            className='font-semibold text-primaryBold disabled:text-primary disabled:cursor-not-allowed'
                         >
                             {isSubmitting ? '전송중...' : '게시'}
                         </button>
