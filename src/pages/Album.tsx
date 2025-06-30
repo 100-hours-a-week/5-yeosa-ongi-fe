@@ -28,6 +28,7 @@ import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
 
 //Types
+import CommentButton from '@/components/Album/CommentButton'
 import CommentsContainer from '@/components/Album/CommentsContainer'
 import LikeButton from '@/components/Album/LikeButton'
 import SideScrollableSection from '@/components/Album/SideScrollableSection'
@@ -89,41 +90,7 @@ const Album = () => {
     } = useCollectionStore()
 
     const [clusters, setClusters] = useState<Cluster[]>([])
-
-    const handleLikeChange = (liked: boolean, count: number) => {
-        console.log(`좋아요 ${liked ? '추가' : '취소'}: ${count}개`)
-        // 필요시 추가 로직 (예: 통계 업데이트, 알림 등)
-    }
-
-    /**
-     * 카테고리 섹션 스크롤 이벤트 처리
-     * @param e
-     */
-    const handleCategoryScroll = (e: React.UIEvent) => {
-        const container = e.target as HTMLDivElement
-        const isScrollEnd = container.scrollWidth - container.scrollLeft <= container.clientWidth + 10
-
-        if (isScrollEnd) {
-            setShowCategoryRightIndicator(false)
-        } else {
-            setShowCategoryRightIndicator(true)
-        }
-    }
-
-    /**
-     * 인물 분류 섹션 스크롤 이벤트 처리
-     * @param e
-     */
-    const handleClusterScroll = (e: React.UIEvent) => {
-        const container = e.target as HTMLDivElement
-        const isScrollEnd = container.scrollWidth - container.scrollLeft <= container.clientWidth + 10
-
-        if (isScrollEnd) {
-            setShowClusterRightIndicator(false)
-        } else {
-            setShowClusterRightIndicator(true)
-        }
-    }
+    const [commentCount, setCommentCount] = useState(0)
 
     const handleSettingClick = () => {
         openModal('설정')
@@ -262,34 +229,15 @@ const Album = () => {
                 </div>
 
                 <div className='flex'>
-                    {/* 좋아요 버튼도 여기에 추가 가능 */}
-                    <LikeButton albumId={albumId as string} showCount={true} onLikeChange={handleLikeChange} />
+                    {/* 좋아요 버튼 */}
+                    <LikeButton albumId={albumId as string} showCount={true} />
 
                     {/* 댓글 버튼 추가 */}
-                    <div className='m-4'>
-                        <button
-                            className='flex items-center justify-between w-full transition-colors border-0 border-b border-blue-200 bg-blue-50 hover:bg-blue-100 focus:outline-none'
-                            onClick={() => setIsCommentsOpen(true)}
-                        >
-                            <div className='flex items-center'>
-                                <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 bg-blue-100 rounded-lg'>
-                                    <svg
-                                        className='w-4 h-4 text-blue-600'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        viewBox='0 0 24 24'
-                                    >
-                                        <path
-                                            strokeLinecap='round'
-                                            strokeLinejoin='round'
-                                            strokeWidth={2}
-                                            d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
+                    <CommentButton
+                        commentCount={commentCount}
+                        showCount={true}
+                        onClick={() => setIsCommentsOpen(true)}
+                    />
                     <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
                         앨범 설정
                     </div>
