@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import CommentItem from './CommentItem'
 
 interface Comment {
+    id: string
     userName: string
     userProfile?: string
     content: string
     createdAt: string
-    replies?: Comment[]
 }
 
 interface CommentsContainerProps {
@@ -85,6 +85,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
         try {
             await addAlbumComments(albumId, newComment.trim())
             const comment: Comment = {
+                id: '0',
                 userName: user!.nickname,
                 userProfile: user?.profileImageURL,
                 content: newComment,
@@ -222,6 +223,43 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
         [handleClose]
     )
 
+    const handleEditComment = async (commentId: string, newContent: string) => {
+        try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: newContent }),
+            })
+
+            if (!response.ok) throw new Error('댓글 수정 실패')
+
+            // 로컬 상태 업데이트
+            setComments(prev =>
+                prev.map(comment => (comment.id === commentId ? { ...comment, content: newContent } : comment))
+            )
+        } catch (error) {
+            console.error('댓글 수정 실패:', error)
+        }
+    }
+
+    // 댓글 삭제 처리
+    const handleDeleteComment = async (commentId: string) => {
+        try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+                method: 'DELETE',
+            })
+
+            if (!response.ok) throw new Error('댓글 삭제 실패')
+
+            // 로컬 상태에서 제거
+            setComments(prev => prev.filter(comment => comment.id !== commentId))
+        } catch (error) {
+            console.error('댓글 삭제 실패:', error)
+        }
+    }
+
     if (!isVisible) return null
 
     return (
@@ -281,7 +319,13 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                     ) : comments.length > 0 ? (
                         <div className='space-y-4'>
                             {[...comments].reverse().map(comment => (
-                                <CommentItem comment={comment}></CommentItem>
+                                <CommentItem
+                                    key={comment.id}
+                                    comment={comment}
+                                    userName={user?.nickname}
+                                    onEdit={handleEditComment}
+                                    onDelete={handleDeleteComment}
+                                ></CommentItem>
                             ))}
                         </div>
                     ) : (
