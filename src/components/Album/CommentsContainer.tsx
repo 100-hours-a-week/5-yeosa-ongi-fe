@@ -228,7 +228,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
         <>
             {/* 백드롭 */}
             <div
-                className={`absolute inset-0 bg-black bg-opacity-50 z-40 ${
+                className={`absolute inset-0 bg-black bg-opacity-50 z-30 ${
                     isOpen ? 'opacity-100' : 'opacity-0'
                 } transition-opacity duration-300`}
                 onClick={handleBackdropClick}
