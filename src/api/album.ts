@@ -1,4 +1,4 @@
-import { ApiResponse } from '../types'
+import { APIResponse } from '@/types/api.types'
 import { authenticatedFetch } from './authUtils'
 import { API_BASE_URL } from './config'
 
@@ -7,7 +7,7 @@ import { API_BASE_URL } from './config'
  * @param albumId
  * @returns
  */
-export const getAlbumAccess = async (albumId: string): Promise<ApiResponse> => {
+export const getAlbumAccess = async (albumId: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/role`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -23,7 +23,7 @@ export const getAlbumAccess = async (albumId: string): Promise<ApiResponse> => {
  * @param albumData
  * @returns
  */
-export const addAlbumPicture = async (albumId: number, albumData: any): Promise<ApiResponse> => {
+export const addAlbumPicture = async (albumId: number, albumData: any): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, {
@@ -54,7 +54,7 @@ export const changeAlbumName = async (albumId: string, albumName: string) => {
  * @param data
  * @returns
  */
-export const createAlbum = async (data: any): Promise<ApiResponse> => {
+export const createAlbum = async (data: any): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album`
         return await authenticatedFetch(apiUrl, {
@@ -72,7 +72,7 @@ export const createAlbum = async (data: any): Promise<ApiResponse> => {
  * @param albumId
  * @returns
  */
-export const deleteAlbum = async (albumId: string): Promise<ApiResponse> => {
+export const deleteAlbum = async (albumId: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, { method: 'DELETE' })
@@ -82,7 +82,7 @@ export const deleteAlbum = async (albumId: string): Promise<ApiResponse> => {
     }
 }
 
-export const fetchAlbumData = async (yearMonth: string): Promise<ApiResponse> => {
+export const fetchAlbumData = async (yearMonth: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/monthly${yearMonth ? '?yearMonth=' + yearMonth : ''}`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -92,7 +92,7 @@ export const fetchAlbumData = async (yearMonth: string): Promise<ApiResponse> =>
     }
 }
 
-export const getAlubmSummary = async (albumId: string): Promise<ApiResponse> => {
+export const getAlubmSummary = async (albumId: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/summary`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -107,7 +107,7 @@ export const getAlubmSummary = async (albumId: string): Promise<ApiResponse> => 
  * @param albumId
  * @returns
  */
-export const getAlbumDetail = async (albumId: string): Promise<ApiResponse> => {
+export const getAlbumDetail = async (albumId: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -124,7 +124,7 @@ export const getAlbumDetail = async (albumId: string): Promise<ApiResponse> => {
  * @param albumId
  * @returns
  */
-export const getCoworkersList = async (albumId: string): Promise<ApiResponse> => {
+export const getCoworkersList = async (albumId: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members`
         return await authenticatedFetch(apiUrl, { method: 'GET' })
@@ -139,7 +139,7 @@ export const getCoworkersList = async (albumId: string): Promise<ApiResponse> =>
  * @param albumId
  * @returns
  */
-export const getSharingLink = async (albumId: string): Promise<ApiResponse> => {
+export const getSharingLink = async (albumId: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/invite/link`
         return await authenticatedFetch(apiUrl, { method: 'POST' })
@@ -154,7 +154,7 @@ export const getSharingLink = async (albumId: string): Promise<ApiResponse> => {
  * @param inviteToken
  * @returns
  */
-export const comfirmInvite = async (inviteToken: string): Promise<ApiResponse> => {
+export const comfirmInvite = async (inviteToken: string): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/invite?inviteToken=${inviteToken}`
         return await authenticatedFetch(apiUrl, { method: 'POST' })
@@ -170,7 +170,7 @@ export const comfirmInvite = async (inviteToken: string): Promise<ApiResponse> =
  * @param userId
  * @returns
  */
-export const deleteCoworker = async (albumId: number, userId: number): Promise<ApiResponse> => {
+export const deleteCoworker = async (albumId: number, userId: number): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/album/${albumId}/members/${userId}`
         return await authenticatedFetch(apiUrl, { method: 'DELETE' })
@@ -180,7 +180,7 @@ export const deleteCoworker = async (albumId: number, userId: number): Promise<A
     }
 }
 
-export const getPreSignedUrl = async (pictures: any): Promise<ApiResponse> => {
+export const getPreSignedUrl = async (pictures: any): Promise<APIResponse> => {
     try {
         const apiUrl = API_BASE_URL + `/api/presigned-url`
         return await authenticatedFetch(apiUrl, {
@@ -202,6 +202,31 @@ export const changeClusterTitle = async (albumId: string, clusterId: string, clu
         })
     } catch (error) {
         console.error('클러스터 이름 수정 실패:', (error as Error).message)
+        throw error
+    }
+}
+
+export const getAlbumComments = async (albumId: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/comments`
+        return await authenticatedFetch(apiUrl, {
+            method: 'GET',
+        })
+    } catch (error) {
+        console.error('댓글 조회 실패 : ', (error as Error).message)
+        throw error
+    }
+}
+
+export const addAlbumComments = async (albumId: string, comment: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/comments`
+        return await authenticatedFetch(apiUrl, {
+            method: 'POST',
+            body: JSON.stringify({ comments: comment }),
+        })
+    } catch (error) {
+        console.error('댓글 작성 실패 : ', (error as Error).message)
         throw error
     }
 }
