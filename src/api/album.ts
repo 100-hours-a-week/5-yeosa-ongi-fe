@@ -230,3 +230,16 @@ export const addAlbumComments = async (albumId: string, comment: string) => {
         throw error
     }
 }
+
+export const controllLikes = async (albumId: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/like`
+        return await authenticatedFetch(apiUrl, {
+            method: 'POST',
+            body: JSON.stringify({}),
+        })
+    } catch (error) {
+        console.error('좋아요 제어 실패 : ', (error as Error).message)
+        throw error
+    }
+}
