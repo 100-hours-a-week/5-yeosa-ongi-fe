@@ -15,7 +15,7 @@ import Main from './pages/Main'
 import MyActivities from './pages/MyActivities'
 import MyPage from './pages/MyPage'
 import Notification from './pages/Notification'
-import useAuthStore from './stores/userStore'
+import useAuthStore from './stores/authStore'
 
 interface ProtectedRouteProps {
     children: ReactNode
@@ -29,11 +29,12 @@ const ProtectedRoute = ({ children, isAuthenticated }: ProtectedRouteProps) => {
 
 function AppRoutes() {
     const navigate = useNavigate()
-    const isAuthenticated = useAuthStore(state => state.isAuthenticated())
+
     const refreshAccessToken = useAuthStore(state => state.refreshAccessToken)
-    const logout = useAuthStore(state => state.logout)
-    const getRefreshToken = useAuthStore(state => state.getRefreshToken)
+    const refreshToken = useAuthStore(state => state.refreshToken)
     const getAccessToken = useAuthStore(state => state.getAccessToken)
+    const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+    const logout = useAuthStore(state => state.logout)
     const queryClient = new QueryClient()
 
     // 로그아웃 핸들러 - useCallback으로 감싸 안정성 개선
@@ -47,7 +48,7 @@ function AppRoutes() {
     useEffect(() => {
         const initializeAuth = async () => {
             // 인증 상태이고 리프레시 토큰이 있는 경우만 진행
-            if (isAuthenticated && getRefreshToken()) {
+            if (isAuthenticated && refreshToken) {
                 console.log('인증된 상태 확인, 리프레시 토큰 존재')
 
                 // 액세스 토큰이 없는 경우 (메모리에서 사라진 경우)
@@ -68,7 +69,7 @@ function AppRoutes() {
                 } else {
                     console.log('액세스 토큰 유효함')
                 }
-            } else if (!isAuthenticated && !getRefreshToken()) {
+            } else if (!isAuthenticated && !refreshToken) {
                 console.log('미인증 상태, 정상')
             } else {
                 console.log('인증 상태와 토큰 불일치, 상태 정리')
@@ -78,7 +79,7 @@ function AppRoutes() {
         }
 
         initializeAuth()
-    }, [isAuthenticated, getRefreshToken, getAccessToken, refreshAccessToken, handleLogout])
+    }, [isAuthenticated, refreshToken, getAccessToken, refreshAccessToken, handleLogout])
 
     return (
         <ToastProvider>
