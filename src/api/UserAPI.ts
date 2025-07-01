@@ -4,10 +4,8 @@ import APIBuilder from './core/APIBuilder'
 
 // 사용자 통계 관련 타입 정의
 export interface UserStatistics {
-    totalRecords: number
-    totalPhotos: number
-    totalPlaces: number
-    // 필요한 다른 통계 필드들 추가
+    albumCount: number
+    placeCount: number
 }
 
 export interface UserActivity {
