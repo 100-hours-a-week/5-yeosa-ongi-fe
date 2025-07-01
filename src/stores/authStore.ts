@@ -76,12 +76,12 @@ const useAuthStore = create<AuthState>()(
             // 로그인
             login: authData => {
                 const { accessToken, refreshToken, refreshTokenExpiresIn, user } = authData
-
+                const refreshTokenExpiresAt = Date.now() + refreshTokenExpiresIn * 1000
                 set({
                     accessToken,
                     accessTokenExpiresAt: Date.now() + ACCESS_TOKEN_EXPIRY_TIME,
                     refreshToken,
-                    refreshTokenExpiresIn,
+                    refreshTokenExpiresIn: refreshTokenExpiresAt,
                     user,
                     isAuthenticated: true,
                     isRefreshing: false,
