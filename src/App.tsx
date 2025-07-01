@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactNode, useCallback, useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import Background from './components/common/Background'
@@ -29,57 +29,19 @@ const ProtectedRoute = ({ children, isAuthenticated }: ProtectedRouteProps) => {
 
 function AppRoutes() {
     const navigate = useNavigate()
-
-    const refreshAccessToken = useAuthStore(state => state.refreshAccessToken)
-    const refreshToken = useAuthStore(state => state.refreshToken)
-    const getAccessToken = useAuthStore(state => state.getAccessToken)
     const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+    const refreshToken = useAuthStore(state => state.refreshToken)
     const logout = useAuthStore(state => state.logout)
     const queryClient = new QueryClient()
 
-    // 로그아웃 핸들러 - useCallback으로 감싸 안정성 개선
-    const handleLogout = useCallback(() => {
-        logout()
-        console.log('로그아웃 후 홈으로 이동')
-        navigate('/login')
-    }, [logout, navigate])
-
-    // 인증 초기화 효과
     useEffect(() => {
-        const initializeAuth = async () => {
-            // 인증 상태이고 리프레시 토큰이 있는 경우만 진행
-            if (isAuthenticated && refreshToken) {
-                console.log('인증된 상태 확인, 리프레시 토큰 존재')
-
-                // 액세스 토큰이 없는 경우 (메모리에서 사라진 경우)
-                if (!getAccessToken()) {
-                    console.log('액세스 토큰 없음, 복구 시도')
-                    try {
-                        const success = await refreshAccessToken()
-                        if (!success) {
-                            console.error('토큰 복구 실패, 로그아웃 진행')
-                            handleLogout()
-                        } else {
-                            console.log('토큰 복구 성공')
-                        }
-                    } catch (error) {
-                        console.error('인증 초기화 오류:', error)
-                        handleLogout()
-                    }
-                } else {
-                    console.log('액세스 토큰 유효함')
-                }
-            } else if (!isAuthenticated && !refreshToken) {
-                console.log('미인증 상태, 정상')
-            } else {
-                console.log('인증 상태와 토큰 불일치, 상태 정리')
-                // 인증 상태와 토큰 보유 상태가 불일치하면 로그아웃
-                handleLogout()
-            }
+        // 인증 상태와 토큰 상태 불일치 시에만 정리
+        if (isAuthenticated && !refreshToken) {
+            console.log('인증 상태 불일치, 로그아웃')
+            logout()
+            navigate('/login')
         }
-
-        initializeAuth()
-    }, [isAuthenticated, refreshToken, getAccessToken, refreshAccessToken, handleLogout])
+    }, [isAuthenticated, refreshToken, logout, navigate])
 
     return (
         <ToastProvider>

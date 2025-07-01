@@ -212,6 +212,13 @@ const useAuthStore = create<AuthState>()(
                     state.accessToken = null
                     state.accessTokenExpiresAt = null
                     state.isRefreshing = false
+
+                    // 새로고침 후 자동으로 토큰 갱신 시도
+                    if (state.isAuthenticated && state.refreshToken) {
+                        setTimeout(() => {
+                            state.refreshAccessToken()
+                        }, 100) // 약간의 딜레이를 주어 초기화 완료 후 실행
+                    }
                 }
             },
         }
