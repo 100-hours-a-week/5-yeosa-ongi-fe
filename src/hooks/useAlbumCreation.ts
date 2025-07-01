@@ -6,7 +6,7 @@ import { FileItem } from '../types/upload'
 interface useAlbumCreationReturn {
     loading: boolean
     error: string | null
-    createAlbumWithFiles: (albumTitle: string, files: FileItem[], albumId: string) => Promise<void>
+    createAlbumWithFiles: (albumTitle: string, files: FileItem[], albumId: string, tags: string[]) => Promise<void>
     clearError: () => void
 }
 
@@ -16,7 +16,7 @@ export const useAlbumCreation = (): useAlbumCreationReturn => {
     const navigate = useNavigate()
 
     const createAlbumWithFiles = useCallback(
-        async (albumTitle: string, files: FileItem[], albumId: string) => {
+        async (albumTitle: string, files: FileItem[], albumId: string, tags: string[]) => {
             if (files.length === 0 || loading) return
 
             const trimmedTitle = albumTitle.trim()
@@ -29,7 +29,7 @@ export const useAlbumCreation = (): useAlbumCreationReturn => {
             setError(null)
 
             try {
-                const result = await AlbumUploadService.createAlbum(trimmedTitle, files, albumId)
+                const result = await AlbumUploadService.createAlbum(trimmedTitle, files, albumId, tags)
 
                 if (albumId) {
                     navigate(`/album/${albumId}`)

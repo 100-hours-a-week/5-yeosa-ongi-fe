@@ -42,7 +42,7 @@ export class AlbumUploadService {
         }
     }
 
-    static createAlbumData(albumTitle, files, presignedFiles) {
+    static createAlbumData(albumTitle, files, presignedFiles, tags) {
         const pictureData = presignedFiles.map(f => (
             {
                 pictureUrl: f.pictureURL || f.pictureName, // 서버 응답에 따라 적절한 필드 사용
@@ -53,10 +53,11 @@ export class AlbumUploadService {
         return {
             albumName: albumTitle,
             pictureUrls: pictureData,
+            concepts: tags
         }
     }
 
-    static async createAlbum(albumTitle, files, albumId) {
+    static async createAlbum(albumTitle, files, albumId, tags) {
         // 1. 앨범 이름과 파일 메타데이터 준비 - 각 파일에 새 이름 할당
         const filesWithNewNames = this.prepareFilesWithNewNames(files)
 
@@ -76,7 +77,7 @@ export class AlbumUploadService {
         // 3. 각 파일을 presigned URL을 사용하여 업로드
         await this.uploadFilesToS3(filesWithNewNames, presignedFiles)
         // 4. 업로드 완료 후 앨범 생성 요청
-        const albumData = this.createAlbumData(albumTitle, filesWithNewNames, presignedFiles)
+        const albumData = this.createAlbumData(albumTitle, filesWithNewNames, presignedFiles, tags)
 
         console.log('생성할 앨범 데이터:', albumData)
 
