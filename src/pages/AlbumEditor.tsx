@@ -34,9 +34,8 @@ const MemoizedCreateAlbumButton = memo(CreateAlbumButton)
 const AlbumEditor = () => {
     const [albumTitle, setAlbumTitle] = useState('이름 없는 앨범')
     const { albumId } = useParams()
-
+    const [selectedTags, setSelectedTags] = useState<string[]>([])
     const albumData = useAlbumCreation()
-    // const fileManager = useFileUpload({ maxFiles: 30 })
 
     const { count, isValid: isFileValid } = useFileCount()
     const files = useFileStore(fileSelectors.files)
@@ -76,6 +75,11 @@ const AlbumEditor = () => {
         [albumTitle, albumData.loading, isProcessing]
     )
 
+    const handleTagsChange = (newTags: string[]) => {
+        setSelectedTags(newTags)
+        console.log('선택된 태그들:', newTags)
+    }
+
     return (
         <div className='flex flex-col min-h-screen'>
             <MemoizedAlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
@@ -88,7 +92,7 @@ const AlbumEditor = () => {
             ) : (
                 <>
                     <CollapsibleContainer title='태그 선택'>
-                        <TagContainer></TagContainer>
+                        <TagContainer activeTags={selectedTags} onTagChange={handleTagsChange}></TagContainer>
                     </CollapsibleContainer>
                 </>
             )}
