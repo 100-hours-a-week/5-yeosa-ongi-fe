@@ -1,4 +1,4 @@
-import { controllLikes } from '@/api/album'
+import { controllLikes, getLikes } from '@/api/album'
 import React, { useEffect, useState } from 'react'
 
 interface LikeButtonProps {
@@ -39,10 +39,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     // 좋아요 상태 로드
     const loadLikeStatus = async () => {
         try {
-            const response = await controllLikes(albumId)
-            setIsLiked(response.data.liked)
-            setLikeCount(response.data.likeCount)
-            await controllLikes(albumId)
+            const response = await getLikes(albumId)
+            setIsLiked(response.data.isLike)
+            setLikeCount(response.data.like)
         } catch (error) {
             console.error('좋아요 상태 로드 오류:', error)
         }
