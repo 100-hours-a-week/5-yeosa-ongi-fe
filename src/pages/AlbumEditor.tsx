@@ -49,13 +49,11 @@ const AlbumEditor = () => {
      * 앨범 생성 핸들러
      */
     const handleCreateAlbum = useCallback(async (): Promise<void> => {
-        // 생성 조건 검사 (1장 이상으로 변경)
         if (files.length < 1 || albumData.loading || isProcessing) {
             return
         }
-
         try {
-            await albumData.createAlbumWithFiles(albumTitle, files, albumId as string)
+            await albumData.createAlbumWithFiles(albumTitle, files, albumId as string, selectedTags)
         } catch (error) {
             console.error('앨범 생성 중 오류:', error)
         }
