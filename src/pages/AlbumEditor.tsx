@@ -11,6 +11,9 @@ import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
 // Types
+
+import TagContainer from '@/components/AlbumEditor/TagContainer'
+import CollapsibleContainer from '@/components/common/CollapsibleContainer'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 
 interface ButtonState {
@@ -79,6 +82,16 @@ const AlbumEditor = () => {
 
             {/* 앨범 제목 폼 */}
             {albumId ? ' ' : <MemoizedAlbumTitleForm value={albumTitle} onChange={handleTitleChange} />}
+
+            {albumId ? (
+                ' '
+            ) : (
+                <>
+                    <CollapsibleContainer title='태그 선택'>
+                        <TagContainer></TagContainer>
+                    </CollapsibleContainer>
+                </>
+            )}
 
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
