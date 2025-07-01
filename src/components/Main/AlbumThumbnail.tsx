@@ -1,6 +1,6 @@
+import { useAlbumSummary } from '@/hooks/useAlbum'
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
-import { getAlubmSummary } from '../../api/album'
 import OptimizedImage from '../common/OptimizedImage'
 
 interface AlbumThumbnailProps {
@@ -11,17 +11,16 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
     const { albums } = useAlbumStore()
     const album = albums[id.toString()]
 
+    const { data: albumSummary } = useAlbumSummary(id)
     const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
     const isSelected = selectedId === id
 
     const handleSelect = async () => {
         if (isSelected) {
-            console.log('앨범 상세페이지로 이동 : ', id)
             navigate(`/album/${id}`)
         } else {
             selectItem(id)
-            const response = await getAlubmSummary(id)
-            setSelectedAlbumSummary(response.data)
+            setSelectedAlbumSummary(albumSummary)
         }
     }
 
@@ -29,7 +28,6 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
         if (!originalUrl || originalUrl === '/default-thumbnail.jpg') {
             return undefined // 기본 이미지는 WebP 변환하지 않음
         }
-
         // URL의 확장자를 .webp로 변경
         return originalUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp')
     }
@@ -48,7 +46,7 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
                 className='absolute inset-0 object-cover w-full h-full'
                 lazy={true}
                 placeholder={true}
-                onLoad={() => console.log('상품 이미지 로드됨')}
+                onLoad={() => console.log('이미지 로드됨')}
             />
 
             {isSelected && (
