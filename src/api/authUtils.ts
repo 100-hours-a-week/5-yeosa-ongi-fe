@@ -1,4 +1,4 @@
-import useAuthStore from '../stores/userStore'
+import useAuthStore from '../stores/authStore'
 
 interface ApiRequstOption {
     method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH'
@@ -7,18 +7,13 @@ interface ApiRequstOption {
 }
 
 // 인증된 API 요청 유틸리티 함수
-export const authenticatedFetch = async (
-    url: string,
-    options: ApiRequstOption = { method: 'GET' }
-) => {
+export const authenticatedFetch = async (url: string, options: ApiRequstOption = { method: 'GET' }) => {
     // 액세스 토큰 가져오기
-    let accessToken: string = useAuthStore.getState().getAccessToken()
+    let accessToken = useAuthStore.getState().getAccessToken()
 
     // 액세스 토큰이 없거나 만료된 경우 갱신 시도
     if (!accessToken) {
-        const refreshSuccess = await useAuthStore
-            .getState()
-            .refreshAccessToken()
+        const refreshSuccess = await useAuthStore.getState().refreshAccessToken()
         if (refreshSuccess) {
             accessToken = useAuthStore.getState().getAccessToken()
         } else {
@@ -44,9 +39,7 @@ export const authenticatedFetch = async (
 
     // 401 오류 처리 (액세스 토큰 만료)
     if (response.status === 401) {
-        const refreshSuccess = await useAuthStore
-            .getState()
-            .refreshAccessToken()
+        const refreshSuccess = await useAuthStore.getState().refreshAccessToken()
         if (refreshSuccess) {
             // 갱신 성공 시 새 액세스 토큰으로 다시 요청
             const newAccessToken = useAuthStore.getState().getAccessToken()
@@ -61,9 +54,7 @@ export const authenticatedFetch = async (
     // 응답 상태 확인
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(
-            errorData.message || `HTTP 에러! 상태: ${response.status}`
-        )
+        throw new Error(errorData.message || `HTTP 에러! 상태: ${response.status}`)
     }
 
     // JSON 응답 파싱
