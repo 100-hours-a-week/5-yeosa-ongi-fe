@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useAuthStore from '../../stores/userStore'
+import useAuthStore from '../../stores/authStore'
 import defaultProfileImage from '/src/assets/default_user_imgae.png'
 import bellIcon from '/src/assets/icons/bell_icon.png'
 import ongiLogoFlat from '/src/assets/ongi_logo_flat.png'
@@ -15,14 +15,13 @@ const Header = ({ showButtons = true }) => {
     })
 
     // Zustand 스토어에서 함수 가져오기
-    const getUserId = useAuthStore(state => state.getUserId)
-    const getUser = useAuthStore(state => state.getUser)
+
+    const user = useAuthStore(state => state.user)
     const isAuthenticated = useAuthStore(state => state.isAuthenticated)
 
     useEffect(() => {
         // 1. 먼저 스토어에서 인증 상태 확인
-        if (isAuthenticated()) {
-            const user = getUser()
+        if (isAuthenticated) {
             setUserInfo({
                 userId: user.userId,
                 profileImageURL: user.profileImageURL,
@@ -40,8 +39,7 @@ const Header = ({ showButtons = true }) => {
     }, [])
 
     const handleProfileClick = () => {
-        console.log(isAuthenticated())
-        if (isAuthenticated()) {
+        if (isAuthenticated) {
             navigate(`/mypage`)
         } else {
             navigate('/login')
