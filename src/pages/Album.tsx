@@ -4,6 +4,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 //Components
 import AlbumTitle from '@/components/Album/AlbumTitle'
 import Cluster from '@/components/Album/Cluster'
+import CommentButton from '@/components/Album/CommentButton'
+import CommentsContainer from '@/components/Album/CommentsContainer'
+import LikeButton from '@/components/Album/LikeButton'
+import SideScrollableSection from '@/components/Album/SideScrollableSection'
 import AlbumSetting from '../components/Album/AlbumSetting'
 import Card from '../components/Album/Card'
 import Category from '../components/Album/Category'
@@ -13,10 +17,8 @@ import { Modal } from '../components/common/Modal'
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 
 //Custom Hooks
+import { useAlbumAccess, useAlbumComments, useAlbumDetail, useDeleteAlbum } from '@/hooks/useAlbum'
 import useModal from '../hooks/useModal'
-
-//APIs
-import { deleteAlbum, getAlbumAccess, getAlbumDetail } from '../api/album'
 
 //Stores
 import useCollectionStore from '../stores/collectionStore'
@@ -28,11 +30,6 @@ import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
 
 //Types
-import CommentButton from '@/components/Album/CommentButton'
-import CommentsContainer from '@/components/Album/CommentsContainer'
-import LikeButton from '@/components/Album/LikeButton'
-import SideScrollableSection from '@/components/Album/SideScrollableSection'
-import { APIResponse } from '@/types/api.types'
 import { RawPicture } from '../types'
 
 interface ClusterInterface {
@@ -57,12 +54,6 @@ interface Category {
     pictures: Picture[]
 }
 
-interface AlbumAccessResponse {
-    data: {
-        role: 'OWNER' | 'NORMAL' | string
-    }
-}
-
 interface AlbumData {
     id: string
     title?: string
@@ -70,11 +61,39 @@ interface AlbumData {
 
 const Album = () => {
     const { albumId } = useParams<{ albumId: string }>()
-    const [albumData, setAlbumData] = useState<AlbumData>()
     const [isCommentsOpen, setIsCommentsOpen] = useState(false)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
-
     const navigate = useNavigate()
+
+    // React Query hooks
+    const {
+        data: albumDetail,
+        isLoading: isDetailLoading,
+        error: detailError,
+    } = useAlbumDetail(albumId!, {
+        enabled: !!albumId,
+    })
+
+    const {
+        data: albumAccess,
+        isLoading: isAccessLoading,
+        error: accessError,
+    } = useAlbumAccess(albumId!, {
+        enabled: !!albumId,
+    })
+
+    const { data: commentsData } = useAlbumComments(albumId!)
+
+    // ✅ 새로운 mutation hooks 사용
+    const deleteAlbumMutation = useDeleteAlbum({
+        onSuccess: () => {
+            console.log('앨범 삭제 성공')
+            navigate('/main')
+        },
+        onError: error => {
+            console.error('앨범 삭제 실패:', error)
+            // 에러 토스트 등 처리
+        },
+    })
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
 
@@ -88,46 +107,70 @@ const Album = () => {
     } = useCollectionStore()
 
     const [clusters, setClusters] = useState<Cluster[]>([])
-    const [commentCount, setCommentCount] = useState(0)
+
+    // 로딩 상태 통합
+    const isLoading = isDetailLoading || isAccessLoading
 
     const handleSettingClick = () => {
         openModal('설정')
     }
 
-    const onchangeName = () => {
-        console.log('클러스터 이름 변경 알림')
+    const handleDeleteAlbum = () => {
+        if (albumId) {
+            deleteAlbumMutation.mutate(albumId)
+        }
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result: APIResponse = await getAlbumAccess(albumId as string)
-                const role = result.data.role
-                if (role !== 'OWNER' && role !== 'NORMAL') {
-                    navigate('/main')
-                }
-                const response = await getAlbumDetail(albumId as string)
-                setAlbumData(response.data)
-                setCommentCount(response.data.commentCount)
-                // 사진 데이터를 스토어에 전달하고 자동 카테고라이징
-                if (response.data && response.data.picture) {
-                    // 스토어에 원본 사진 데이터 전달 - 내부적으로 카테고라이징 실행
-                    const pictures: RawPicture[] = response.data.picture
-                    await setPicturesAndCategorize(albumId as string, pictures)
-                }
-
-                setClusters(response.data.cluster)
-                setClusterCollections(albumId as string, response.data.cluster)
-
-                setIsLoading(false)
-            } catch (error) {
-                navigate('/main')
-            }
+        // 아직 로딩 중이면 대기
+        if (isDetailLoading || isAccessLoading) {
+            return
         }
 
-        fetchData()
-    }, [albumId])
+        // 에러 처리
+        if (detailError || accessError) {
+            console.error('앨범 데이터 로딩 실패:', detailError || accessError)
+            navigate('/main')
+            return
+        }
 
+        // 데이터가 아직 없으면 대기
+        if (!albumDetail || !albumAccess) {
+            return
+        }
+
+        // 권한 확인
+        const role = albumAccess.role
+        if (role !== 'OWNER' && role !== 'NORMAL') {
+            console.warn('앨범 접근 권한이 없습니다.')
+            navigate('/main')
+            return
+        }
+
+        // 앨범 데이터 처리
+        if (albumDetail.picture) {
+            const pictures: RawPicture[] = albumDetail.picture
+            setPicturesAndCategorize(albumId as string, pictures)
+        }
+
+        if (albumDetail.cluster) {
+            setClusters(albumDetail.cluster)
+            setClusterCollections(albumId as string, albumDetail.cluster)
+        }
+    }, [
+        albumDetail,
+        albumAccess,
+        detailError,
+        accessError,
+        isDetailLoading,
+        isAccessLoading,
+        albumId,
+        navigate,
+        setPicturesAndCategorize,
+        setClusterCollections,
+    ])
+
+    // 로딩 중일 때
     if (isLoading) {
         return (
             <>
@@ -137,11 +180,26 @@ const Album = () => {
         )
     }
 
+    // 데이터가 없을 때
+    if (!albumDetail) {
+        return (
+            <>
+                <Header />
+                <div className='flex items-center justify-center h-64'>
+                    <p>앨범을 찾을 수 없습니다.</p>
+                </div>
+            </>
+        )
+    }
+
+    // ✅ 댓글 수는 React Query 데이터에서 직접 가져오기
+    const commentCount = commentsData?.length || albumDetail.commentCount || 0
+
     return (
         <>
             <Header />
             <div className='relative'>
-                <AlbumTitle title={albumData?.title || ''} />
+                <AlbumTitle title={albumDetail.title || ''} />
                 <Card />
                 <div className='flex m-4'>
                     {/* 좋아요 버튼 */}
@@ -254,11 +312,9 @@ const Album = () => {
                 {modalData && (
                     <AlbumSetting
                         albumId={albumId as string}
-                        albumName={albumData?.title || ' '}
-                        handleDelete={() => {
-                            deleteAlbum(albumId as string)
-                            navigate('/main')
-                        }}
+                        albumName={albumDetail.title || ' '}
+                        handleDelete={handleDeleteAlbum} // ✅ 새로운 mutation 사용
+                        //isDeleting={deleteAlbumMutation.isPending} // 로딩 상태 전달
                     />
                 )}
             </Modal>
