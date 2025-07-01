@@ -1,4 +1,4 @@
-import { useState } from 'react'
+// TagContainer.tsx - 상태를 부모로부터 받는 컴포넌트
 import TagItem from './TagItem'
 
 const predefinedTags: string[] = [
@@ -18,28 +18,24 @@ const predefinedTags: string[] = [
     '풍경',
 ]
 
-// 태그 컨테이너 컴포넌트
-const TagContainer = () => {
-    // 활성화된 태그들과 순서 관리
-    const [activeTags, setActiveTags] = useState<string[]>([])
+interface TagContainerProps {
+    activeTags: string[]
+    onTagChange: (tags: string[]) => void
+}
 
+const TagContainer = ({ activeTags, onTagChange }: TagContainerProps) => {
     // 태그 클릭 핸들러
     const handleTagClick = (tagLabel: string): void => {
-        setActiveTags(prev => {
-            if (prev.includes(tagLabel)) {
-                // 이미 활성화된 태그면 비활성화
-                return prev.filter(tag => tag !== tagLabel)
-            } else {
-                // 비활성화된 태그면 활성화 (맨 뒤에 추가)
-                return [...prev, tagLabel]
-            }
-        })
+        if (activeTags.includes(tagLabel)) {
+            // 이미 활성화된 태그면 비활성화
+            onTagChange(activeTags.filter(tag => tag !== tagLabel))
+        } else {
+            onTagChange([...activeTags, tagLabel])
+        }
     }
 
     return (
         <div className='w-full p-6 pt-2 mx-auto space-y-8'>
-            {/* 카테고리별 태그들 */}
-
             <div className='flex flex-wrap gap-2'>
                 {/* 활성화된 태그들을 먼저 표시 (선택 순서대로) */}
                 {activeTags
@@ -59,13 +55,6 @@ const TagContainer = () => {
                         />
                     ))}
             </div>
-
-            {/* 선택된 태그 데이터 (개발용)
-            <div className='p-4 border border-gray-200 rounded-lg bg-gray-50'>
-                <pre className='p-3 overflow-x-auto text-xs text-gray-600 bg-white border rounded'>
-                    {JSON.stringify(activeTags, null, 2)}
-                </pre>
-            </div> */}
         </div>
     )
 }
