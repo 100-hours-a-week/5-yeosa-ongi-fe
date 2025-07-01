@@ -5,7 +5,7 @@ const Card = () => {
     const [isFlipped, setIsFlipped] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [imagesLoaded, setImagesLoaded] = useState(false)
-    const [totalRotation, setTotalRotation] = useState(0) // 누적 회전 각도
+    const [totalRotation, setTotalRotation] = useState(0)
     const { allCollection } = useCollectionStore()
 
     const pictures = allCollection?.pictures || []
@@ -48,15 +48,18 @@ const Card = () => {
             const cardWidth = rect.width
             const isRightSide = clickX > cardWidth / 2
 
-            // 회전 방향에 따라 누적 회전 각도 업데이트
-            const rotationAmount = isRightSide ? 180 : -180
-            setTotalRotation(prev => prev + rotationAmount)
-            setIsFlipped(!isFlipped)
-
-            // 애니메이션이 절반 진행된 후 이미지 인덱스 변경
-            setTimeout(() => {
+            // 이미지 인덱스를 즉시 변경 (방향에 따라)
+            if (isRightSide) {
+                // 오른쪽 클릭: 다음 사진
                 setCurrentImageIndex(prev => (prev + 1) % pictures.length)
-            }, 250)
+                setTotalRotation(prev => prev + 180)
+            } else {
+                // 왼쪽 클릭: 이전 사진
+                setCurrentImageIndex(prev => (prev - 1 + pictures.length) % pictures.length)
+                setTotalRotation(prev => prev - 180)
+            }
+
+            setIsFlipped(!isFlipped)
         }
     }
 
@@ -68,9 +71,6 @@ const Card = () => {
     const getRotationTransform = () => {
         return `rotateY(${totalRotation}deg)`
     }
-
-    // 현재 보여줄 이미지 인덱스 결정
-    const displayImageIndex = currentImageIndex
 
     return (
         <div className='m-4' style={{ perspective: '1000px' }}>
@@ -95,15 +95,15 @@ const Card = () => {
                     <div className='relative w-full h-full'>
                         <img
                             className='object-cover w-full h-full rounded-3xl'
-                            src={pictures[displayImageIndex]?.pictureURL}
-                            alt={`사진 ${displayImageIndex + 1}`}
+                            src={pictures[currentImageIndex]?.pictureURL}
+                            alt={`사진 ${currentImageIndex + 1}`}
                         />
-                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 top-2 right-2 group-hover:opacity-70'>
+                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-gray-700 bg-opacity-50 rounded-lg opacity-0 top-2 right-2 group-hover:opacity-70'>
                             {currentImageIndex + 1} / {pictures.length}
                         </div>
-                        {canFlip && currentImageIndex === 0 && (
-                            <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 bottom-2 left-2 group-hover:opacity-70'>
-                                클릭해서 다음 사진 보기
+                        {canFlip && (
+                            <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-gray-700 bg-opacity-50 rounded-lg opacity-0 bottom-2 left-2 group-hover:opacity-70'>
+                                클릭해서 다른 사진 보기
                             </div>
                         )}
                     </div>
@@ -122,10 +122,10 @@ const Card = () => {
                     <div className='relative w-full h-full'>
                         <img
                             className='object-cover w-full h-full rounded-3xl'
-                            src={pictures[displayImageIndex]?.pictureURL}
-                            alt={`사진 ${displayImageIndex + 1}`}
+                            src={pictures[currentImageIndex]?.pictureURL}
+                            alt={`사진 ${currentImageIndex + 1}`}
                         />
-                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-black bg-opacity-50 rounded-lg opacity-0 top-2 right-2 group-hover:opacity-70'>
+                        <div className='absolute px-2 py-1 text-xs text-white transition-opacity duration-200 bg-gray-700 bg-opacity-50 rounded-lg opacity-0 top-2 right-2 group-hover:opacity-70'>
                             {currentImageIndex + 1} / {pictures.length}
                         </div>
                     </div>
