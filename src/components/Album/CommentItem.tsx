@@ -64,7 +64,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
 
     // 👉 드래그 시작
     const handleStart = (clientX: number) => {
-        if (isEditing) return
+        if (!isMyComment || isEditing) return
+
         startX.current = clientX
         currentX.current = clientX
         isDragging.current = true
@@ -104,6 +105,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
     // 👉 마우스 이벤트
     const handleMouseDown = (e: React.MouseEvent) => {
         handleStart(e.clientX)
+        if (!isMyComment || isEditing) return
+
         document.addEventListener('mousemove', handleMouseMove)
         document.addEventListener('mouseup', handleMouseUp)
     }
@@ -119,6 +122,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className 
     // 👉 터치 이벤트
     const handleTouchStart = (e: React.TouchEvent) => {
         handleStart(e.touches[0].clientX)
+        if (!isMyComment || isEditing) return
 
         document.addEventListener('touchmove', handleTouchMove)
         document.addEventListener('touchend', handleTouchEnd)
