@@ -254,6 +254,18 @@ export const deleteAlbumComments = async (albumId: string, commentsId: string) =
         throw error
     }
 }
+//좋아요 조회
+export const getLikes = async (albumId: string) => {
+    try {
+        const apiUrl = API_BASE_URL + `/api/album/${albumId}/like`
+        return await authenticatedFetch(apiUrl, {
+            method: 'GET',
+        })
+    } catch (error) {
+        console.error('좋아요 조회 실패 : ', (error as Error).message)
+        throw error
+    }
+}
 
 export const controllLikes = async (albumId: string) => {
     try {
