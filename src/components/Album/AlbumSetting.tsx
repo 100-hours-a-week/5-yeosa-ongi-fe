@@ -53,10 +53,12 @@ const AlbumSetting = ({ albumId, albumName, handleDelete }: AlbumSettingProps) =
     }, [albumId])
 
     const sections = {
-        sharing: {
-            title: '공유하기',
-            content: <AlbumShare sharingLink={sharingLink} />,
-        },
+        ...(userRole === 'OWNER' && {
+            sharing: {
+                title: '공유하기',
+                content: <AlbumShare sharingLink={sharingLink} />,
+            },
+        }),
         coworkerManager: {
             title: '공동 작업자',
             content: <CoworkerManager albumId={albumId} />,
