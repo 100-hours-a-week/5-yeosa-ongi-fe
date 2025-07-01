@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { getPreSignedUrl } from '../api/album'
 
 import { useLogout } from '@/hooks/useAuth'
+import { useUpdateUserInfo } from '@/hooks/useUser'
 import axios from 'axios'
 import ConfirmModal from '../components/common/ConfirmModal'
 import Header from '../components/common/Header'
@@ -45,6 +46,8 @@ const MyPage = () => {
 
     const [inputValue, setInputValue] = useState(userInfo.nickname)
     const [isValid, setIsValid] = useState(false)
+
+    const updateUserInfo = useUpdateUserInfo()
     const { isOpen, modalData, openModal, closeModal } = useModal()
     useEffect(() => {
         setIsLoading(true)
@@ -144,8 +147,8 @@ const MyPage = () => {
                 nickname: nickname,
                 profileImageURL: userInfo.profileImageURL,
             }
-            const response = await updateUserInfo(userInfo.userId, userInfoBody)
-            console.log(response)
+
+            const response = updateUserInfo.mutate({ userId: userInfo.userId, userInfo: userInfoBody })
 
             // 상태 업데이트
             const updatedUserInfo = {
