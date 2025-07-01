@@ -73,8 +73,6 @@ const Album = () => {
     const [albumData, setAlbumData] = useState<AlbumData>()
     const [isCommentsOpen, setIsCommentsOpen] = useState(false)
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const [showCategoryRightIndicator, setShowCategoryRightIndicator] = useState<boolean>(true)
-    const [showClusterRightIndicator, setShowClusterRightIndicator] = useState<boolean>(true)
 
     const navigate = useNavigate()
 
@@ -110,7 +108,7 @@ const Album = () => {
                 }
                 const response = await getAlbumDetail(albumId as string)
                 setAlbumData(response.data)
-
+                setCommentCount(response.data.commentCount)
                 // 사진 데이터를 스토어에 전달하고 자동 카테고라이징
                 if (response.data && response.data.picture) {
                     // 스토어에 원본 사진 데이터 전달 - 내부적으로 카테고라이징 실행
@@ -120,8 +118,6 @@ const Album = () => {
 
                 setClusters(response.data.cluster)
                 setClusterCollections(albumId as string, response.data.cluster)
-                // setClusters(mockClusters)
-                // setClusterCollections(albumId, mockClusters)
 
                 setIsLoading(false)
             } catch (error) {
@@ -152,7 +148,11 @@ const Album = () => {
                     <LikeButton albumId={albumId as string} showCount={true} />
 
                     {/* 댓글 버튼 */}
-                    <CommentButton showCount={false} onClick={() => setIsCommentsOpen(true)} />
+                    <CommentButton
+                        commentCount={commentCount}
+                        showCount={true}
+                        onClick={() => setIsCommentsOpen(true)}
+                    />
                     <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
                         앨범 설정
                     </div>
