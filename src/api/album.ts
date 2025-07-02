@@ -3,55 +3,6 @@ import { authenticatedFetch } from './authUtils'
 import { API_BASE_URL } from './config'
 
 /**
- * 앨범 사진 추가
- * @param albumId: number
- * @param albumData
- * @returns
- */
-export const addAlbumPicture = async (albumId: number, albumData: any): Promise<APIResponse> => {
-    try {
-        const apiUrl = API_BASE_URL + `/api/album/${albumId}`
-        return await authenticatedFetch(apiUrl, {
-            method: 'POST',
-            body: JSON.stringify(albumData),
-        })
-    } catch (error) {
-        console.error('앨범 사진 추가 실패:', (error as Error).message)
-        throw error
-    }
-}
-
-/**
- * 앨범 생성
- * @param data
- * @returns
- */
-export const createAlbum = async (data: any): Promise<APIResponse> => {
-    try {
-        const apiUrl = API_BASE_URL + `/api/album`
-        return await authenticatedFetch(apiUrl, {
-            method: 'POST',
-            body: JSON.stringify(data),
-        })
-    } catch (error) {
-        console.error('앨범 생성 실패:', (error as Error).message)
-        throw error
-    }
-}
-
-//==== = = == = = = == = = = = =
-
-export const fetchAlbumData = async (yearMonth: string): Promise<APIResponse> => {
-    try {
-        const apiUrl = API_BASE_URL + `/api/album/monthly${yearMonth ? '?yearMonth=' + yearMonth : ''}`
-        return await authenticatedFetch(apiUrl, { method: 'GET' })
-    } catch (error) {
-        console.error('앨범 데이터 Fetch 실패:', (error as Error).message)
-        throw error
-    }
-}
-
-/**
  * 앨범 상세 정보 조회
  * @param albumId
  * @returns
