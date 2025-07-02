@@ -90,7 +90,7 @@ export class AlbumUploadService {
             )
         })
 
-        const presignedFiles = presignedResponse.data.presignedFiles
+        const presignedFiles = presignedResponse.presignedFiles
 
         console.log('서버에서 받은 presignedFiles:', presignedFiles)
 
