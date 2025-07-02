@@ -103,7 +103,11 @@ export class AlbumAPI {
      * 초대 확인 (공동 작업자 추가)
      */
     static confirmInvite(inviteToken: string) {
-        return APIBuilder.post(`/api/album/invite?inviteToken=${inviteToken}`, {}).requiresAuth().build().call<any>()
+        return APIBuilder.post(`/api/album/invite?inviteToken=${inviteToken}`, {})
+            .params({ inviteToken })
+            .requiresAuth()
+            .build()
+            .call<any>()
     }
 
     /**
@@ -163,5 +167,23 @@ export class AlbumAPI {
      */
     static toggleLike(albumId: string) {
         return APIBuilder.post(`/api/album/${albumId}/like`, {}).requiresAuth().build().call<APIResponse>()
+    }
+
+    // 앨범 사진 삭제
+    static deleteAlbumPictures(albumId: string, selectedPictureIds: string[]) {
+        console.log(selectedPictureIds)
+        return APIBuilder.delete(`/api/album/${albumId}/picture`)
+            .data({ pictureIds: selectedPictureIds })
+            .requiresAuth(true)
+            .build()
+            .call<void>()
+    }
+
+    // 앨범 사진 복원
+    static recoverAlbumPictures(albumId: string, selectedPictureIds: string[]) {
+        return APIBuilder.put(`/api/album/${albumId}/picture`, selectedPictureIds)
+            .requiresAuth(true)
+            .build()
+            .call<void>()
     }
 }

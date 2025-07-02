@@ -23,6 +23,7 @@ export const albumKeys = {
     members: (albumId: string) => [...albumKeys.all, 'members', albumId] as const,
     comments: (albumId: string) => [...albumKeys.all, 'comments', albumId] as const,
     likes: (albumId: string) => [...albumKeys.all, 'likes', albumId] as const,
+    pictures: (albumId: string) => [...albumKeys.all, 'pictures', albumId] as const,
 } as const
 
 // ============= 조회 Query Hooks =============
@@ -250,6 +251,71 @@ export const useAddPicture = (options?: { onSuccess?: (data: any) => void; onErr
         },
         onError: (error: APIError) => {
             console.error('사진 추가 실패:', error.message)
+            options?.onError?.(error)
+        },
+    })
+}
+
+/**
+ * 앨범 사진 삭제
+ */
+export const useDeleteAlbumPictures = (options?: { onSuccess?: () => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async ({ albumId, pictureIds }: { albumId: string; pictureIds: string[] }) => {
+            console.log(pictureIds)
+            const response = await AlbumAPI.deleteAlbumPictures(albumId, pictureIds)
+            return response
+        },
+        onSuccess: (_, variables) => {
+            // 해당 앨범의 사진 목록 캐시 무효화
+            queryClient.invalidateQueries({
+                queryKey: albumKeys.pictures(variables.albumId),
+            })
+
+            // 앨범 상세 정보도 무효화 (사진 개수 등이 변경될 수 있음)
+            queryClient.invalidateQueries({
+                queryKey: albumKeys.detail(variables.albumId),
+            })
+
+            console.log('앨범 사진 삭제 성공')
+            options?.onSuccess?.()
+        },
+        onError: (error: APIError) => {
+            console.error('앨범 사진 삭제 실패:', error.message)
+            options?.onError?.(error)
+        },
+    })
+}
+
+/**
+ * 앨범 사진 복원
+ */
+export const useRecoverAlbumPictures = (options?: { onSuccess?: () => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async ({ albumId, pictureIds }: { albumId: string; pictureIds: string[] }) => {
+            const response = await AlbumAPI.recoverAlbumPictures(albumId, pictureIds)
+            return response
+        },
+        onSuccess: (_, variables) => {
+            // 해당 앨범의 사진 목록 캐시 무효화
+            queryClient.invalidateQueries({
+                queryKey: albumKeys.pictures(variables.albumId),
+            })
+
+            // 앨범 상세 정보도 무효화
+            queryClient.invalidateQueries({
+                queryKey: albumKeys.detail(variables.albumId),
+            })
+
+            console.log('앨범 사진 복원 성공')
+            options?.onSuccess?.()
+        },
+        onError: (error: APIError) => {
+            console.error('앨범 사진 복원 실패:', error.message)
             options?.onError?.(error)
         },
     })
