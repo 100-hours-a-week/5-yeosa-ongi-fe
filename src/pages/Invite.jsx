@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { comfirmInvite, getAlbumAccess } from '../api/album'
+import { useAlbumAccess } from '@/hooks/useAlbum'
+import { comfirmInvite } from '../api/album'
 import useAuthStore from '../stores/userStore'
 
 const Invite = () => {
@@ -9,6 +10,14 @@ const Invite = () => {
     const token = searchParams.get('token')
 
     const isAuthenticated = useAuthStore(state => state.isAuthenticated())
+
+    const {
+        data: albumAccess,
+        isLoading: isAccessLoading,
+        error: accessError,
+    } = useAlbumAccess(albumId, {
+        enabled: !!albumId,
+    })
 
     const handleLogin = () => {
         // 현재 URL을 로그인 후 리다이렉트 URL로 설정
@@ -27,10 +36,8 @@ const Invite = () => {
 
         const proccessInvite = async () => {
             const response = await comfirmInvite(token)
-
             const albumId = response.data.albumId
-            const result = await getAlbumAccess(albumId)
-            if (result.data.role) {
+            if (albumAccess.role) {
                 navigate(`/album/${albumId}`)
             }
         }

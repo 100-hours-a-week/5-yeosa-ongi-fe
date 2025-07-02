@@ -1,4 +1,4 @@
-import { changeAlbumName } from '@/api/album'
+import { useUpdateAlbumName } from '@/hooks/useAlbum'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
@@ -19,15 +19,13 @@ interface AlbumTitleProps {
 const AlbumTitle = ({ title }: AlbumTitleProps) => {
     const { albumId } = useParams()
     const [currentTitle, setCurrentTitle] = useState<string>(title)
+    const changeAlbumName = useUpdateAlbumName()
 
     const handleSaveName = async (newValue: string) => {
-        try {
-            const response = await changeAlbumName(albumId as string, newValue)
-            // 성공하면 로컬 상태 업데이트
-            setCurrentTitle(newValue)
-        } catch (error) {
-            console.error(error)
+        if (albumId) {
+            changeAlbumName.mutate({ albumId, albumName: newValue })
         }
+        setCurrentTitle(newValue)
     }
 
     return (

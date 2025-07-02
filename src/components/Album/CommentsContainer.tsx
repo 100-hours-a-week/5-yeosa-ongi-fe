@@ -1,4 +1,4 @@
-import { addAlbumComments, deleteAlbumComments, getAlbumComments, updateAlbumComments } from '@/api/album'
+import { useAlbumComments, useCreateComment, useDeleteComment, useUpdateComment } from '@/hooks/useAlbum'
 import useModal from '@/hooks/useModal'
 import useAuthStore from '@/stores/authStore'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -15,7 +15,7 @@ interface Comment {
 }
 
 interface CommentsContainerProps {
-    albumId: string // 댓글을 불러올 게시물 ID
+    albumId: string
     isOpen: boolean
     onClose: () => void
     onHeightChange?: (height: number) => void
@@ -25,9 +25,8 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
     const headerHeight = 56
     const screenHeight = window.innerHeight - headerHeight
 
-    // 인스타그램과 유사한 높이 설정
-    const minHeight = Math.round(screenHeight * 0.7) // 화면의 70%
-    const maxHeight = Math.round(screenHeight) // 화면의 90%
+    const minHeight = Math.round(screenHeight * 0.7)
+    const maxHeight = Math.round(screenHeight)
 
     const heights = [minHeight, maxHeight]
 
@@ -35,12 +34,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
     const [isResizing, setIsResizing] = useState(false)
     const [tempHeight, setTempHeight] = useState(heights[0])
     const [isVisible, setIsVisible] = useState(false)
-
-    // 댓글 관련 상태
-    const [comments, setComments] = useState<Comment[]>([])
-    const [isLoading, setIsLoading] = useState(false)
     const [newComment, setNewComment] = useState('')
-    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const { user } = useAuthStore()
     const startY = useRef(0)
@@ -48,64 +42,78 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
     const inputRef = useRef<HTMLInputElement>(null)
     const getCurrentHeight = () => (isResizing ? tempHeight : heights[currentHeightIndex])
 
-    const { isOpen: isModalOpen, modalData, openModal, closeModal } = useModal()
-    // 댓글 불러오기
-    const loadComments = useCallback(async () => {
-        if (!albumId) return
+    // ✅ React Query hooks
+    const { data: commentsData, isLoading: isCommentsLoading, error: commentsError } = useAlbumComments(albumId)
 
-        setIsLoading(true)
-        try {
-            const commentsData = await getAlbumComments(albumId)
-            console.log(commentsData.data)
-            setComments(commentsData.data)
-        } catch (error) {
-            console.error('댓글 로딩 실패:', error)
-        } finally {
-            setIsLoading(false)
-        }
-    }, [albumId])
+    const createCommentMutation = useCreateComment({
+        onSuccess: () => {
+            setNewComment('')
+            console.log('댓글 작성 성공')
+            // 포커스 유지
+            if (inputRef.current) {
+                inputRef.current.focus()
+            }
+        },
+        onError: error => {
+            console.error('댓글 작성 실패:', error)
+            alert('댓글 작성에 실패했습니다.')
+        },
+    })
+
+    const updateCommentMutation = useUpdateComment({
+        onSuccess: () => {
+            console.log('댓글 수정 성공')
+        },
+        onError: error => {
+            console.error('댓글 수정 실패:', error)
+            alert('댓글 수정에 실패했습니다.')
+        },
+    })
+
+    const deleteCommentMutation = useDeleteComment({
+        onSuccess: () => {
+            console.log('댓글 삭제 성공')
+            closeModal()
+        },
+        onError: error => {
+            console.error('댓글 삭제 실패:', error)
+            alert('댓글 삭제에 실패했습니다.')
+            closeModal()
+        },
+    })
+
+    // ✅ 댓글 데이터 처리
+    const comments = commentsData || []
+
+    const { isOpen: isModalOpen, modalData, openModal, closeModal } = useModal()
 
     // 컨테이너 열기/닫기 애니메이션 처리
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true)
             setCurrentHeightIndex(0)
-            loadComments() // 열릴 때 댓글 로드
         } else {
             const timer = setTimeout(() => {
                 setIsVisible(false)
-                setComments([]) // 닫힐 때 댓글 초기화
                 setNewComment('')
             }, 300)
             return () => clearTimeout(timer)
         }
-    }, [isOpen, loadComments])
+    }, [isOpen])
 
-    // 댓글 추가 처리
-    const handleSubmitComment = async () => {
-        if (!newComment.trim() || isSubmitting) return
+    // ✅ 개선된 댓글 추가 처리
+    const handleSubmitComment = () => {
+        const trimmedComment = newComment.trim()
 
-        setIsSubmitting(true)
-        try {
-            await addAlbumComments(albumId, newComment.trim())
-            const comment: Comment = {
-                commentId: '0',
-                userName: user!.nickname,
-                userProfile: user?.profileImageURL,
-                content: newComment,
-                createdAt: new Date().toLocaleString('sv-SE').replace(' ', 'T'),
-            }
-            console.log(comment)
-            setComments(prev => (Array.isArray(prev) ? [...prev, comment] : [comment]))
-            setNewComment('')
-            if (inputRef.current) {
-                inputRef.current.focus()
-            }
-        } catch (error) {
-            console.error('댓글 추가 실패:', error)
-        } finally {
-            setIsSubmitting(false)
-        }
+        // 유효성 검사
+        if (!trimmedComment) return
+        if (createCommentMutation.isPending) return
+
+        // mutation 실행
+        createCommentMutation.mutate({
+            albumId,
+            comment: trimmedComment,
+        })
     }
 
     // Enter 키로 댓글 전송
@@ -227,30 +235,41 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
         [handleClose]
     )
 
-    const handleEditComment = async (commentId: string, newContent: string) => {
-        try {
-            const response = await updateAlbumComments(albumId, commentId, newContent)
-            if (response.code !== 'COMMENT_UPDATE_SUCCESS') throw new Error('댓글 수정 실패')
+    // ✅ 개선된 댓글 수정 처리
+    const handleEditComment = (commentId: string, newContent: string) => {
+        const trimmedContent = newContent.trim()
 
-            // 로컬 상태 업데이트
-            setComments(prev =>
-                prev.map(comment => (comment.commentId === commentId ? { ...comment, content: newContent } : comment))
-            )
-        } catch (error) {
-            console.error('댓글 수정 실패:', error)
+        if (!trimmedContent) {
+            alert('댓글 내용을 입력해주세요.')
+            return
         }
+
+        if (updateCommentMutation.isPending) {
+            return
+        }
+
+        updateCommentMutation.mutate({
+            albumId,
+            commentId,
+            comment: trimmedContent,
+        })
     }
 
-    // 댓글 삭제 처리
-    const handleDeleteComment = async (commentId: string) => {
-        try {
-            const response = await deleteAlbumComments(albumId, commentId)
-            if (response.code !== 'COMMENT_DELETE_SUCCESS') throw new Error('댓글 삭제 실패')
-            setComments(prev => prev.filter(comment => comment.commentId !== commentId))
-        } catch (error) {
-            console.error('댓글 삭제 실패:', error)
+    // ✅ 개선된 댓글 삭제 처리
+    const handleDeleteComment = (commentId: string) => {
+        if (deleteCommentMutation.isPending) {
+            return
         }
+
+        deleteCommentMutation.mutate({
+            albumId,
+            commentId,
+        })
     }
+
+    // ✅ 로딩 상태 통합
+    const isAnyMutationPending =
+        createCommentMutation.isPending || updateCommentMutation.isPending || deleteCommentMutation.isPending
 
     if (!isVisible) return null
 
@@ -290,7 +309,11 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                     <h3 className='text-lg font-semibold text-gray-900'>
                         댓글 {comments.length > 0 && `(${comments.length})`}
                     </h3>
-                    <button onClick={handleClose} className='p-1 transition-colors rounded-full hover:bg-gray-100'>
+                    <button
+                        onClick={handleClose}
+                        className='p-1 transition-colors rounded-full hover:bg-gray-100'
+                        disabled={isAnyMutationPending}
+                    >
                         <svg className='w-6 h-6 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path
                                 strokeLinecap='round'
@@ -304,9 +327,14 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
 
                 {/* 댓글 리스트 */}
                 <div className='flex-1 min-h-0 px-4 py-2 overflow-y-auto'>
-                    {isLoading ? (
+                    {isCommentsLoading ? (
                         <div className='flex items-center justify-center py-8'>
                             <div className='w-6 h-6 border-2 border-gray-300 rounded-full animate-spin border-t-blue-500'></div>
+                            <span className='ml-2 text-gray-500'>댓글을 불러오는 중...</span>
+                        </div>
+                    ) : commentsError ? (
+                        <div className='flex items-center justify-center py-8 text-red-500'>
+                            댓글을 불러오는데 실패했습니다.
                         </div>
                     ) : comments.length > 0 ? (
                         <div className='space-y-4'>
@@ -317,7 +345,7 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                                     userName={user?.nickname}
                                     onEdit={handleEditComment}
                                     onDelete={openModal}
-                                ></CommentItem>
+                                />
                             ))}
                         </div>
                     ) : (
@@ -337,25 +365,26 @@ const CommentsContainer = ({ albumId, isOpen, onClose, onHeightChange }: Comment
                             onChange={e => setNewComment(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder='댓글을 입력하세요...'
-                            disabled={isSubmitting}
+                            disabled={createCommentMutation.isPending}
                             className='flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-primary disabled:bg-gray-100'
                         />
                         <button
                             onClick={handleSubmitComment}
-                            disabled={!newComment.trim() || isSubmitting}
+                            disabled={!newComment.trim() || createCommentMutation.isPending}
                             className='font-semibold text-primaryBold disabled:text-primary disabled:cursor-not-allowed'
                         >
-                            {isSubmitting ? '전송중...' : '게시'}
+                            {createCommentMutation.isPending ? '전송중...' : '게시'}
                         </button>
                     </div>
                 </div>
             </div>
 
+            {/* 삭제 확인 모달 */}
             <Modal isOpen={isModalOpen} onClose={closeModal} title={modalData}>
                 {modalData && (
                     <ConfirmModal
                         title='댓글 삭제'
-                        content={`댓글을 삭제하시겠습니까?`}
+                        content='댓글을 삭제하시겠습니까?'
                         handleConfirm={() => handleDeleteComment(modalData)}
                         closeModal={closeModal}
                     />
