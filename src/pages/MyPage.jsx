@@ -305,6 +305,7 @@ const MyPage = () => {
     }
 
     // 프로필 이미지 업로드 핸들러
+    // 프로필 이미지 업로드 핸들러 - 수정된 버전
     const handleProfileImageUpload = async file => {
         if (!file) return
 
