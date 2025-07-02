@@ -16,3 +16,4 @@ export const comfirmInvite = async (inviteToken: string): Promise<APIResponse> =
         throw error
     }
 }
+
