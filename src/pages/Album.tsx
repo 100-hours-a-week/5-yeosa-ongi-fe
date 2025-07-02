@@ -81,9 +81,6 @@ const Album = () => {
         enabled: !!albumId,
     })
 
-    const { data: commentsData } = useAlbumComments(albumId!)
-
-    // ✅ 새로운 mutation hooks 사용
     const deleteAlbumMutation = useDeleteAlbum({
         onSuccess: () => {
             console.log('앨범 삭제 성공')
@@ -91,9 +88,10 @@ const Album = () => {
         },
         onError: error => {
             console.error('앨범 삭제 실패:', error)
-            // 에러 토스트 등 처리
         },
     })
+
+    const { data: commentsData } = useAlbumComments(albumId!)
 
     const { isOpen, modalData, openModal, closeModal } = useModal()
 

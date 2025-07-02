@@ -1,5 +1,5 @@
-import { controllLikes, getLikes } from '@/api/album'
-import React, { useEffect, useState } from 'react'
+import { useAlbumLikes, useToggleLike } from '@/hooks/useAlbum'
+import React from 'react'
 
 interface LikeButtonProps {
     albumId: string
@@ -16,72 +16,59 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     initialCount = 0,
     showCount = true,
     className = '',
+    onLikeChange,
 }) => {
-    const [isLiked, setIsLiked] = useState(initialLiked)
-    const [likeCount, setLikeCount] = useState(initialCount)
-    const [isLoading, setIsLoading] = useState(false)
+    const { data: likesData, isLoading: isLikesLoading, error: likesError } = useAlbumLikes(albumId)
 
-    // API 호출 함수들
-    const toggleLike = async () => {
-        if (isLoading) return
-
-        setIsLoading(true)
-        try {
-            await controllLikes(albumId)
-        } catch (error) {
-            console.error('좋아요 API 오류:', error)
-            throw error
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    // 좋아요 상태 로드
-    const loadLikeStatus = async () => {
-        try {
-            const response = await getLikes(albumId)
-            setIsLiked(response.data.isLike)
-            setLikeCount(response.data.like)
-        } catch (error) {
-            console.error('좋아요 상태 로드 오류:', error)
-        }
-    }
-
-    // 컴포넌트 마운트 시 좋아요 상태 로드
-    useEffect(() => {
-        loadLikeStatus()
-    }, [albumId])
+    const toggleLikeMutation = useToggleLike({
+        onSuccess: data => {
+            console.log('좋아요 토글 성공:', data)
+            // 성공 시 콜백 호출
+            if (onLikeChange && likesData) {
+                onLikeChange(!likesData.isLike, data.like || likesData.like)
+            }
+        },
+        onError: error => {
+            console.error('좋아요 토글 실패:', error)
+            // 에러 토스트 등 처리 가능
+        },
+    })
 
     // 좋아요 클릭 핸들러
     const handleLikeClick = async () => {
-        if (isLoading) return
-
-        // 낙관적 업데이트 (UI 먼저 변경)
-        const newLiked = !isLiked
-        const newCount = newLiked ? likeCount + 1 : likeCount - 1
-
-        setIsLiked(newLiked)
-        setLikeCount(newCount)
-        try {
-            await toggleLike()
-        } catch (error) {
-            setIsLiked(!newLiked)
-            setLikeCount(newLiked ? likeCount - 1 : likeCount + 1)
+        if (isLikesLoading || toggleLikeMutation.isPending) {
+            return // 로딩 중이면 클릭 무시
         }
+
+        toggleLikeMutation.mutate(albumId)
     }
+
+    // 로딩 중이거나 에러일 때 초기값 사용
+    const isLiked = likesData?.isLike ?? initialLiked
+    const likeCount = likesData?.like ?? initialCount
+
+    const isDisabled = isLikesLoading || toggleLikeMutation.isPending || !!likesError
 
     return (
         <button
             onClick={handleLikeClick}
-            disabled={isLoading}
+            disabled={isDisabled}
             className={`flex items-center gap-1 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${className} w-12`}
         >
             {/* 하트 아이콘 */}
             <div className='relative'>
+                {/* 로딩 스피너 오버레이 */}
+                {(isLikesLoading || toggleLikeMutation.isPending) && (
+                    <div className='absolute inset-0 flex items-center justify-center'>
+                        <div className='w-3 h-3 border border-gray-300 rounded-full border-t-primary animate-spin'></div>
+                    </div>
+                )}
+
+                {/* 하트 아이콘 */}
                 <svg
                     className={`w-5 h-5 transition-all duration-300 ${
                         isLiked ? 'text-primaryBold fill-current' : 'text-gray-600 hover:text-primary'
-                    } `}
+                    } ${isLikesLoading || toggleLikeMutation.isPending ? 'opacity-30' : 'opacity-100'}`}
                     fill={isLiked ? 'currentColor' : 'none'}
                     stroke='currentColor'
                     viewBox='0 0 24 24'
@@ -97,8 +84,19 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
             {/* 좋아요 개수 */}
             {showCount && (
-                <span className='text-sm font-medium text-gray-700 transition-colors duration-200'>
-                    {likeCount.toLocaleString()}
+                <span
+                    className={`text-sm font-medium text-gray-700 transition-colors duration-200 ${
+                        isLikesLoading || toggleLikeMutation.isPending ? 'opacity-50' : 'opacity-100'
+                    }`}
+                >
+                    {isLikesLoading ? '--' : likeCount}
+                </span>
+            )}
+
+            {/* 에러 상태 표시 (선택적) */}
+            {likesError && (
+                <span className='ml-1 text-xs text-red-500' title='좋아요 정보를 불러올 수 없습니다'>
+                    !
                 </span>
             )}
         </button>

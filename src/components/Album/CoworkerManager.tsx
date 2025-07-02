@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { getAlbumAccess, getCoworkersList } from '../../api/album.ts'
+import { useAlbumAccess } from '@/hooks/useAlbum.ts'
+import { getCoworkersList } from '../../api/album.ts'
 import Coworker from './Coworker.tsx'
 
 interface CoworkerManagerProps {
@@ -18,15 +19,21 @@ const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [coworkerList, setCoworkerList] = useState<Coworker[]>([])
-    const [userRole, setUserRole] = useState<string>('')
+    const {
+        data: albumAccess,
+        isLoading: isAccessLoading,
+        error: accessError,
+    } = useAlbumAccess(albumId!, {
+        enabled: !!albumId,
+    })
+
+    const userRole = albumAccess.role
     useEffect(() => {
         const fetchCoworkers = async () => {
             try {
                 setLoading(true)
                 setError(null)
                 const result = await getCoworkersList(albumId)
-                const response = await getAlbumAccess(albumId)
-                setUserRole(response.data.role)
                 setCoworkerList(result.data.userInfo)
             } catch (err) {
                 console.error('공동 작업자 목록을 불러오는데 실패했습니다', err)
