@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AlbumUploadService } from '../services/albumUploadService'
 import { FileItem } from '../types/upload'
+// 실제 앨범 관련 API 훅들을 import하세요
+import { useAddPicture, useCreateAlbum, useGetPreSignedUrl } from '@/hooks/useAlbum'
 
 interface useAlbumCreationReturn {
     loading: boolean
@@ -14,6 +16,11 @@ export const useAlbumCreation = (): useAlbumCreationReturn => {
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const navigate = useNavigate()
+
+    // API 훅들 초기화
+    const getPreSignedUrlMutation = useGetPreSignedUrl()
+    const createAlbumMutation = useCreateAlbum()
+    const addAlbumPictureMutation = useAddPicture()
 
     const createAlbumWithFiles = useCallback(
         async (albumTitle: string, files: FileItem[], albumId: string, tags: string[]) => {
@@ -29,7 +36,14 @@ export const useAlbumCreation = (): useAlbumCreationReturn => {
             setError(null)
 
             try {
-                const result = await AlbumUploadService.createAlbum(trimmedTitle, files, albumId, tags)
+                // API 훅들을 AlbumUploadService에 전달
+                const apiHooks = {
+                    getPreSignedUrlMutation,
+                    createAlbumMutation,
+                    addAlbumPictureMutation,
+                }
+
+                const result = await AlbumUploadService.createAlbum(trimmedTitle, files, albumId, tags, apiHooks)
 
                 if (albumId) {
                     navigate(`/album/${albumId}`)
@@ -43,7 +57,7 @@ export const useAlbumCreation = (): useAlbumCreationReturn => {
                 setLoading(false)
             }
         },
-        [loading, navigate]
+        [loading, navigate, getPreSignedUrlMutation, createAlbumMutation, addAlbumPictureMutation]
     )
 
     const clearError = useCallback(() => {
