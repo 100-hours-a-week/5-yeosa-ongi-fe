@@ -1,6 +1,7 @@
-import { fetchAlbumData } from '@/api/album'
 import { AlbumData, useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
-import { ApiResponse } from '@/types'
+
+import { AlbumAPI } from '@/api/AlbumAPI'
+import { APIResponse } from '@/types/api.types'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Month from './Month'
@@ -13,7 +14,7 @@ type AlbumDataResponse = {
     hasNext: boolean | string
 }
 
-type AlbumApiResponse = ApiResponse<AlbumDataResponse>
+type AlbumApiResponse = APIResponse<AlbumDataResponse>
 
 const AlbumList = () => {
     const { clearSelection } = useMainPageStore()
@@ -24,7 +25,7 @@ const AlbumList = () => {
             queryKey: ['albums'],
             queryFn: async ({ pageParam = ' ' }) => {
                 console.log('API 요청:', pageParam)
-                const result = await fetchAlbumData(pageParam as string)
+                const result = await AlbumAPI.getMonthlyAlbums(pageParam as string)
                 return result
             },
             initialPageParam: ' ',
