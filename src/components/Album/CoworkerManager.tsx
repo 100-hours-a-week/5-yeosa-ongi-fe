@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
-import { useAlbumAccess } from '@/hooks/useAlbum.ts'
-import { getCoworkersList } from '../../api/album.ts'
+
+import { useAlbumAccess, useAlbumMembers, useRemoveMember } from '@/hooks/useAlbum.ts'
+
 import Coworker from './Coworker.tsx'
 
 interface CoworkerManagerProps {
@@ -15,10 +16,11 @@ interface Coworker {
     role: string
     isOwner: string
 }
+
 const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
-    const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null)
-    const [coworkerList, setCoworkerList] = useState<Coworker[]>([])
+
+    // 앨범 접근 권한 조회
+
     const {
         data: albumAccess,
         isLoading: isAccessLoading,
@@ -27,64 +29,103 @@ const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
         enabled: !!albumId,
     })
 
-    const userRole = albumAccess.role
-    useEffect(() => {
-        const fetchCoworkers = async () => {
-            try {
-                setLoading(true)
-                setError(null)
-                const result = await getCoworkersList(albumId)
-                setCoworkerList(result.data.userInfo)
-            } catch (err) {
-                console.error('공동 작업자 목록을 불러오는데 실패했습니다', err)
-                setError('공동 작업자 목록을 불러오는데 실패했습니다.')
-            } finally {
-                setLoading(false)
-            }
-        }
 
-        fetchCoworkers()
-    }, [])
+    // 앨범 멤버 목록 조회
+    const {
+        data: membersData,
+        isLoading: isMembersLoading,
+        error: membersError,
+    } = useAlbumMembers(albumId!, {
+        enabled: !!albumId,
+    })
+
+    // 멤버 삭제 mutation
+    const deleteAlbumMemberMutation = useRemoveMember()
+
+    // 로딩 상태 통합
+    const isLoading = isAccessLoading || isMembersLoading
+
+
+    // 에러 상태 확인
+    const hasError = accessError || membersError
+
+    // 안전하게 데이터 추출
+    const userRole = albumAccess?.role
+    const members = membersData?.userInfo || []
 
     const handleRemove = useCallback(
         (userId: string) => {
-            const deleteCoworker = async () => {
-                try {
-                    const result = await deleteCoworker()
-                    console.log('삭제 성공!', result)
-                    setCoworkerList(prev => prev.filter(coworker => coworker.userId !== userId))
-                } catch (error) {
-                    console.error('삭제 실패:', error)
-                    // 사용자에게 에러 알림 표시
-                }
+            if (!albumId || !userId) {
+                console.error('albumId 또는 userId가 없습니다')
+                return
             }
-            deleteCoworker()
+
+            deleteAlbumMemberMutation.mutate(
+                { albumId, userId },
+                {
+                    onSuccess: result => {
+                        console.log('멤버 삭제 성공!', result)
+                        // React Query가 자동으로 캐시를 업데이트하므로
+                        // 수동으로 상태를 업데이트할 필요 없음
+                    },
+                    onError: error => {
+                        console.error('멤버 삭제 실패:', error)
+                        // 에러 알림 표시 로직 추가 가능
+                        alert('멤버 삭제에 실패했습니다. 다시 시도해주세요.')
+                    },
+                }
+            )
         },
-        [albumId, coworkerList]
+        [albumId, deleteAlbumMemberMutation]
     )
 
-    return (
-        <>
+    // 로딩 상태
+    if (isLoading) {
+        return (
             <div className='relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg shadow-lg'>
                 <div className='p-5 border-b'>
                     <h3 className='text-lg font-medium text-gray-800'>공동 작업자</h3>
                 </div>
-                <div>
-                    {coworkerList.map((element, index) => {
-                        return (
-                            <Coworker
-                                userId={element.userId}
-                                nickname={element.nickname}
-                                profileImageURL={element.profileImageURL}
-                                role={element.role}
-                                isOwner={userRole}
-                                handleRemove={handleRemove}
-                            />
-                        )
-                    })}
-                </div>
+                <div className='p-5 text-center text-gray-500'>로딩 중...</div>
             </div>
-        </>
+        )
+    }
+
+    // 에러 상태
+    if (hasError) {
+        return (
+            <div className='relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg shadow-lg'>
+                <div className='p-5 border-b'>
+                    <h3 className='text-lg font-medium text-gray-800'>공동 작업자</h3>
+                </div>
+                <div className='p-5 text-center text-red-500'>공동 작업자 목록을 불러오는데 실패했습니다.</div>
+            </div>
+        )
+    }
+
+    return (
+        <div className='relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg shadow-lg'>
+            <div className='p-5 border-b'>
+                <h3 className='text-lg font-medium text-gray-800'>공동 작업자</h3>
+            </div>
+            <div>
+                {members.length === 0 ? (
+                    <div className='p-5 text-center text-gray-500'>공동 작업자가 없습니다.</div>
+                ) : (
+                    members.map((element: Coworker) => (
+                        <Coworker
+                            key={element.userId} // key prop 추가
+                            userId={element.userId}
+                            nickname={element.nickname}
+                            profileImageURL={element.profileImageURL}
+                            role={element.role}
+                            isOwner={userRole}
+                            handleRemove={handleRemove}
+                        />
+                    ))
+                )}
+            </div>
+        </div>
     )
 }
 

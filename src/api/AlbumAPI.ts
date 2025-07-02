@@ -109,7 +109,7 @@ export class AlbumAPI {
     /**
      * 공동 작업자 삭제
      */
-    static removeMember(albumId: number, userId: number) {
+    static removeMember(albumId: string, userId: string) {
         return APIBuilder.delete(`/api/album/${albumId}/members/${userId}`).requiresAuth().build().call<void>()
     }
 

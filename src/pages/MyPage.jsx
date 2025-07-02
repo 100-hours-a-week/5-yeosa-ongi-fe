@@ -5,8 +5,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
-import { getPreSignedUrl } from '../api/album'
-
+import { useGetPreSignedUrl } from '@/hooks/useAlbum'
 import { useLogout } from '@/hooks/useAuth'
 import { useUpdateUserInfo } from '@/hooks/useUser'
 import axios from 'axios'
@@ -47,8 +46,10 @@ const MyPage = () => {
     const [inputValue, setInputValue] = useState(userInfo.nickname)
     const [isValid, setIsValid] = useState(false)
 
+    const getPreSignedUrl = useGetPreSignedUrl()
     const updateUserInfo = useUpdateUserInfo()
     const { isOpen, modalData, openModal, closeModal } = useModal()
+
     useEffect(() => {
         setIsLoading(true)
         try {
@@ -140,15 +141,25 @@ const MyPage = () => {
             alert('닉네임을 입력해주세요.')
             return
         }
-        console.log(isValid)
-        if (!isValid) return
+
+        if (!isValid) {
+            alert('유효하지 않은 닉네임입니다.')
+            return
+        }
+
         try {
             const userInfoBody = {
-                nickname: nickname,
+                nickname: nickname.trim(),
                 profileImageURL: userInfo.profileImageURL,
             }
 
-            const response = updateUserInfo.mutate({ userId: userInfo.userId, userInfo: userInfoBody })
+            // mutateAsync 사용하여 응답 받기
+            const response = await updateUserInfo.mutateAsync({
+                userId: userInfo.userId,
+                userInfo: userInfoBody,
+            })
+
+            console.log('닉네임 업데이트 응답:', response)
 
             // 상태 업데이트
             const updatedUserInfo = {
@@ -167,7 +178,7 @@ const MyPage = () => {
             updateSessionStorage(updatedUserInfo)
 
             setIsEditing(false)
-            console.log('닉네임이 성공적으로 업데이트되었습니다:', nickname)
+            console.log('닉네임이 성공적으로 업데이트되었습니다:', nickname.trim())
         } catch (error) {
             console.error('닉네임 업데이트 오류:', error)
             alert('닉네임 업데이트에 실패했습니다. 다시 시도해주세요.')
@@ -294,6 +305,7 @@ const MyPage = () => {
     }
 
     // 프로필 이미지 업로드 핸들러
+    // 프로필 이미지 업로드 핸들러 - 수정된 버전
     const handleProfileImageUpload = async file => {
         if (!file) return
 
@@ -302,8 +314,8 @@ const MyPage = () => {
             // 파일명 정리
             const cleanFileName = sanitizeFileName(file.name)
 
-            // Pre-Signed URL 가져오기
-            const response = await getPreSignedUrl({
+            // Pre-Signed URL 가져오기 - mutateAsync 사용
+            const response = await getPreSignedUrl.mutateAsync({
                 pictures: [
                     {
                         pictureName: cleanFileName,
@@ -312,19 +324,11 @@ const MyPage = () => {
                 ],
             })
 
-            if (!response.data || !response.data.presignedFiles || response.data.presignedFiles.length === 0) {
-                throw new Error('Pre-Signed URL을 가져오는데 실패했습니다.')
-            }
+            console.log('Pre-signed URL 응답:', response)
 
-            // Pre-Signed URL
-
-            const presignedUrl = response.data.presignedFiles[0].presignedUrl
-
-            // 실제 저장될 영구 URL (S3에 저장된 후의 URL)
-            // 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
-            // 가정: 응답에 원본 URL이 포함되어 있거나, 패턴을 알고 있는 경우
-
-            const permanentImageUrl = response.data.presignedFiles[0].pictureURL || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
+            // 응답에서 필요한 데이터 추출
+            const presignedUrl = response.presignedFiles[0].presignedUrl
+            const permanentImageUrl = response.presignedFiles[0].pictureURL || presignedUrl.split('?')[0]
 
             // 파일 업로드 (S3에 직접 업로드)
             const uploadResponse = await axios.put(presignedUrl, file, {
@@ -337,16 +341,23 @@ const MyPage = () => {
                 throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
-            // API 호출하여 사용자 정보 업데이트
-            const result = await updateUserInfo(userInfo.userId, {
-                nickname: userInfo.nickname,
-                profileImageURL: permanentImageUrl,
+            console.log('S3 업로드 완료')
+
+            // API 호출하여 사용자 정보 업데이트 - mutateAsync 사용
+            const updateResult = await updateUserInfo.mutateAsync({
+                userId: userInfo.userId,
+                userInfo: {
+                    nickname: userInfo.nickname,
+                    profileImageURL: permanentImageUrl,
+                },
             })
+
+            console.log('사용자 정보 업데이트 결과:', updateResult)
 
             // 사용자 정보 업데이트 (영구 URL 사용)
             const updatedUserInfo = {
                 ...userInfo,
-                profileImageURL: result.data.profileImageURL,
+                profileImageURL: updateResult.data.profileImageURL || permanentImageUrl,
             }
 
             // 상태 업데이트

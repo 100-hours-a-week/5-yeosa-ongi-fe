@@ -99,7 +99,10 @@ export const useAlbumAccess = (
 /**
  * 공동 작업자 목록 조회
  */
-export const useAlbumMembers = (albumId: string, options?: UseQueryOptions<any, APIError>) => {
+export const useAlbumMembers = (
+    albumId: string,
+    options?: Omit<UseQueryOptions<any, APIError>, 'queryKey' | 'queryFn'>
+) => {
     return useQuery({
         queryKey: albumKeys.members(albumId),
         queryFn: async () => {
@@ -367,7 +370,7 @@ export const useRemoveMember = (options?: { onSuccess?: () => void; onError?: (e
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: async ({ albumId, userId }: { albumId: number; userId: number }) => {
+        mutationFn: async ({ albumId, userId }: { albumId: string; userId: string }) => {
             await AlbumAPI.removeMember(albumId, userId)
         },
         onSuccess: (_, variables) => {
