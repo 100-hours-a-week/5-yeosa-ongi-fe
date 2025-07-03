@@ -1,12 +1,14 @@
 import { useAlbumSummary } from '@/hooks/useAlbum'
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
+import { generateOptimizedUrl } from '@/utils/imageOptimizer'
 import { useNavigate } from 'react-router-dom'
 import OptimizedImage from '../common/OptimizedImage'
 
 interface AlbumThumbnailProps {
     id: string
+    props: { height: number; width: number }
 }
-const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
+const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
     const navigate = useNavigate()
     const { albums } = useAlbumStore()
     const album = albums[id.toString()]
@@ -14,6 +16,12 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
     const { data: albumSummary } = useAlbumSummary(id)
     const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
     const isSelected = selectedId === id
+
+    const optimizedSrc = generateOptimizedUrl(
+        album?.thumbnailURL || '/default-thumbnail.jpg',
+        props?.width || 200,
+        props?.height || 200
+    )
 
     const handleSelect = async () => {
         if (isSelected) {
@@ -44,6 +52,8 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
                 webpSrc={generateWebpSrc(album?.thumbnailURL)}
                 alt='Album thumbnail'
                 className='absolute inset-0 object-cover w-full h-full'
+                width={props?.width}
+                height={props?.height}
                 lazy={true}
                 placeholder={true}
                 onLoad={() => console.log('이미지 로드됨')}
