@@ -1,4 +1,14 @@
-import heic2any from 'heic2any'
+// 동적 import로 heic2any 라이브러리 로드
+let heic2anyModule = null
+
+const loadHeic2Any = async () => {
+    if (!heic2anyModule) {
+        console.log('heic2any 라이브러리 로딩 중...')
+        heic2anyModule = await import('heic2any')
+    }
+    return heic2anyModule.default
+}
+
 
 export const isHEICFile = file => {
     return (
@@ -22,6 +32,9 @@ export const convertHEICtoJPG = async (heicFile, options = {}) => {
 
     try {
         console.log('HEIC 파일 변환 시작:', heicFile.name)
+
+        // 동적으로 heic2any 라이브러리 로드
+        const heic2any = await loadHeic2Any()
 
         // HEIC 파일을 지정된 형식의 Blob으로 변환
         const convertedBlob = await heic2any({
