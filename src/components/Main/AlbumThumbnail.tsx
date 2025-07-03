@@ -2,7 +2,6 @@ import { useAlbumSummary } from '@/hooks/useAlbum'
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { generateOptimizedUrl } from '@/utils/imageOptimizer'
 import { useNavigate } from 'react-router-dom'
-import OptimizedImage from '../common/OptimizedImage'
 
 interface AlbumThumbnailProps {
     id: string
@@ -32,13 +31,24 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
         }
     }
 
-    const generateWebpSrc = (originalUrl: string | undefined): string | undefined => {
+    const generateAdvancedImageSrc = (originalUrl: string | undefined) => {
         if (!originalUrl || originalUrl === '/default-thumbnail.jpg') {
-            return undefined // 기본 이미지는 WebP 변환하지 않음
+            return {
+                avif: undefined,
+                webp: undefined,
+                fallback: originalUrl,
+            }
         }
-        // URL의 확장자를 .webp로 변경
-        return originalUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+
+        const baseUrl = originalUrl.replace(/\.(jpg|jpeg|png|webp)$/i, '')
+        return {
+            avif: `${baseUrl}.avif`,
+            webp: originalUrl.endsWith('.webp') ? originalUrl : `${baseUrl}.webp`,
+            fallback: originalUrl,
+        }
     }
+
+    const { avif, webp, fallback } = generateAdvancedImageSrc(album?.thumbnailURL)
 
     return (
         <div data-album-thumbnail='true' className='relative w-full h-full border-solid' onClick={handleSelect}>
@@ -47,17 +57,19 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
                 src={album?.thumbnailURL || '/default-thumbnail.jpg'}
                 alt='Album thumbnail'
             /> */}
-            <OptimizedImage
-                src={album?.thumbnailURL || '/default-thumbnail.jpg'}
-                webpSrc={generateWebpSrc(album?.thumbnailURL)}
-                alt='Album thumbnail'
-                className='absolute inset-0 object-cover w-full h-full'
-                width={props?.width}
-                height={props?.height}
-                lazy={true}
-                placeholder={true}
-                onLoad={() => console.log('이미지 로드됨')}
-            />
+            <picture className='absolute inset-0'>
+                {webp && <source srcSet={webp} type='image/webp' />}
+                <img
+                    className='object-cover w-full h-full'
+                    src={fallback || '/default-thumbnail.jpg'}
+                    alt='Album thumbnail'
+                    width={props?.width}
+                    height={props?.height}
+                    loading='lazy'
+                    decoding='async'
+                    onLoad={() => console.log('이미지 로드됨')}
+                />
+            </picture>
 
             {isSelected && (
                 <div className='absolute inset-0 z-10 flex items-center justify-center bg-black opacity-55'>
