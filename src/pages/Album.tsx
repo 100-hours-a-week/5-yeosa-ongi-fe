@@ -24,12 +24,12 @@ import useModal from '../hooks/useModal'
 import useCollectionStore from '../stores/collectionStore'
 
 //Assets
-import Arrow_Right from '../assets/icons/Arrow Right.png'
 import iconDuplicated from '../assets/icons/icon_duplicated.png'
 import iconShaky from '../assets/icons/icon_shaky.png'
 import images_icon from '../assets/icons/images_icon.png'
 
 //Types
+import Icon from '@/components/common/Icon'
 import { RawPicture } from '../types'
 
 interface ClusterInterface {
@@ -275,7 +275,7 @@ const Album = () => {
                             </div>
                             <div className='text-sm text-gray-dark'>중복된 사진</div>
                         </div>
-                        <img className='m-2 size-2' src={Arrow_Right} />
+                        <Icon name='arrow' className='text-gray-300' />
                     </button>
                 </div>
 
@@ -290,7 +290,7 @@ const Album = () => {
                             </div>
                             <div className='text-sm text-gray-dark'>흔들린 사진</div>
                         </div>
-                        <img className='m-2 size-2' src={Arrow_Right} />
+                        <Icon name='arrow' className='text-gray-300' />
                     </button>
                 </div>
             </div>

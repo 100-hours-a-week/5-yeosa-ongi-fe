@@ -1,8 +1,9 @@
 // components/FilePreview/PureFilePreview.tsx (새 파일)
-import crossIcon from '@/assets/cross_icon.png'
+
 import { memo } from 'react'
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import Icon from '../common/Icon'
 
 interface FilePreviewProps {
     previewUrl: string
@@ -52,7 +53,7 @@ const FilePreview = memo(
 
                 {/* 삭제 버튼 */}
                 <button className='absolute z-20 top-2 right-2' onClick={onDelete} disabled={isConverting}>
-                    <img className='w-4 h-4' src={crossIcon} alt='삭제' />
+                    <Icon name='close' />
                 </button>
 
                 {/* 에러 오버레이 */}

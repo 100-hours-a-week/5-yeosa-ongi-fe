@@ -1,6 +1,6 @@
-import iconCheck from '@/assets/icons/icon_check.png'
 import iconCopy from '@/assets/icons/icon_copy.png'
 import { useState } from 'react'
+import Icon from '../common/Icon'
 
 const AlbumShare = ({ sharingLink = 'https://example.com/share/album123456' }) => {
     const [copied, setCopied] = useState(false)
@@ -40,7 +40,7 @@ const AlbumShare = ({ sharingLink = 'https://example.com/share/album123456' }) =
                             aria-label='링크 복사하기'
                         >
                             {copied ? (
-                                <img className='w-4 h-4' src={iconCheck} alt='복사됨' />
+                                <Icon name='check' className='text-gray-100' />
                             ) : (
                                 <img className='w-4 h-4' src={iconCopy} alt='복사하기' />
                             )}

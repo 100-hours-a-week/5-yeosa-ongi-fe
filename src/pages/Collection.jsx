@@ -18,9 +18,9 @@ import useModal from '../hooks/useModal'
 // Assets
 import CollectionHeader from '@/components/Collection/CollectionHeader'
 import ImageModal from '@/components/Collection/ImageModal'
+import Icon from '@/components/common/Icon'
 import MovingDotsLoader from '@/components/common/MovingDotsLoader'
 import { useDeleteAlbumPictures, useRecoverAlbumPictures } from '@/hooks/useAlbum'
-import arrowLeft from '../assets/icons/Arrow_Left.png'
 
 const Collection = () => {
     const { albumId, collectionName } = useParams()
@@ -235,7 +235,7 @@ const Collection = () => {
         <>
             <div className='h-[52px] relative flex items-center justify-center'>
                 <button onClick={() => navigate(-1)} className='absolute h-1/2 left-4 top-1/4'>
-                    <img src={arrowLeft} className='h-1/2 left-4 top-1/4' alt='뒤로가기' />
+                    <Icon name='arrow' className='' direction='left' />
                 </button>
                 <div className='text-center'>{currentCollection?.alt || currentCollection?.name || '컬렉션'}</div>
             </div>
