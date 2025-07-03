@@ -1,10 +1,10 @@
 import defaultProfileImage from '@/assets/default_user_imgae.png'
-import iconCheck from '@/assets/icons/icon_check.png'
 import icon_pencil from '@/assets/icons/icon_pencil.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
+import Icon from '@/components/common/Icon'
 import { useGetPreSignedUrl } from '@/hooks/useAlbum'
 import { useLogout } from '@/hooks/useAuth'
 import { useUpdateUserInfo } from '@/hooks/useUser'
@@ -304,36 +304,168 @@ const MyPage = () => {
         }
     }
 
-    // 프로필 이미지 업로드 핸들러
-    // 프로필 이미지 업로드 핸들러 - 수정된 버전
+    // WebP 변환 함수
+    const convertImageToWebP = (file, quality = 0.8) => {
+        return new Promise((resolve, reject) => {
+            // 이미 WebP인 경우 그대로 반환
+            if (file.type === 'image/webp') {
+                resolve(file)
+                return
+            }
+
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            const img = new Image()
+
+            img.onload = () => {
+                // 캔버스 크기 설정 (원본 크기 유지 또는 리사이징)
+                canvas.width = img.width
+                canvas.height = img.height
+
+                // 고품질 렌더링 설정
+                if (ctx) {
+                    ctx.imageSmoothingEnabled = true
+                    ctx.imageSmoothingQuality = 'high'
+
+                    // 이미지 그리기
+                    ctx.drawImage(img, 0, 0)
+
+                    // WebP로 변환
+                    canvas.toBlob(
+                        blob => {
+                            if (blob) {
+                                // 원본 파일명에서 확장자를 .webp로 변경
+                                const webpFileName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+
+                                const webpFile = new File([blob], webpFileName, {
+                                    type: 'image/webp',
+                                    lastModified: Date.now(),
+                                })
+
+                                resolve(webpFile)
+                            } else {
+                                reject(new Error('WebP 변환 실패'))
+                            }
+                        },
+                        'image/webp',
+                        quality
+                    )
+                } else {
+                    reject(new Error('Canvas 컨텍스트 생성 실패'))
+                }
+            }
+
+            img.onerror = () => {
+                reject(new Error('이미지 로드 실패'))
+            }
+
+            // 파일을 이미지로 로드
+            img.src = URL.createObjectURL(file)
+        })
+    }
+
+    // 프로필 이미지 리사이징 함수 (선택사항)
+    const resizeProfileImage = (file, maxWidth = 400, maxHeight = 400, quality = 0.8) => {
+        return new Promise((resolve, reject) => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            const img = new Image()
+
+            img.onload = () => {
+                // 비율 유지하면서 리사이징
+                const ratio = Math.min(maxWidth / img.width, maxHeight / img.height)
+                const newWidth = Math.round(img.width * ratio)
+                const newHeight = Math.round(img.height * ratio)
+
+                canvas.width = newWidth
+                canvas.height = newHeight
+
+                if (ctx) {
+                    ctx.imageSmoothingEnabled = true
+                    ctx.imageSmoothingQuality = 'high'
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight)
+
+                    canvas.toBlob(
+                        blob => {
+                            if (blob) {
+                                const resizedFileName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+                                const resizedFile = new File([blob], resizedFileName, {
+                                    type: 'image/webp',
+                                    lastModified: Date.now(),
+                                })
+                                resolve(resizedFile)
+                            } else {
+                                reject(new Error('이미지 리사이징 실패'))
+                            }
+                        },
+                        'image/webp',
+                        quality
+                    )
+                } else {
+                    reject(new Error('Canvas 컨텍스트 생성 실패'))
+                }
+            }
+
+            img.onerror = () => {
+                reject(new Error('이미지 로드 실패'))
+            }
+
+            img.src = URL.createObjectURL(file)
+        })
+    }
+
+    // 수정된 프로필 이미지 업로드 핸들러
     const handleProfileImageUpload = async file => {
         if (!file) return
 
         setIsUploading(true)
         try {
-            // 파일명 정리
-            const cleanFileName = sanitizeFileName(file.name)
+            console.log('원본 파일:', file.name, file.type, `${(file.size / 1024).toFixed(1)}KB`)
 
-            // Pre-Signed URL 가져오기 - mutateAsync 사용
+            // 1단계: WebP 변환 (+ 선택적 리사이징)
+            let processedFile
+
+            try {
+                // 프로필 이미지는 보통 크기 제한이 있으므로 리사이징 + WebP 변환
+                processedFile = await resizeProfileImage(file, 400, 400, 0.85)
+                console.log(
+                    '변환된 파일:',
+                    processedFile.name,
+                    processedFile.type,
+                    `${(processedFile.size / 1024).toFixed(1)}KB`
+                )
+
+                // 파일 크기 절약 효과 출력
+                const savings = (((file.size - processedFile.size) / file.size) * 100).toFixed(1)
+                console.log(`파일 크기 절약: ${savings}%`)
+            } catch (conversionError) {
+                console.warn('WebP 변환 실패, 원본 파일 사용:', conversionError)
+                processedFile = file
+            }
+
+            // 2단계: 파일명 정리 (WebP 확장자 반영)
+            const cleanFileName = sanitizeFileName(processedFile.name)
+
+            // 3단계: Pre-Signed URL 가져오기
             const response = await getPreSignedUrl.mutateAsync({
                 pictures: [
                     {
                         pictureName: cleanFileName,
-                        pictureType: file.type,
+                        pictureType: processedFile.type, // 변환된 파일 타입 사용
                     },
                 ],
             })
 
             console.log('Pre-signed URL 응답:', response)
 
-            // 응답에서 필요한 데이터 추출
+            // 4단계: 응답에서 필요한 데이터 추출
             const presignedUrl = response.presignedFiles[0].presignedUrl
             const permanentImageUrl = response.presignedFiles[0].pictureURL || presignedUrl.split('?')[0]
 
-            // 파일 업로드 (S3에 직접 업로드)
-            const uploadResponse = await axios.put(presignedUrl, file, {
+            // 5단계: 변환된 파일을 S3에 업로드
+            const uploadResponse = await axios.put(presignedUrl, processedFile, {
                 headers: {
-                    'Content-Type': file.type,
+                    'Content-Type': processedFile.type, // WebP 타입 사용
                 },
             })
 
@@ -341,9 +473,9 @@ const MyPage = () => {
                 throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
-            console.log('S3 업로드 완료')
+            console.log('S3 업로드 완료 (WebP 형식)')
 
-            // API 호출하여 사용자 정보 업데이트 - mutateAsync 사용
+            // 6단계: API 호출하여 사용자 정보 업데이트
             const updateResult = await updateUserInfo.mutateAsync({
                 userId: userInfo.userId,
                 userInfo: {
@@ -354,34 +486,34 @@ const MyPage = () => {
 
             console.log('사용자 정보 업데이트 결과:', updateResult)
 
-            // 사용자 정보 업데이트 (영구 URL 사용)
+            // 7단계: 상태 업데이트
             const updatedUserInfo = {
                 ...userInfo,
                 profileImageURL: updateResult.profileImageURL || permanentImageUrl,
             }
 
-            // 상태 업데이트
             setUserInfo(updatedUserInfo)
 
-            // 상태 관리 라이브러리 업데이트
             if (setUser) {
                 setUser(updatedUserInfo)
             }
 
-            // 세션 스토리지 업데이트
             updateSessionStorage(updatedUserInfo)
 
-            console.log('프로필 이미지가 성공적으로 업데이트되었습니다.')
+            console.log('프로필 이미지가 WebP 형식으로 성공적으로 업데이트되었습니다.')
+
+            // 성공 메시지 (선택사항)
+            // alert('프로필 이미지가 업데이트되었습니다!')
         } catch (error) {
             console.error('프로필 이미지 업로드 오류:', error)
             alert('프로필 이미지 업로드에 실패했습니다. 다시 시도해주세요.')
+
             // 업로드 실패시 미리보기 초기화
             setPreviewImageURL(userInfo.profileImageURL)
         } finally {
             setIsUploading(false)
         }
     }
-
     return (
         <>
             <Header showButtons={false} />
@@ -442,7 +574,7 @@ const MyPage = () => {
                                         onClick={handleSave}
                                         className='absolute p-1 px-2 py-1 ml-2 text-sm text-white transform -translate-y-1/2 rounded -right-8 top-1/2'
                                     >
-                                        <img className='w-3 h-3' src={iconCheck} alt='편집' />
+                                        <Icon name='check' className='text-black' />
                                     </button>
                                 </div>
                             ) : (
