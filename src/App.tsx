@@ -48,92 +48,90 @@ function AppRoutes() {
             <div className='fixed inset-0 -z-10'>
                 <Background />
             </div>
-            <div className='bg-white-blue'>
-                <QueryClientProvider client={queryClient}>
-                    <Routes>
-                        <Route path='/login' element={<Login />} />
-                        <Route path='/auth/callback/kakao' element={<KakaoCallback />} />
-                        <Route
-                            path='/'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <Main />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path='/album-editor/:albumId'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <AlbumEditor />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path='/album-editor/new'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <AlbumEditor />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path='/album/:albumId'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <Album />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path='/album/:albumId/:collectionName'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <Collection />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path='/mypage'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <MyPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path='/my-activities'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <MyActivities />
-                                </ProtectedRoute>
-                            }
-                        />
+            <QueryClientProvider client={queryClient}>
+                <Routes>
+                    <Route path='/login' element={<Login />} />
+                    <Route path='/auth/callback/kakao' element={<KakaoCallback />} />
+                    <Route
+                        path='/'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Main />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/album-editor/:albumId'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AlbumEditor />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/album-editor/new'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AlbumEditor />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/album/:albumId'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Album />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/album/:albumId/:collectionName'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Collection />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/mypage'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <MyPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/my-activities'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <MyActivities />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                        <Route
-                            path='/community'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <Community />
-                                </ProtectedRoute>
-                            }
-                        />
+                    <Route
+                        path='/community'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Community />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                        <Route
-                            path='/notification'
-                            element={
-                                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                                    <Notification />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route path='/invite' element={<Invite />} />
-                        {/* <Route path='/test' element={<TestComponent />} /> */}
-                        {/* 404 페이지 처리 */}
-                        <Route path='*' element={<Navigate to='/' replace />} />
-                    </Routes>
-                </QueryClientProvider>
-            </div>
+                    <Route
+                        path='/notification'
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Notification />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path='/invite' element={<Invite />} />
+                    {/* <Route path='/test' element={<TestComponent />} /> */}
+                    {/* 404 페이지 처리 */}
+                    <Route path='*' element={<Navigate to='/' replace />} />
+                </Routes>
+            </QueryClientProvider>
         </ToastProvider>
     )
 }

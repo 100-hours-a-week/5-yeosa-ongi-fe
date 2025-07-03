@@ -22,7 +22,7 @@ body {
     width: 100%;
     position: relative;
     min-height: 100vh;
-    background-color: #f8fafc; /* 바깥쪽 배경색 */
+    background-color: #fafafa;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 선택적: 그림자 효과 */
 
     /* 드래그 방지 */
