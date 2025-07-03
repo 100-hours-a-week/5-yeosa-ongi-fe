@@ -65,7 +65,7 @@ const Card = () => {
                 {/* 메인 이미지 */}
                 <img
                     className={`object-cover w-full h-full rounded-3xl transition-opacity duration-300 ${
-                        isAnimating ? 'opacity-75' : 'opacity-100'
+                        isAnimating ? 'opacity-90' : 'opacity-100'
                     }`}
                     src={pictures[currentImageIndex]?.pictureURL}
                     alt={`사진 ${currentImageIndex + 1}`}
