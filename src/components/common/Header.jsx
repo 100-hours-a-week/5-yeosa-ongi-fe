@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useAuthStore from '../../stores/authStore'
 import defaultProfileImage from '/src/assets/default_user_imgae.png'
-import ongiLogoFlat from '/src/assets/ongi_logo_flat.png'
+import ongiLogoFlat from '/src/assets/ongi_logo_flat.webp'
 
 const Header = ({ showButtons = true }) => {
     const navigate = useNavigate()
