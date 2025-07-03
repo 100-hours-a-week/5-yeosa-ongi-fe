@@ -43,7 +43,7 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
         const baseUrl = originalUrl.replace(/\.(jpg|jpeg|png|webp)$/i, '')
         return {
             avif: `${baseUrl}.avif`,
-            webp: originalUrl.endsWith('.webp') ? originalUrl : `${baseUrl}.webp`,
+            webp: originalUrl.endsWith('.webp') ? '' : `${baseUrl}.webp`,
             fallback: originalUrl,
         }
     }
