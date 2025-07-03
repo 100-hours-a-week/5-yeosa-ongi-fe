@@ -1,19 +1,5 @@
 import { usePictureStatistics } from '@/hooks/useUser'
-import {
-    CategoryScale,
-    Chart as ChartJS,
-    Legend,
-    LinearScale,
-    LineElement,
-    PointElement,
-    Title,
-    Tooltip,
-} from 'chart.js'
-import { useMemo, useState } from 'react'
-import { Line } from 'react-chartjs-2'
-
-// Chart.js 등록
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+import { useEffect, useMemo, useState } from 'react'
 
 // 숫자 포맷팅 함수
 const formatNumber = num => {
@@ -36,9 +22,39 @@ const formatDate = dateString => {
     }
 }
 
+// Chart.js 동적 로딩 함수
+const loadChartLibrary = async () => {
+    console.log('Chart.js 라이브러리 동적 로딩 중...')
+
+    // Chart.js와 react-chartjs-2를 동적으로 로드
+    const [chartModule, reactChartModule] = await Promise.all([import('chart.js'), import('react-chartjs-2')])
+
+    const {
+        Chart: ChartJS,
+        CategoryScale,
+        LinearScale,
+        PointElement,
+        LineElement,
+        Title,
+        Tooltip,
+        Legend,
+    } = chartModule
+
+    // Chart.js 등록 - 동적 로딩 시에만 실행
+    ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+
+    return {
+        ChartJS,
+        Line: reactChartModule.Line,
+    }
+}
+
 const IncomeChart = () => {
     const [selectedOption, setSelectedOption] = useState(0)
     const [showDropdown, setShowDropdown] = useState(false)
+    const [chartLibrary, setChartLibrary] = useState(null)
+    const [chartLoading, setChartLoading] = useState(true)
+    const [chartError, setChartError] = useState(null)
 
     const options = [
         { label: 'Last 30 Days', value: '30days' },
@@ -48,8 +64,27 @@ const IncomeChart = () => {
     // 현재 년월 생성 (예: "2025-01")
     const currentYearMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
 
-    // ✅ React Query 훅을 컴포넌트 최상위에서 호출
+    // React Query 훅을 컴포넌트 최상위에서 호출
     const { data: pictureStatsData, isLoading, error } = usePictureStatistics(currentYearMonth)
+
+    // Chart.js 동적 로딩
+    useEffect(() => {
+        const initChart = async () => {
+            try {
+                setChartLoading(true)
+                const library = await loadChartLibrary()
+                setChartLibrary(library)
+                console.log('Chart.js 라이브러리 로딩 완료')
+            } catch (error) {
+                console.error('Chart.js 로딩 실패:', error)
+                setChartError(error)
+            } finally {
+                setChartLoading(false)
+            }
+        }
+
+        initChart()
+    }, [])
 
     // 차트 데이터 가공
     const chartData = useMemo(() => {
@@ -69,24 +104,30 @@ const IncomeChart = () => {
         }
     }, [pictureStatsData])
 
-    // 로딩 상태
-    if (isLoading) {
+    // 로딩 상태 (데이터 로딩 또는 차트 라이브러리 로딩)
+    if (isLoading || chartLoading) {
         return (
             <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
                 <div className='animate-pulse'>
                     <div className='w-3/4 h-6 mb-5 bg-gray-300 rounded'></div>
-                    <div className='bg-gray-300 rounded h-80'></div>
+                    <div className='bg-gray-300 rounded h-80'>
+                        <div className='flex items-center justify-center h-full'>
+                            <div className='text-gray-500'>
+                                {isLoading ? '데이터 로딩 중...' : '차트 라이브러리 로딩 중...'}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
     }
 
-    // 에러 상태
-    if (error) {
+    // 에러 상태 (데이터 에러 또는 차트 라이브러리 에러)
+    if (error || chartError) {
         return (
             <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
                 <div className='py-10 text-center text-red-500'>
-                    데이터를 불러오는데 실패했습니다.
+                    {error ? '데이터를 불러오는데 실패했습니다.' : '차트 라이브러리 로딩에 실패했습니다.'}
                     <br />
                     <button
                         onClick={() => window.location.reload()}
@@ -95,6 +136,15 @@ const IncomeChart = () => {
                         다시 시도
                     </button>
                 </div>
+            </div>
+        )
+    }
+
+    // 차트 라이브러리가 아직 로드되지 않은 경우
+    if (!chartLibrary) {
+        return (
+            <div className='p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
+                <div className='py-10 text-center text-gray-500'>차트를 준비 중입니다...</div>
             </div>
         )
     }
@@ -162,6 +212,9 @@ const IncomeChart = () => {
             },
         },
     }
+
+    // 동적 로딩된 Line 컴포넌트 사용
+    const { Line } = chartLibrary
 
     return (
         <>
