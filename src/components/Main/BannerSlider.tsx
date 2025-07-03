@@ -1,8 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import banner01 from '@/assets/banners/banner01.png'
-import banner02 from '@/assets/banners/pumati_banner1.png'
+import banner01 from '@/assets/banners/banner01.webp'
+import banner02 from '@/assets/banners/pumati_banner1.webp'
 
 const BannerSlider = () => {
     const banners = [
@@ -18,18 +18,6 @@ const BannerSlider = () => {
             link: 'https://tebutebu.com/',
             alt: '두 번째 배너',
         },
-        // {
-        //     id: 3,
-        //     image: 'https://via.placeholder.com/1200x300/10B981/FFFFFF?text=Banner+3',
-        //     link: 'https://example.com/page3',
-        //     alt: '세 번째 배너',
-        // },
-        // {
-        //     id: 4,
-        //     image: 'https://via.placeholder.com/1200x300/F59E0B/FFFFFF?text=Banner+4',
-        //     link: 'https://example.com/page4',
-        //     alt: '네 번째 배너',
-        // },
     ]
 
     const [currentIndex, setCurrentIndex] = useState(0)
