@@ -1,7 +1,6 @@
-import RightArrow from '@/assets/icons/Arrow Right.png'
-import LeftArrow from '@/assets/icons/Arrow_Left.png'
 import downloadIcon from '@/assets/icons/download.png'
 import { useEffect, useState } from 'react'
+import Icon from '../common/Icon'
 const ImageModal = ({ idx, pictures }) => {
     const [index, setIndex] = useState(idx)
     const [isDownloading, setIsDownloading] = useState(false)
@@ -145,7 +144,7 @@ const ImageModal = ({ idx, pictures }) => {
                         className='absolute p-2 transform -translate-y-1/2 rounded-full left-4 top-1/2'
                         onClick={handleMoveLeft}
                     >
-                        <img src={LeftArrow} className='h-3' alt='이전' />
+                        <Icon name='arrow' className='' direction='left' />
                     </button>
                 )}
 
@@ -155,7 +154,7 @@ const ImageModal = ({ idx, pictures }) => {
                         className='absolute p-2 transform -translate-y-1/2 rounded-full right-4 top-1/2 '
                         onClick={handleMoveRight}
                     >
-                        <img src={RightArrow} className='h-3' alt='다음' />
+                        <Icon name='arrow' className='' direction='right' />
                     </button>
                 )}
             </div>
