@@ -357,7 +357,7 @@ const MyPage = () => {
             // 사용자 정보 업데이트 (영구 URL 사용)
             const updatedUserInfo = {
                 ...userInfo,
-                profileImageURL: updateResult.data.profileImageURL || permanentImageUrl,
+                profileImageURL: updateResult.profileImageURL || permanentImageUrl,
             }
 
             // 상태 업데이트
