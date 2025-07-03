@@ -28,6 +28,8 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
     onLoad?: () => void
     onError?: () => void
     sizes?: string
+    width: number
+    height: number
 }
 
 // WebP 지원 확인 Hook
@@ -109,6 +111,8 @@ function OptimizedImage({
     style = {},
     lazy = true,
     placeholder = true,
+    width,
+    height,
     onLoad,
     onError,
     ...props
@@ -144,10 +148,12 @@ function OptimizedImage({
 
     const shouldLoad = !lazy || isInView
 
-
     if (hasError) {
         return (
-            <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
+            <div
+                className={`flex items-center justify-center bg-gray-100 ${className}`}
+                style={{ width, height, ...style }}
+            >
                 <span className='text-sm text-gray-500'>로드 실패</span>
             </div>
         )
@@ -157,15 +163,15 @@ function OptimizedImage({
         <>
             <div ref={elementRef} className='absolute inset-0 pointer-events-none' />
             {shouldLoad && isChecked && currentSrc ? (
-
                 <img
                     src={currentSrc}
                     alt={alt}
+                    width={width}
+                    height={height}
                     onLoad={handleLoad}
                     onError={handleError}
                     className={className}
                     style={style}
-
                     loading={lazy ? 'lazy' : 'eager'}
                     {...props}
                 />
