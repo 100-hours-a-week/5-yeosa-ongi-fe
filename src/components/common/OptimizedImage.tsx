@@ -1,8 +1,5 @@
-// OptimizedImage.tsx - 기존 컴포넌트 개선
 interface OptimizedImageProps {
     src: string
-    webpSrc?: string
-    avifSrc?: string // 추가
     alt: string
     width?: number
     height?: number
@@ -14,8 +11,6 @@ interface OptimizedImageProps {
 
 const OptimizedImage = ({
     src,
-    webpSrc,
-    avifSrc, // 추가
     alt,
     width,
     height,
@@ -24,17 +19,40 @@ const OptimizedImage = ({
     placeholder = true,
     onLoad,
 }: OptimizedImageProps) => {
+    // 이미지 소스 처리 로직을 내부에서 처리
+    const getImageSources = (originalUrl: string) => {
+        if (!originalUrl || originalUrl === '/default-thumbnail.jpg') {
+            return {
+                webpSrc: undefined,
+                fallbackSrc: originalUrl,
+            }
+        }
+
+        // 이미 WebP인 경우: WebP 그대로 사용
+        if (originalUrl.endsWith('.webp')) {
+            return {
+                webpSrc: originalUrl,
+                fallbackSrc: originalUrl,
+            }
+        }
+
+        // JPG/JPEG인 경우: JPG를 fallback으로 사용, WebP는 undefined
+        return {
+            webpSrc: undefined,
+            fallbackSrc: originalUrl,
+        }
+    }
+
+    const { webpSrc, fallbackSrc } = getImageSources(src)
+
     return (
         <picture className={className}>
-            {/* AVIF 우선 */}
-            {avifSrc && <source srcSet={avifSrc} type='image/avif' />}
-
-            {/* WebP 차선 */}
+            {/* WebP가 있는 경우만 source 태그 생성 */}
             {webpSrc && <source srcSet={webpSrc} type='image/webp' />}
 
             {/* 기본 fallback */}
             <img
-                src={src}
+                src={fallbackSrc}
                 alt={alt}
                 width={width}
                 height={height}
@@ -50,3 +68,5 @@ const OptimizedImage = ({
         </picture>
     )
 }
+
+export default OptimizedImage
