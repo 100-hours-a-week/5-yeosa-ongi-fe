@@ -2,8 +2,8 @@ import { useTotalStatistics } from '@/hooks/useUser'
 import { useNavigate } from 'react-router-dom'
 
 // Assets
-import albumIcon from '@/assets/icons/images_icon.png'
-import locationIcon from '@/assets/icons/location_icon.png'
+import ImageIcon from '@/icons/ImageIcon'
+import LocationIcon from '@/icons/LocationIcon'
 
 const Intro = () => {
     const navigate = useNavigate()
@@ -17,11 +17,11 @@ const Intro = () => {
             <div className='flex gap-8 h-[40px] relative border-solid items-center p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
                 <div>내 활동</div>
                 <div className='flex flex-row items-center gap-2'>
-                    <img className='size-4' src={albumIcon} alt='Album icon' />
+                    <ImageIcon variant='multiple' className='w-4 h-4 text-gray-400' />
                     <div className='w-6 h-4 text-sm bg-gray-300 rounded animate-pulse'></div>
                 </div>
                 <div className='flex flex-row items-center gap-2'>
-                    <img className='size-4' src={locationIcon} alt='Location icon' />
+                    <LocationIcon className='w-4 h-4 text-gray-400' />
                     <div className='w-6 h-4 text-sm bg-gray-300 rounded animate-pulse'></div>
                 </div>
             </div>
@@ -34,11 +34,11 @@ const Intro = () => {
             <div className='flex gap-8 h-[40px] relative border-solid items-center p-3 m-2 text-gray-700 bg-gray-100 shadow-md box-shadow rounded-xl'>
                 <div>내 활동</div>
                 <div className='flex flex-row items-center gap-2'>
-                    <img className='size-4' src={albumIcon} alt='Album icon' />
+                    <ImageIcon variant='multiple' className='w-4 h-4 text-gray-400' />
                     <div className='text-sm text-red-500'>-</div>
                 </div>
                 <div className='flex flex-row items-center gap-2'>
-                    <img className='size-4' src={locationIcon} alt='Location icon' />
+                    <LocationIcon className='w-4 h-4 text-gray-400' />
                     <div className='text-sm text-red-500'>-</div>
                 </div>
             </div>
@@ -54,12 +54,12 @@ const Intro = () => {
             <div>내 활동</div>
 
             <div className='flex flex-row items-center gap-2'>
-                <img className='size-4' src={albumIcon} alt='Album icon' />
+                <ImageIcon variant='multiple' className='w-4 h-4 text-gray-400' />
                 <div className='text-sm font-medium'>{albumCount.toLocaleString()}</div>
             </div>
 
             <div className='flex flex-row items-center gap-2'>
-                <img className='size-4' src={locationIcon} alt='Location icon' />
+                <LocationIcon className='w-4 h-4 text-gray-400' />
                 <div className='text-sm font-medium'>{locationCount.toLocaleString()}</div>
             </div>
         </div>

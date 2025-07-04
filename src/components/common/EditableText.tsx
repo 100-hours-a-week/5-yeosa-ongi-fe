@@ -1,4 +1,5 @@
-import { Check, Edit2, Loader2, X } from 'lucide-react'
+import EditIcon from '@/icons/EditIcon'
+import { Check, Loader2, X } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import TextField from './TextField'
 
@@ -262,7 +263,7 @@ const EditableText: React.FC<EditableTextProps> = ({
                                         className='p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors'
                                         title='편집'
                                     >
-                                        <Edit2 className='w-4 h-4' />
+                                        <EditIcon className='w-4 h-4' />
                                     </button>
                                 )}
                             </div>

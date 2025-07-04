@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useAuthStore from '../../stores/authStore'
+import OptimizedImage from './OptimizedImage'
 import defaultProfileImage from '/src/assets/default_user_imgae.png'
 import ongiLogoFlat from '/src/assets/ongi_logo_flat.webp'
 
@@ -8,9 +9,9 @@ const Header = ({ showButtons = true }) => {
     const navigate = useNavigate()
 
     // 사용자 정보 상태
-    const [userInfo, setUserInfo] = useState({
-        userId: null,
-        profileImageURL: null,
+    const [userInfo, setUserInfo] = useState<{ userId: string; profileImageURL: string }>({
+        userId: '',
+        profileImageURL: '',
     })
 
     // Zustand 스토어에서 함수 가져오기
@@ -20,7 +21,7 @@ const Header = ({ showButtons = true }) => {
 
     useEffect(() => {
         // 1. 먼저 스토어에서 인증 상태 확인
-        if (isAuthenticated) {
+        if (isAuthenticated && user) {
             setUserInfo({
                 userId: user.userId,
                 profileImageURL: user.profileImageURL,
@@ -31,7 +32,7 @@ const Header = ({ showButtons = true }) => {
             if (userIdFromSession) {
                 setUserInfo({
                     userId: userIdFromSession,
-                    profileImageURL: null,
+                    profileImageURL: '',
                 })
             }
         }
@@ -48,7 +49,7 @@ const Header = ({ showButtons = true }) => {
     return (
         <header className='flex items-center justify-between px-4 shadow-sm h-14 bg-white-blue'>
             <button onClick={() => navigate('/')}>
-                <img className='h-8' src={ongiLogoFlat} alt='Logo' />
+                <img src={ongiLogoFlat} alt='logo' className='h-8' />
             </button>
             <div className='w-40'></div>
             {showButtons && (
@@ -58,7 +59,11 @@ const Header = ({ showButtons = true }) => {
                         aria-label='Profile'
                         onClick={handleProfileClick}
                     >
-                        <img src={userInfo.profileImageURL || defaultProfileImage} className='rounded-full size-full' />
+                        <OptimizedImage
+                            alt='userProfileImage'
+                            src={userInfo.profileImageURL || defaultProfileImage}
+                            className='rounded-full size-full'
+                        />
                     </button>
                 </div>
             )}

@@ -1,6 +1,8 @@
-import downloadIcon from '@/assets/icons/download.png'
+
+import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Icon from '../common/Icon'
+
 const ImageModal = ({ idx, pictures }) => {
     const [index, setIndex] = useState(idx)
     const [isDownloading, setIsDownloading] = useState(false)
@@ -172,9 +174,9 @@ const ImageModal = ({ idx, pictures }) => {
                             </div>
                         </div>
                     ) : (
-                        <div className='flex'>
+                        <div className='flex items-center'>
                             Download
-                            <img className='h-4 mx-2 mt-1' src={downloadIcon}></img>
+                            <Download className='w-4 h-4 mx-2' />
                         </div>
                     )}
                 </button>

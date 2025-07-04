@@ -1,5 +1,4 @@
 import defaultProfileImage from '@/assets/default_user_imgae.png'
-import icon_pencil from '@/assets/icons/icon_pencil.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
@@ -574,7 +573,7 @@ const MyPage = () => {
                                         onClick={handleSave}
                                         className='absolute p-1 px-2 py-1 ml-2 text-sm text-white transform -translate-y-1/2 rounded -right-8 top-1/2'
                                     >
-                                        <Icon name='check' className='text-black' />
+                                        <Icon name='check' className='text-gray-500' />
                                     </button>
                                 </div>
                             ) : (
@@ -585,7 +584,7 @@ const MyPage = () => {
                                         onClick={handleEditClick}
                                         aria-label='프로필 편집'
                                     >
-                                        <img className='w-4 h-4' src={icon_pencil} alt='편집' />
+                                        <Icon name='edit' className='w-4 h-4 text-gray-500' />
                                     </button>
                                 </>
                             )}
@@ -615,20 +614,7 @@ const MyPage = () => {
                                         </svg>
                                         <span className='text-base'>내 활동</span>
                                     </div>
-                                    <svg
-                                        className='w-5 h-5 text-gray-400'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        viewBox='0 0 24 24'
-                                        xmlns='http://www.w3.org/2000/svg'
-                                    >
-                                        <path
-                                            strokeLinecap='round'
-                                            strokeLinejoin='round'
-                                            strokeWidth='2'
-                                            d='M9 5l7 7-7 7'
-                                        ></path>
-                                    </svg>
+                                    <Icon name='arrow' direction='right' className='w-4 h-4 text-gray-400' />
                                 </button>
 
                                 <button
@@ -657,20 +643,7 @@ const MyPage = () => {
                                         </svg>
                                         <span className='text-base'>문의하기</span>
                                     </div>
-                                    <svg
-                                        className='w-5 h-5 text-gray-400'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        viewBox='0 0 24 24'
-                                        xmlns='http://www.w3.org/2000/svg'
-                                    >
-                                        <path
-                                            strokeLinecap='round'
-                                            strokeLinejoin='round'
-                                            strokeWidth='2'
-                                            d='M9 5l7 7-7 7'
-                                        ></path>
-                                    </svg>
+                                    <Icon name='arrow' direction='right' className='w-4 h-4 text-gray-400' />
                                 </button>
 
                                 <button
