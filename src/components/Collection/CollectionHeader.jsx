@@ -1,5 +1,5 @@
-import iconRecovery from '@/assets/icons/icon_recovery.png'
-import iconTrash from '@/assets/icons/icon_trash.png'
+import { RotateCcw, Trash2 } from 'lucide-react'
+
 const CollectionHeader = ({
     currentCollection,
     pictures,
@@ -30,14 +30,14 @@ const CollectionHeader = ({
                                 setIsSelectMode(true)
                             }}
                         >
-                            <img src={iconRecovery} className='h-6' alt='복원' />
+                            <RotateCcw className='w-5 h-5 text-gray-500' />
                         </button>
                         <button
                             onClick={() => {
                                 setIsSelectMode(true)
                             }}
                         >
-                            <img src={iconTrash} className='h-6' alt='삭제' />
+                            <Trash2 className='w-5 h-5 text-gray-500' />
                         </button>
                     </div>
                 ) : (
@@ -46,7 +46,7 @@ const CollectionHeader = ({
                             setIsSelectMode(true)
                         }}
                     >
-                        <img src={iconTrash} className='h-4' alt='삭제' />
+                        <Trash2 className='w-5 h-5 text-gray-500' />
                     </button>
                 )
             ) : (
