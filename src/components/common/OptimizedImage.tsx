@@ -9,6 +9,7 @@ interface OptimizedImageProps {
     lazy?: boolean
     placeholder?: boolean
     onLoad?: () => void
+    fetchpriority?: boolean
     aspectRatio?: string // Tailwind aspect ratio 클래스 (예: 'aspect-square', 'aspect-video')
 }
 
@@ -21,6 +22,7 @@ const OptimizedImage = ({
     lazy = true,
     placeholder = true,
     onLoad,
+    fetchpriority = false,
     aspectRatio = 'aspect-square',
 }: OptimizedImageProps) => {
     const [isLoaded, setIsLoaded] = useState(false)
@@ -74,8 +76,6 @@ const OptimizedImage = ({
     // 이미지 클래스 - 부드러운 전환
     const imageClasses = `
         absolute inset-0 w-full h-full object-cover
-        transition-opacity duration-300 ease-in-out
-        ${isLoaded ? 'opacity-100' : 'opacity-0'}
     `.trim()
 
     // 스켈레톤 클래스 - shimmer 애니메이션
@@ -115,6 +115,7 @@ const OptimizedImage = ({
                         decoding='async'
                         onLoad={handleLoad}
                         onError={handleError}
+                        fetchPriority={fetchpriority ? 'high' : 'low'}
                         className={imageClasses}
                     />
                 </picture>
