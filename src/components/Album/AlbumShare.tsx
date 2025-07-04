@@ -1,4 +1,4 @@
-import iconCopy from '@/assets/icons/icon_copy.png'
+import { Copy } from 'lucide-react'
 import { useState } from 'react'
 import Icon from '../common/Icon'
 
@@ -39,11 +39,7 @@ const AlbumShare = ({ sharingLink = 'https://example.com/share/album123456' }) =
                             className='flex items-center justify-center w-10 h-10 text-white transition-colors border bg-primary rounded-r-md '
                             aria-label='링크 복사하기'
                         >
-                            {copied ? (
-                                <Icon name='check' className='text-gray-100' />
-                            ) : (
-                                <img className='w-4 h-4' src={iconCopy} alt='복사하기' />
-                            )}
+                            {copied ? <Icon name='check' className='text-gray-100' /> : <Copy className='w-4 h-4' />}
                         </button>
                     </div>
 
