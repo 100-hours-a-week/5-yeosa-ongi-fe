@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 
 interface OptimizedImageProps {
@@ -25,6 +26,7 @@ const OptimizedImage = ({
     fetchpriority = false,
     aspectRatio = 'aspect-square',
 }: OptimizedImageProps) => {
+
     const [isLoaded, setIsLoaded] = useState(false)
     const [isError, setIsError] = useState(false)
 
@@ -130,6 +132,7 @@ const OptimizedImage = ({
                 </div>
             )}
         </div>
+
     )
 }
 

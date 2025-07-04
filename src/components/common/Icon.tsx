@@ -1,4 +1,6 @@
+
 import { ArrowIcon, CheckIcon, CloseIcon, EditIcon, HeartIcon, ImageIcon, LocationIcon } from '@/icons/index'
+
 
 import { BaseIconProps } from '@/types/icon.types'
 import React from 'react'
@@ -12,6 +14,7 @@ const iconComponents = {
     edit: EditIcon,
     image: ImageIcon,
     location: LocationIcon,
+
 } as const
 
 export type IconName = keyof typeof iconComponents

@@ -29,6 +29,7 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
             <OptimizedImage
                 src={album?.thumbnailURL || '/default-thumbnail.jpg'}
                 alt='Album thumbnail'
+
                 className='absolute inset-0'
                 lazy={true}
                 placeholder={true}
