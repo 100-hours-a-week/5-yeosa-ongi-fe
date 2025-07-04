@@ -1,7 +1,7 @@
-import onboadingImage1 from '@/assets/onboardingImages/onboarding01.png'
-import onboadingImage2 from '@/assets/onboardingImages/onboarding02.png'
-import onboadingImage3 from '@/assets/onboardingImages/onboarding03.png'
-import onboadingImage4 from '@/assets/onboardingImages/onboarding04.png'
+import onboadingImage1 from '@/assets/onboardingImages/onboarding01.webp'
+import onboadingImage2 from '@/assets/onboardingImages/onboarding02.webp'
+import onboadingImage3 from '@/assets/onboardingImages/onboarding03.webp'
+import onboadingImage4 from '@/assets/onboardingImages/onboarding04.webp'
 import { useEffect, useRef, useState } from 'react'
 import Icon from '../common/Icon'
 
