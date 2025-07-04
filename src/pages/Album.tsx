@@ -24,12 +24,12 @@ import useModal from '../hooks/useModal'
 import useCollectionStore from '../stores/collectionStore'
 
 //Assets
-import iconDuplicated from '../assets/icons/icon_duplicated.png'
-import iconShaky from '../assets/icons/icon_shaky.png'
-import images_icon from '../assets/icons/images_icon.png'
+import iconDuplicated from '../assets/icons/icon_duplicated.svg'
+import iconShaky from '../assets/icons/icon_shaky.svg'
 
 //Types
 import Icon from '@/components/common/Icon'
+import ImageIcon from '@/icons/ImageIcon'
 import { RawPicture } from '../types'
 
 interface ClusterInterface {
@@ -220,7 +220,7 @@ const Album = () => {
                     <div className='ml-4 font-sans text-md'>카테고리 </div>
                     <button onClick={() => navigate(`/album/${albumId}/전체`)} className='px-2'>
                         <div className='flex items-center '>
-                            <img src={images_icon} className='h-4'></img>
+                            <ImageIcon variant='multiple' className='w-4 h-4 text-gray-400' />
                             <div className='px-2 text-xs tracking-tighter'>
                                 전체 {allCollection?.count} 개 사진 보기
                             </div>
