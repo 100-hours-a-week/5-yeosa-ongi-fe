@@ -15,19 +15,19 @@ const Card = () => {
     // 이미지 미리 로드
     useEffect(() => {
         if (pictures.length > 0) {
-            let loadedCount = 0
-            const totalImages = pictures.length
+            // 1. 첫 번째 이미지만 즉시 고우선순위로 로드
+            const firstImg = new Image()
+            firstImg.src = pictures[0].pictureURL
 
-            pictures.forEach(picture => {
-                const img = new Image()
-                img.onload = img.onerror = () => {
-                    loadedCount++
-                    if (loadedCount === totalImages) {
-                        setImagesLoaded(true)
-                    }
-                }
-                img.src = picture.pictureURL
-            })
+            // 2. 첫 번째 이미지 로드 완료 후 나머지 순차 로드
+            firstImg.onload = () => {
+                pictures.slice(1).forEach((picture, index) => {
+                    setTimeout(() => {
+                        const img = new Image()
+                        img.src = picture.pictureURL
+                    }, index * 100) // 100ms씩 지연해서 순차 로드
+                })
+            }
         }
     }, [pictures])
 
@@ -58,7 +58,7 @@ const Card = () => {
     return (
         <div className='m-4'>
             <div
-                className={`rounded-3xl h-52 shadow-lg group relative overflow-hidden ${
+                className={`rounded-3xl h-60 shadow-lg group relative overflow-hidden ${
                     canNavigate ? (isAnimating ? 'cursor-default' : 'cursor-pointer') : 'cursor-default'
                 }`}
                 onClick={handleClick}
@@ -67,6 +67,8 @@ const Card = () => {
                 <OptimizedImage
                     className={`object-cover w-full h-full rounded-3xl transition-opacity duration-300`}
                     lazy={false}
+                    fetchpriority={true}
+                    height={240}
                     src={pictures[currentImageIndex]?.pictureURL}
                     alt={`사진 ${currentImageIndex + 1}`}
                 />
