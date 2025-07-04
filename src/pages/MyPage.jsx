@@ -1,5 +1,4 @@
 import defaultProfileImage from '@/assets/default_user_imgae.png'
-import icon_pencil from '@/assets/icons/icon_pencil.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
@@ -585,7 +584,7 @@ const MyPage = () => {
                                         onClick={handleEditClick}
                                         aria-label='프로필 편집'
                                     >
-                                        <img className='w-4 h-4' src={icon_pencil} alt='편집' />
+                                        <Icon name='edit' className='w-4 h-4 text-gray-500' />
                                     </button>
                                 </>
                             )}
