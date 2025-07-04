@@ -1,5 +1,6 @@
 import useCollectionStore from '@/stores/collectionStore'
 import { useEffect, useState } from 'react'
+import OptimizedImage from '../common/OptimizedImage'
 
 const Card = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -63,10 +64,9 @@ const Card = () => {
                 onClick={handleClick}
             >
                 {/* 메인 이미지 */}
-                <img
-                    className={`object-cover w-full h-full rounded-3xl transition-opacity duration-300 ${
-                        isAnimating ? 'opacity-90' : 'opacity-100'
-                    }`}
+                <OptimizedImage
+                    className={`object-cover w-full h-full rounded-3xl transition-opacity duration-300`}
+                    lazy={false}
                     src={pictures[currentImageIndex]?.pictureURL}
                     alt={`사진 ${currentImageIndex + 1}`}
                 />
