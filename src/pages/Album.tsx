@@ -29,7 +29,6 @@ import iconShaky from '../assets/icons/icon_shaky.svg'
 
 //Types
 import Icon from '@/components/common/Icon'
-import ImageIcon from '@/icons/ImageIcon'
 import { Settings } from 'lucide-react'
 import { RawPicture } from '../types'
 
@@ -211,7 +210,7 @@ const Album = () => {
                         onClick={() => setIsCommentsOpen(true)}
                     />
                     <div className='absolute cursor-pointer right-6 text-md' onClick={handleSettingClick}>
-                        <Settings className='h-5 text-gray-500' />
+                        <Settings className='h-5 text-gray-500 ' />
                     </div>
                 </div>
             </div>
@@ -221,7 +220,7 @@ const Album = () => {
                     <div className='ml-4 font-sans text-md'>카테고리 </div>
                     <button onClick={() => navigate(`/album/${albumId}/전체`)} className='px-2'>
                         <div className='flex items-center '>
-                            <ImageIcon variant='multiple' className='w-4 h-4 text-gray-400' />
+                            <Icon name='image' variant='multiple' className='h-4 text-gray-500' />
                             <div className='px-2 text-xs tracking-tighter'>
                                 전체 {allCollection?.count} 개 사진 보기
                             </div>
@@ -229,37 +228,17 @@ const Album = () => {
                     </button>
                 </div>
 
-                <div className='relative'>
-                    <div
-                        className='flex flex-row w-full gap-2 px-2 py-4 overflow-x-auto scrollbar-thin scrollbar-gray-light scrollbar-track-gray-light'
-                        onScroll={handleCategoryScroll}
-                    >
-                        {tagCollections &&
-                            tagCollections.map((category: Category, index: number) => (
-                                <Category title={category.name} pictures={category.pictures} albumId={albumId} />
-                            ))}
-                    </div>
-                    {showCategoryRightIndicator && (
-                        <div className='absolute top-0 right-0 flex items-center justify-end w-16 h-full pointer-events-none bg-gradient-to-l from-white to-transparent'>
-                            <div className='flex items-center justify-center w-8 h-8 mr-2 bg-white rounded-full shadow-sm bg-opacity-70'>
-                                <svg
-                                    xmlns='http://www.w3.org/2000/svg'
-                                    className='w-5 h-5 text-gray-500'
-                                    fill='none'
-                                    viewBox='0 0 24 24'
-                                    stroke='currentColor'
-                                >
-                                    <path
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth={2}
-                                        d='M9 5l7 7-7 7'
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <SideScrollableSection>
+                    {tagCollections &&
+                        tagCollections.map(category => (
+                            <Category
+                                key={category.name}
+                                title={category.name}
+                                pictures={category.pictures}
+                                albumId={albumId as string}
+                            />
+                        ))}
+                </SideScrollableSection>
             </div>
 
             <div className='m-4 mt-6'>
@@ -321,7 +300,6 @@ const Album = () => {
                     )}
                 </div>
             )}
-
             {/* 댓글 컨테이너 */}
             <CommentsContainer
                 albumId={albumId as string}

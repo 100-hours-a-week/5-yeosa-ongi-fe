@@ -27,7 +27,7 @@ interface UseFileUploadReturn {
  * @returns {Object} 파일 관리 객체와 메서드
  */
 const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadReturn => {
-    const { maxFiles = 10 } = options
+    const { maxFiles = 30 } = options
     const [files, setFiles] = useState<FileItem[]>([])
     const [error, setError] = useState<string>('')
     const [isProcessing, setProcessing] = useState<boolean>(false)
