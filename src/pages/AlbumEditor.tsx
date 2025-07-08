@@ -17,6 +17,7 @@ import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
 import TagContainer from '@/components/AlbumEditor/TagContainer'
 import CollapsibleContainer from '@/components/common/CollapsibleContainer'
+import { ALBUM_TEXTS } from '@/constants/text'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 
 interface ButtonState {
@@ -35,7 +36,7 @@ const MemoizedCreateAlbumButton = memo(CreateAlbumButton)
  * 새 앨범 생성 또는 기존 앨범에 사진 추가 기능 제공
  */
 const AlbumEditor = () => {
-    const [albumTitle, setAlbumTitle] = useState('이름 없는 앨범')
+    const [albumTitle, setAlbumTitle] = useState<string>(ALBUM_TEXTS.UNTITLED_ALBUM)
     const { albumId } = useParams()
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const albumData = useAlbumCreation()
