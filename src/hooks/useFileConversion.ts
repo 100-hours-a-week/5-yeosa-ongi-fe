@@ -1,6 +1,7 @@
 import { convertToWebP } from '@/services/imageConversionService'
 import { ConversionCacheManager } from '@/utils/conversionCache'
-import { getFileTypeDisplay, isHEICFile } from '@/utils/fileHelpers'
+import { isHEICFile } from '@/utils/metadata'
+
 import { useEffect, useRef, useState } from 'react'
 
 interface FileConversionState {
@@ -16,9 +17,6 @@ export const useFileConversion = (
 ): FileConversionState => {
     const [state, setState] = useState<FileConversionState>(() => {
         const needsConversion = isHEICFile(file) || file.type !== 'image/webp'
-
-        let initialPreviewUrl = ''
-        let initialFileType = getFileTypeDisplay(file)
 
         if (needsConversion) {
             return {
@@ -56,7 +54,6 @@ export const useFileConversion = (
         const processFile = async () => {
             try {
                 let processedFile = file
-                let targetFileType = getFileTypeDisplay(file)
 
                 // 1. HEIC 변환 처리
                 if (isHEICFile(file)) {
@@ -64,7 +61,6 @@ export const useFileConversion = (
                     const cached = ConversionCacheManager.get(file)
                     if (cached) {
                         processedFile = cached.convertedFile
-                        targetFileType = 'JPEG'
                     } else {
                         // 변환 중인지 확인
 
@@ -77,7 +73,6 @@ export const useFileConversion = (
 
                         const converted = await ConversionCacheManager.convert(file)
                         processedFile = converted.convertedFile
-                        targetFileType = 'JPEG'
                     }
                 }
 
@@ -89,12 +84,10 @@ export const useFileConversion = (
                         setState(prev => ({
                             ...prev,
                             isConverting: true,
-                            fileType: `${targetFileType} → WebP`,
                         }))
                     }
 
                     processedFile = await convertToWebP(processedFile, webPQuality)
-                    targetFileType = 'WebP'
                 }
 
                 // 3. 최종 결과 설정
