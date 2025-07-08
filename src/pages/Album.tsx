@@ -30,6 +30,7 @@ import iconShaky from '../assets/icons/icon_shaky.svg'
 //Types
 import Icon from '@/components/common/Icon'
 import ImageIcon from '@/icons/ImageIcon'
+import { Settings } from 'lucide-react'
 import { RawPicture } from '../types'
 
 interface ClusterInterface {
@@ -209,8 +210,8 @@ const Album = () => {
                         showCount={true}
                         onClick={() => setIsCommentsOpen(true)}
                     />
-                    <div className='m-4 cursor-pointer text-md' onClick={handleSettingClick}>
-                        앨범 설정
+                    <div className='absolute cursor-pointer right-6 text-md' onClick={handleSettingClick}>
+                        <Settings className='h-5 text-gray-500' />
                     </div>
                 </div>
             </div>
@@ -261,39 +262,45 @@ const Album = () => {
                 )}
             </div>
 
-            <div className='m-4 mt-6'>
-                <div className='ml-4 font-sans text-md'>검토해줘 </div>
+            {duplicatedCollection?.count !== 0 && shakyCollection?.count !== 0 && (
+                <div className='m-4 mt-6'>
+                    <div className='ml-4 font-sans text-md'>검토해줘 </div>
 
-                <div className='m-4'>
-                    <button
-                        className='flex items-center justify-between w-full bg-gray-100 border-0 border-b border-gray-200 focus:outline-none'
-                        onClick={() => navigate(`/album/${albumId}/중복`)}
-                    >
-                        <div className='flex items-center'>
-                            <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50'>
-                                <img src={iconDuplicated}></img>
-                            </div>
-                            <div className='text-sm text-gray-dark'>중복된 사진</div>
+                    {duplicatedCollection?.count !== 0 && (
+                        <div className='m-4'>
+                            <button
+                                className='flex items-center justify-between w-full bg-gray-100 border-0 border-b border-gray-200 focus:outline-none'
+                                onClick={() => navigate(`/album/${albumId}/중복`)}
+                            >
+                                <div className='flex items-center'>
+                                    <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50'>
+                                        <img src={iconDuplicated}></img>
+                                    </div>
+                                    <div className='text-sm text-gray-dark'>중복된 사진</div>
+                                </div>
+                                <Icon name='arrow' className='text-gray-300' />
+                            </button>
                         </div>
-                        <Icon name='arrow' className='text-gray-300' />
-                    </button>
-                </div>
+                    )}
 
-                <div className='m-4'>
-                    <button
-                        className='flex items-center justify-between w-full bg-gray-100 border-0 border-b border-gray-200 focus:outline-none'
-                        onClick={() => navigate(`/album/${albumId}/흔들림`)}
-                    >
-                        <div className='flex items-center'>
-                            <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50'>
-                                <img src={iconShaky}></img>
-                            </div>
-                            <div className='text-sm text-gray-dark'>흔들린 사진</div>
+                    {shakyCollection?.count !== 0 && (
+                        <div className='m-4'>
+                            <button
+                                className='flex items-center justify-between w-full bg-gray-100 border-0 border-b border-gray-200 focus:outline-none'
+                                onClick={() => navigate(`/album/${albumId}/흔들림`)}
+                            >
+                                <div className='flex items-center'>
+                                    <div className='flex items-center justify-center flex-shrink-0 w-8 h-8 mr-4 rounded-lg bg-gray-50'>
+                                        <img src={iconShaky}></img>
+                                    </div>
+                                    <div className='text-sm text-gray-dark'>흔들린 사진</div>
+                                </div>
+                                <Icon name='arrow' className='text-gray-300' />
+                            </button>
                         </div>
-                        <Icon name='arrow' className='text-gray-300' />
-                    </button>
+                    )}
                 </div>
-            </div>
+            )}
 
             {/* 댓글 컨테이너 */}
             <CommentsContainer
