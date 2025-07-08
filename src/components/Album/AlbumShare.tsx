@@ -19,7 +19,7 @@ const AlbumShare = ({ sharingLink = 'https://example.com/share/album123456' }) =
     }
 
     return (
-        <div className='relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg shadow-lg'>
+        <div className='relative flex flex-col w-full h-full max-w-md mx-auto bg-white rounded-lg '>
             <div className='p-5 border-b'>
                 <h3 className='text-lg font-medium text-gray-800'>앨범 공유</h3>
             </div>
