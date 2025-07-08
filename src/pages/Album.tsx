@@ -220,7 +220,9 @@ const Album = () => {
                     <div className='ml-4 font-sans text-md'>카테고리 </div>
                     <button onClick={() => navigate(`/album/${albumId}/전체`)} className='px-2'>
                         <div className='flex items-center '>
-                            <img src={images_icon} className='h-4'></img>
+
+                            <Icon name='image' variant='multiple' className='h-4 text-gray-500' />
+
                             <div className='px-2 text-xs tracking-tighter'>
                                 전체 {allCollection?.count} 개 사진 보기
                             </div>
