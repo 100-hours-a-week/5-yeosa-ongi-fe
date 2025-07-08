@@ -36,3 +36,17 @@ export interface RawPicture {
     isShaky: boolean
     pictureURL: string
 }
+
+export interface Picture {
+    id: string | number
+    url: string
+    name?: string
+}
+
+export interface RawPicture {
+    pictureId: string
+    tag: string
+    isDuplicated: boolean
+    isShaky: boolean
+    pictureURL: string
+}

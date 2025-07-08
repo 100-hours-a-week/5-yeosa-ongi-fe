@@ -5,11 +5,12 @@ import './App.css'
 import Background from './components/common/Background'
 import MovingDotsLoader from './components/common/MovingDotsLoader'
 import { ToastProvider } from './contexts/ToastContext'
+import Main from './pages/Main'
 import useAuthStore from './stores/authStore'
 
 const Login = lazy(() => import('./pages/LoginPage'))
 const KakaoCallback = lazy(() => import('./pages/auth/KakaoCallback'))
-const Main = lazy(() => import('./pages/Main'))
+
 const AlbumEditor = lazy(() => import('./pages/AlbumEditor'))
 const Album = lazy(() => import('./pages/Album'))
 const Collection = lazy(() => import('./pages/Collection'))
