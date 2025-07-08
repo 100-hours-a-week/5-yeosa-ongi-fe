@@ -15,32 +15,7 @@ const MapSkeleton = ({ height }: { height: number }) => (
         <div className='relative w-full' style={{ height }}>
             {/* 메인 지도 영역 스켈레톤 */}
             <div className='absolute inset-0 z-0 bg-gray-50' />
-            <Skeleton className='absolute inset-0 w-full h-full' borderRadius={12} />
-
-            {/* 지도 컨트롤 버튼들 스켈레톤 */}
-            <div className='absolute z-10 flex flex-col gap-2 top-4 right-4'>
-                <Skeleton circle width={40} height={40} />
-                <Skeleton circle width={40} height={40} />
-                <Skeleton width={80} height={32} borderRadius={16} />
-            </div>
-
-            {/* 검색/필터 영역 스켈레톤 */}
-            <div className='absolute z-10 top-4 left-4'>
-                <Skeleton width={200} height={36} borderRadius={18} />
-            </div>
-
-            {/* 하단 정보 패널 스켈레톤 */}
-            <div className='absolute z-10 bottom-4 left-4 right-4'>
-                <div className='p-3 bg-white rounded-lg shadow-lg'>
-                    <div className='flex items-center gap-3'>
-                        <Skeleton circle width={50} height={50} />
-                        <div className='flex-1'>
-                            <Skeleton width='70%' height={16} className='mb-2' />
-                            <Skeleton width='50%' height={14} />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Skeleton className='absolute inset-0 w-full h-full' />
         </div>
     </SkeletonTheme>
 )
