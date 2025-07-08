@@ -2,7 +2,6 @@ import { useFileConversion } from '@/hooks/useFileConversion'
 import { FileItem } from '@/types/upload'
 import React, { useCallback } from 'react'
 import Icon from '../common/Icon'
-
 import FilePreview from './FilePreview'
 
 interface FilePreviewContainerProps {
@@ -30,13 +29,11 @@ const FilePreviewContainer = React.memo<FilePreviewContainerProps>(
             )
         }
 
-        // 순수 컴포넌트에 상태와 핸들러 전달
         return (
             <div className='relative w-full h-full will-change-transform '>
                 <FilePreview
                     previewUrl={conversionState.previewUrl}
                     fileName={file.file.name}
-                    fileType={conversionState.fileType}
                     isConverting={conversionState.isConverting}
                     conversionError={conversionState.error}
                     onDelete={handleDelete}
