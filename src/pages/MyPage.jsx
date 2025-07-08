@@ -1,21 +1,20 @@
 import defaultProfileImage from '@/assets/default_user_imgae.png'
-import iconCheck from '@/assets/icons/icon_check.png'
-import icon_pencil from '@/assets/icons/icon_pencil.png'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
-import { getPreSignedUrl } from '../api/album'
-
+import Icon from '@/components/common/Icon'
+import { useGetPreSignedUrl } from '@/hooks/useAlbum'
+import { useLogout } from '@/hooks/useAuth'
+import { useUpdateUserInfo } from '@/hooks/useUser'
 import axios from 'axios'
-import { updateUserInfo } from '../api/user'
 import ConfirmModal from '../components/common/ConfirmModal'
 import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
 import TextInput from '../components/common/TextInput'
 import ImageInput from '../components/MyPage/ImageInput'
 import useModal from '../hooks/useModal'
-import useAuthStore from '../stores/userStore'
+import useAuthStore from '../stores/authStore'
 
 const MyPage = () => {
     const navigate = useNavigate()
@@ -26,6 +25,7 @@ const MyPage = () => {
         profileImageURL: null,
         nickname: '사용자',
     })
+    const logoutMutation = useLogout()
 
     const [isLoading, setIsLoading] = useState(true)
     const [isEditing, setIsEditing] = useState(false)
@@ -34,19 +34,27 @@ const MyPage = () => {
     const [previewImageURL, setPreviewImageURL] = useState(null)
     const [isUploading, setIsUploading] = useState(false)
 
+    const refreshToken = useAuthStore(state => state.refreshToken)
     const getUserId = useAuthStore(state => state.getUserId)
-    const getUser = useAuthStore(state => state.getUser)
+    const getUser = useAuthStore(state => state.user)
     const setUser = useAuthStore(state => state.setUser)
+    const getRefreshToken = useAuthStore(state => state.getRefreshToken)
     const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+    const logout = useAuthStore(state => state.logout)
+
     const [inputValue, setInputValue] = useState(userInfo.nickname)
     const [isValid, setIsValid] = useState(false)
+
+    const getPreSignedUrl = useGetPreSignedUrl()
+    const updateUserInfo = useUpdateUserInfo()
     const { isOpen, modalData, openModal, closeModal } = useModal()
+
     useEffect(() => {
         setIsLoading(true)
         try {
             // 1. 먼저 스토어에서 인증 상태 확인
-            if (isAuthenticated()) {
-                const user = getUser()
+            if (isAuthenticated) {
+                const user = getUser
                 if (user && user.userId) {
                     const updatedInfo = {
                         userId: user.userId,
@@ -132,15 +140,25 @@ const MyPage = () => {
             alert('닉네임을 입력해주세요.')
             return
         }
-        console.log(isValid)
-        if (!isValid) return
+
+        if (!isValid) {
+            alert('유효하지 않은 닉네임입니다.')
+            return
+        }
+
         try {
             const userInfoBody = {
-                nickname: nickname,
+                nickname: nickname.trim(),
                 profileImageURL: userInfo.profileImageURL,
             }
-            const response = await updateUserInfo(userInfo.userId, userInfoBody)
-            console.log(response)
+
+            // mutateAsync 사용하여 응답 받기
+            const response = await updateUserInfo.mutateAsync({
+                userId: userInfo.userId,
+                userInfo: userInfoBody,
+            })
+
+            console.log('닉네임 업데이트 응답:', response)
 
             // 상태 업데이트
             const updatedUserInfo = {
@@ -159,7 +177,7 @@ const MyPage = () => {
             updateSessionStorage(updatedUserInfo)
 
             setIsEditing(false)
-            console.log('닉네임이 성공적으로 업데이트되었습니다:', nickname)
+            console.log('닉네임이 성공적으로 업데이트되었습니다:', nickname.trim())
         } catch (error) {
             console.error('닉네임 업데이트 오류:', error)
             alert('닉네임 업데이트에 실패했습니다. 다시 시도해주세요.')
@@ -244,6 +262,19 @@ const MyPage = () => {
         await handleProfileImageUpload(file)
     }
 
+    const handleLogout = () => {
+        logoutMutation.mutate(refreshToken || undefined, {
+            onSuccess: () => {
+                logout()
+                navigate('/login')
+            },
+            onError: () => {
+                logout()
+                navigate('/login')
+            },
+        })
+    }
+
     // 안전한 이미지 로드 함수
     const loadImageWithHeaders = async signedUrl => {
         try {
@@ -272,88 +303,216 @@ const MyPage = () => {
         }
     }
 
-    // 프로필 이미지 업로드 핸들러
+    // WebP 변환 함수
+    const convertImageToWebP = (file, quality = 0.8) => {
+        return new Promise((resolve, reject) => {
+            // 이미 WebP인 경우 그대로 반환
+            if (file.type === 'image/webp') {
+                resolve(file)
+                return
+            }
+
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            const img = new Image()
+
+            img.onload = () => {
+                // 캔버스 크기 설정 (원본 크기 유지 또는 리사이징)
+                canvas.width = img.width
+                canvas.height = img.height
+
+                // 고품질 렌더링 설정
+                if (ctx) {
+                    ctx.imageSmoothingEnabled = true
+                    ctx.imageSmoothingQuality = 'high'
+
+                    // 이미지 그리기
+                    ctx.drawImage(img, 0, 0)
+
+                    // WebP로 변환
+                    canvas.toBlob(
+                        blob => {
+                            if (blob) {
+                                // 원본 파일명에서 확장자를 .webp로 변경
+                                const webpFileName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+
+                                const webpFile = new File([blob], webpFileName, {
+                                    type: 'image/webp',
+                                    lastModified: Date.now(),
+                                })
+
+                                resolve(webpFile)
+                            } else {
+                                reject(new Error('WebP 변환 실패'))
+                            }
+                        },
+                        'image/webp',
+                        quality
+                    )
+                } else {
+                    reject(new Error('Canvas 컨텍스트 생성 실패'))
+                }
+            }
+
+            img.onerror = () => {
+                reject(new Error('이미지 로드 실패'))
+            }
+
+            // 파일을 이미지로 로드
+            img.src = URL.createObjectURL(file)
+        })
+    }
+
+    // 프로필 이미지 리사이징 함수 (선택사항)
+    const resizeProfileImage = (file, maxWidth = 400, maxHeight = 400, quality = 0.8) => {
+        return new Promise((resolve, reject) => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            const img = new Image()
+
+            img.onload = () => {
+                // 비율 유지하면서 리사이징
+                const ratio = Math.min(maxWidth / img.width, maxHeight / img.height)
+                const newWidth = Math.round(img.width * ratio)
+                const newHeight = Math.round(img.height * ratio)
+
+                canvas.width = newWidth
+                canvas.height = newHeight
+
+                if (ctx) {
+                    ctx.imageSmoothingEnabled = true
+                    ctx.imageSmoothingQuality = 'high'
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight)
+
+                    canvas.toBlob(
+                        blob => {
+                            if (blob) {
+                                const resizedFileName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+                                const resizedFile = new File([blob], resizedFileName, {
+                                    type: 'image/webp',
+                                    lastModified: Date.now(),
+                                })
+                                resolve(resizedFile)
+                            } else {
+                                reject(new Error('이미지 리사이징 실패'))
+                            }
+                        },
+                        'image/webp',
+                        quality
+                    )
+                } else {
+                    reject(new Error('Canvas 컨텍스트 생성 실패'))
+                }
+            }
+
+            img.onerror = () => {
+                reject(new Error('이미지 로드 실패'))
+            }
+
+            img.src = URL.createObjectURL(file)
+        })
+    }
+
+    // 수정된 프로필 이미지 업로드 핸들러
     const handleProfileImageUpload = async file => {
         if (!file) return
 
         setIsUploading(true)
         try {
-            // 파일명 정리
-            const cleanFileName = sanitizeFileName(file.name)
+            console.log('원본 파일:', file.name, file.type, `${(file.size / 1024).toFixed(1)}KB`)
 
-            // Pre-Signed URL 가져오기
-            const response = await getPreSignedUrl({
+            // 1단계: WebP 변환 (+ 선택적 리사이징)
+            let processedFile
+
+            try {
+                // 프로필 이미지는 보통 크기 제한이 있으므로 리사이징 + WebP 변환
+                processedFile = await resizeProfileImage(file, 400, 400, 0.85)
+                console.log(
+                    '변환된 파일:',
+                    processedFile.name,
+                    processedFile.type,
+                    `${(processedFile.size / 1024).toFixed(1)}KB`
+                )
+
+                // 파일 크기 절약 효과 출력
+                const savings = (((file.size - processedFile.size) / file.size) * 100).toFixed(1)
+                console.log(`파일 크기 절약: ${savings}%`)
+            } catch (conversionError) {
+                console.warn('WebP 변환 실패, 원본 파일 사용:', conversionError)
+                processedFile = file
+            }
+
+            // 2단계: 파일명 정리 (WebP 확장자 반영)
+            const cleanFileName = sanitizeFileName(processedFile.name)
+
+            // 3단계: Pre-Signed URL 가져오기
+            const response = await getPreSignedUrl.mutateAsync({
                 pictures: [
                     {
                         pictureName: cleanFileName,
-                        pictureType: file.type,
+                        pictureType: processedFile.type, // 변환된 파일 타입 사용
                     },
                 ],
             })
 
-            if (!response.data || !response.data.presignedFiles || response.data.presignedFiles.length === 0) {
-                throw new Error('Pre-Signed URL을 가져오는데 실패했습니다.')
-            }
+            console.log('Pre-signed URL 응답:', response)
 
-            // Pre-Signed URL
+            // 4단계: 응답에서 필요한 데이터 추출
+            const presignedUrl = response.presignedFiles[0].presignedUrl
+            const permanentImageUrl = response.presignedFiles[0].pictureURL || presignedUrl.split('?')[0]
 
-            const presignedUrl = response.data.presignedFiles[0].presignedUrl
-
-
-            // 실제 저장될 영구 URL (S3에 저장된 후의 URL)
-            // 주의: 이 URL은 실제 서버에서 제공하는 방식에 따라 달라질 수 있습니다
-            // 가정: 응답에 원본 URL이 포함되어 있거나, 패턴을 알고 있는 경우
-
-            const permanentImageUrl = response.data.presignedFiles[0].pictureURL || presignedUrl.split('?')[0] // URL에서 쿼리 파라미터 제거 (만료 정보 제거)
-
-
-            // 파일 업로드 (S3에 직접 업로드)
-            const uploadResponse = await axios.put(presignedUrl, file, {
+            // 5단계: 변환된 파일을 S3에 업로드
+            const uploadResponse = await axios.put(presignedUrl, processedFile, {
                 headers: {
-                    'Content-Type': file.type,
+                    'Content-Type': processedFile.type, // WebP 타입 사용
                 },
             })
 
-
             if (uploadResponse.status !== 200) {
-
                 throw new Error(`파일 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`)
             }
 
-            // API 호출하여 사용자 정보 업데이트
-            const result = await updateUserInfo(userInfo.userId, {
-                nickname: userInfo.nickname,
-                profileImageURL: permanentImageUrl,
+            console.log('S3 업로드 완료 (WebP 형식)')
+
+            // 6단계: API 호출하여 사용자 정보 업데이트
+            const updateResult = await updateUserInfo.mutateAsync({
+                userId: userInfo.userId,
+                userInfo: {
+                    nickname: userInfo.nickname,
+                    profileImageURL: permanentImageUrl,
+                },
             })
 
-            // 사용자 정보 업데이트 (영구 URL 사용)
+            console.log('사용자 정보 업데이트 결과:', updateResult)
+
+            // 7단계: 상태 업데이트
             const updatedUserInfo = {
                 ...userInfo,
-                profileImageURL: result.data.profileImageURL,
+                profileImageURL: updateResult.profileImageURL || permanentImageUrl,
             }
 
-            // 상태 업데이트
             setUserInfo(updatedUserInfo)
 
-            // 상태 관리 라이브러리 업데이트
             if (setUser) {
                 setUser(updatedUserInfo)
             }
 
-            // 세션 스토리지 업데이트
             updateSessionStorage(updatedUserInfo)
 
-            console.log('프로필 이미지가 성공적으로 업데이트되었습니다.')
+            console.log('프로필 이미지가 WebP 형식으로 성공적으로 업데이트되었습니다.')
+
+            // 성공 메시지 (선택사항)
+            // alert('프로필 이미지가 업데이트되었습니다!')
         } catch (error) {
             console.error('프로필 이미지 업로드 오류:', error)
             alert('프로필 이미지 업로드에 실패했습니다. 다시 시도해주세요.')
+
             // 업로드 실패시 미리보기 초기화
             setPreviewImageURL(userInfo.profileImageURL)
         } finally {
             setIsUploading(false)
         }
     }
-
     return (
         <>
             <Header showButtons={false} />
@@ -414,7 +573,7 @@ const MyPage = () => {
                                         onClick={handleSave}
                                         className='absolute p-1 px-2 py-1 ml-2 text-sm text-white transform -translate-y-1/2 rounded -right-8 top-1/2'
                                     >
-                                        <img className='w-3 h-3' src={iconCheck} alt='편집' />
+                                        <Icon name='check' className='text-gray-500' />
                                     </button>
                                 </div>
                             ) : (
@@ -425,7 +584,7 @@ const MyPage = () => {
                                         onClick={handleEditClick}
                                         aria-label='프로필 편집'
                                     >
-                                        <img className='w-4 h-4' src={icon_pencil} alt='편집' />
+                                        <Icon name='edit' className='w-4 h-4 text-gray-500' />
                                     </button>
                                 </>
                             )}
@@ -455,20 +614,7 @@ const MyPage = () => {
                                         </svg>
                                         <span className='text-base'>내 활동</span>
                                     </div>
-                                    <svg
-                                        className='w-5 h-5 text-gray-400'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        viewBox='0 0 24 24'
-                                        xmlns='http://www.w3.org/2000/svg'
-                                    >
-                                        <path
-                                            strokeLinecap='round'
-                                            strokeLinejoin='round'
-                                            strokeWidth='2'
-                                            d='M9 5l7 7-7 7'
-                                        ></path>
-                                    </svg>
+                                    <Icon name='arrow' direction='right' className='w-4 h-4 text-gray-400' />
                                 </button>
 
                                 <button
@@ -497,20 +643,7 @@ const MyPage = () => {
                                         </svg>
                                         <span className='text-base'>문의하기</span>
                                     </div>
-                                    <svg
-                                        className='w-5 h-5 text-gray-400'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        viewBox='0 0 24 24'
-                                        xmlns='http://www.w3.org/2000/svg'
-                                    >
-                                        <path
-                                            strokeLinecap='round'
-                                            strokeLinejoin='round'
-                                            strokeWidth='2'
-                                            d='M9 5l7 7-7 7'
-                                        ></path>
-                                    </svg>
+                                    <Icon name='arrow' direction='right' className='w-4 h-4 text-gray-400' />
                                 </button>
 
                                 <button
@@ -549,11 +682,7 @@ const MyPage = () => {
                         title={modalData}
                         content={'로그아웃 하시겠습니까?'}
                         closeModal={closeModal}
-                        handleConfirm={() => {
-                            useAuthStore.getState().logout()
-                            closeModal()
-                            navigate('/login')
-                        }}
+                        handleConfirm={handleLogout}
                     />
                 )}
             </Modal>

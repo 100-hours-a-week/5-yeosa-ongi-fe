@@ -71,9 +71,9 @@ const Month = ({ albumIds, title, handleOutsideClick }: MonthProps) => {
     }, [handleOutsideClick])
 
     return (
-        <div ref={monthRef} className='py-2'>
-            <div className='h-8 p-1 ml-2 text-md'>{title}</div>
-            <div ref={gridRef} className='min-h-[100px]'>
+        <div ref={monthRef} className='py-1 '>
+            <div className='h-8 p-1 ml-1 text-sm '>{title}</div>
+            <div ref={gridRef} className='min-h-[100px] '>
                 <Grid items={items}></Grid>
             </div>
         </div>

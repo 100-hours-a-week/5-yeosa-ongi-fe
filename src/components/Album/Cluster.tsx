@@ -1,5 +1,9 @@
+<<<<<<< HEAD
+import { useUpdateClusterTitle } from '@/hooks/useAlbum'
+=======
 import { changeClusterTitle } from '@/api/album'
 
+>>>>>>> main
 import { ChangeEvent, CSSProperties, FocusEvent, KeyboardEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextInput from '../common/TextInput'
@@ -33,6 +37,7 @@ const Cluster = ({ cluster, albumId }: ClusterProps) => {
     const [originalName, setOriginalName] = useState(cluster.clusterName)
     const [isLoading, setSaveLoading] = useState(false)
     const navigate = useNavigate()
+    const updateClusterTitle = useUpdateClusterTitle()
 
     const handleEditClick = () => {
         setIsEditing(true)
@@ -83,13 +88,17 @@ const Cluster = ({ cluster, albumId }: ClusterProps) => {
 
         try {
             const trimmedName = newName.trim()
-            const response = await changeClusterTitle(albumId, cluster.clusterId, trimmedName)
+            const response = await updateClusterTitle.mutateAsync({
+                albumId,
+                clusterId: cluster.clusterId,
+                clusterName: trimmedName,
+            })
 
             // API 응답 확인
-            if (response && response.success) {
+            if (response) {
                 setIsEditing(false)
             } else {
-                throw new Error(response?.message || '이름 변경에 실패했습니다.')
+                throw new Error('이름 변경에 실패했습니다.')
             }
         } catch (error) {
             console.error('클러스터 이름 변경 실패:', error)

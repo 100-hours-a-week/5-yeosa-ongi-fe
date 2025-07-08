@@ -8,8 +8,6 @@ import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
 
 // APIs
-import { deleteAlbumPicture } from '../api/pictures/deletePicture'
-import { recoverAlbumPicture } from '../api/pictures/recoverPicture'
 
 // Store
 import useCollectionStore from '../stores/collectionStore'
@@ -20,8 +18,9 @@ import useModal from '../hooks/useModal'
 // Assets
 import CollectionHeader from '@/components/Collection/CollectionHeader'
 import ImageModal from '@/components/Collection/ImageModal'
+import Icon from '@/components/common/Icon'
 import MovingDotsLoader from '@/components/common/MovingDotsLoader'
-import arrowLeft from '../assets/icons/Arrow_Left.png'
+import { useDeleteAlbumPictures, useRecoverAlbumPictures } from '@/hooks/useAlbum'
 
 const Collection = () => {
     const { albumId, collectionName } = useParams()
@@ -42,6 +41,61 @@ const Collection = () => {
     const getCollectionByName = useCollectionStore(state => state.getCollectionByName)
     const removePictures = useCollectionStore(state => state.removePictures)
     const recoverPictures = useCollectionStore(state => state.recoverPictures)
+
+    const deleteAlbumPictures = useDeleteAlbumPictures({
+        onSuccess: () => {
+            console.log('사진 삭제 성공')
+            // Store 업데이트
+            const pictureIds = Array.from(selectedPictures)
+            removePictures(pictureIds)
+
+            const updatedCollection = getCollectionByName(collectionName)
+            // 타입 가드를 사용하여 안전하게 처리
+            if (updatedCollection && 'pictures' in updatedCollection) {
+                setCurrentCollection(updatedCollection)
+
+                if (updatedCollection.pictures.length === 0) {
+                    navigate(`/album/${albumId}`)
+                }
+            } else {
+                navigate(`/album/${albumId}`)
+            }
+
+            setIsSelectMode(false)
+            setSelectedPictures(new Set())
+        },
+        onError: error => {
+            console.error('사진 삭제 중 오류 발생:', error)
+        },
+    })
+
+    const recoverAlbumPictures = useRecoverAlbumPictures({
+        onSuccess: () => {
+            console.log('사진 복원 성공')
+            // Store 업데이트
+            const pictureIds = Array.from(selectedPictures)
+            recoverPictures(pictureIds)
+
+            const updatedCollection = getCollectionByName(collectionName)
+            // 타입 가드를 사용하여 안전하게 처리
+            if (updatedCollection && 'pictures' in updatedCollection) {
+                setCurrentCollection(updatedCollection)
+
+                if (updatedCollection.pictures.length === 0) {
+                    navigate(`/album/${albumId}`)
+                }
+            } else {
+                navigate(`/album/${albumId}`)
+            }
+
+            setIsSelectMode(false)
+            setIsRecovery(false)
+            setSelectedPictures(new Set())
+        },
+        onError: error => {
+            console.error('사진 복원 중 오류 발생:', error)
+        },
+    })
 
     const toggleSelect = pictureId => {
         setSelectedPictures(prev => {
@@ -120,53 +174,32 @@ const Collection = () => {
     }
 
     /**
-     * 사진 삭제 핸들러
+     * 사진 삭제 핸들러 - 현재 시스템의 훅 사용
      */
     const handleDelete = async () => {
-        try {
-            const pictureIds = Array.from(selectedPictures)
+        if (!albumId) return
 
-            await deleteAlbumPicture(albumId, { pictureIds })
-            removePictures(pictureIds)
-
-            const updatedCollection = getCollectionByName(collectionName)
-            setCurrentCollection(updatedCollection)
-
-            setIsSelectMode(false)
-            setSelectedPictures(new Set())
-
-            if (!updatedCollection || updatedCollection.pictures.length === 0) {
-                navigate(`/album/${albumId}`)
-            }
-        } catch (error) {
-            console.error('사진 삭제 중 오류 발생:', error)
-        }
+        const pictureIds = Array.from(selectedPictures)
+        console.log(pictureIds)
+        deleteAlbumPictures.mutate({
+            albumId,
+            pictureIds,
+        })
+        closeModal()
     }
 
     /**
-     * 사진 복원 핸들러
+     * 사진 복원 핸들러 - 현재 시스템의 훅 사용
      */
     const handleRecover = async () => {
-        try {
-            const pictureIds = Array.from(selectedPictures)
-            await recoverAlbumPicture(albumId, { pictureIds })
-            recoverPictures(pictureIds)
+        if (!albumId) return
 
-            // 업데이트된 컬렉션 데이터 가져오기
-            const updatedCollection = getCollectionByName(collectionName)
-            setCurrentCollection(updatedCollection)
-
-            setIsSelectMode(false)
-            setIsRecovery(false)
-            setSelectedPictures(new Set())
-
-            // 컬렉션이 비어있으면 앨범 페이지로 이동
-            if (!updatedCollection || updatedCollection.pictures.length === 0) {
-                navigate(`/album/${albumId}`)
-            }
-        } catch (error) {
-            console.error('사진 복원 중 오류 발생:', error)
-        }
+        const pictureIds = Array.from(selectedPictures)
+        recoverAlbumPictures.mutate({
+            albumId,
+            pictureIds,
+        })
+        closeModal()
     }
 
     useEffect(() => {
@@ -202,7 +235,7 @@ const Collection = () => {
         <>
             <div className='h-[52px] relative flex items-center justify-center'>
                 <button onClick={() => navigate(-1)} className='absolute h-1/2 left-4 top-1/4'>
-                    <img src={arrowLeft} className='h-1/2 left-4 top-1/4' alt='뒤로가기' />
+                    <Icon name='arrow' className='' direction='left' />
                 </button>
                 <div className='text-center'>{currentCollection?.alt || currentCollection?.name || '컬렉션'}</div>
             </div>

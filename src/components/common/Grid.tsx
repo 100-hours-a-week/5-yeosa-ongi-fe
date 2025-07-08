@@ -31,7 +31,7 @@ const Grid: FC<GridProps> = memo(({ col = 4, items = [] }) => {
             {chunkArray.map((array, rowIndex) => (
                 <div
                     key={`row-${rowIndex}`}
-                    className='grid'
+                    className='relative grid'
                     style={{
                         gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
                         height: `calc(min(100vw,430px) / ${col})`,

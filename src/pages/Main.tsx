@@ -1,11 +1,21 @@
+<<<<<<< HEAD
+import { useCallback, useState } from 'react'
+
+// Components
+import ResizableContainer from '@/components/common/ResizableContainer'
+import AlbumList from '@/components/Main/AlbumList'
+=======
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Components
+>>>>>>> main
 import AlbumListHeader from '@/components/Main/AlbumListHeader'
 import BannerSlider from '@/components/Main/BannerSlider'
 import KakaoMap from '@/components/Main/KakaoMap'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
+<<<<<<< HEAD
+=======
 import MovingDotsLoader from '../components/common/MovingDotsLoader'
 import OnboardingScreen from '../components/Main/OnboardingScreen'
 
@@ -21,12 +31,22 @@ import ResizableContainer from '@/components/common/ResizableContainer'
 import Month from '@/components/Main/Month'
 
 type yearMonth = string | null
+>>>>>>> main
 
 const CONSTANTS = {
     HEADER_HEIGHT: 56,
     BANNER_HEIGHT: 72,
 }
 
+<<<<<<< HEAD
+const Main = () => {
+    const [listHeight, setListHeight] = useState(0)
+
+    /**
+     * 지도의 실제 높이 계산
+     * @returns
+     */
+=======
 type LoadingState = 'loading' | 'success' | 'error' | 'empty'
 
 const Main = () => {
@@ -43,6 +63,7 @@ const Main = () => {
     const { albumsByMonth, setAlbums, addAlbums } = useAlbumStore()
 
     // 지도의 실제 높이 계산
+>>>>>>> main
     const getMapHeight = () => {
         const totalHeight = window.innerHeight - CONSTANTS.HEADER_HEIGHT
         const availableHeight = totalHeight - CONSTANTS.BANNER_HEIGHT
@@ -54,6 +75,21 @@ const Main = () => {
         setListHeight(height)
     }, [])
 
+<<<<<<< HEAD
+    return (
+        <div className='relative h-screen overflow-hidden'>
+            <Header />
+            <div className='flex-col content'>
+                <div className='relative' style={{ height: 'calc(100vh - 56px)' }}>
+                    <BannerSlider />
+                    <div className='absolute inset-0 top-[72px] border-t border-solid'>
+                        <KakaoMap height={getMapHeight()} />
+                    </div>
+                    <ResizableContainer className='' onHeightChange={handleListHeightChange}>
+                        <AlbumListHeader />
+                        <AlbumList />
+                    </ResizableContainer>
+=======
     // 초기 데이터 로드
     useEffect(() => {
         let isMounted = true
@@ -206,6 +242,7 @@ const Main = () => {
                     ) : (
                         <OnboardingScreen />
                     )}
+>>>>>>> main
                 </div>
             </div>
 
@@ -213,5 +250,8 @@ const Main = () => {
         </div>
     )
 }
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
 export default Main

@@ -27,14 +27,22 @@ const useMainPageStore = create<MainPageState>((set, get) => ({
     clearSelection: () => set({ selectedId: null, selectedAlbumSummary: null }),
 }))
 
+<<<<<<< HEAD
+export interface AlbumData {
+=======
 interface AlbumData {
+>>>>>>> main
     albumId: number
     albumName: string
     thumbnailPictureURL: string
     latitude: number
     longitude: number
     createdAt: string
+<<<<<<< HEAD
+    memberProfileImageURL: string[]
+=======
     memberProfileImageURL: string
+>>>>>>> main
 }
 
 // 저장되는 앨범 인터페이스
@@ -44,7 +52,11 @@ interface Album {
     latitude: number
     longitude: number
     createdAt: string
+<<<<<<< HEAD
+    memberProfileImageURL: string[]
+=======
     memberProfileImageURL: string
+>>>>>>> main
 }
 
 interface AlbumState {

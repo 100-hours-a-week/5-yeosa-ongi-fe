@@ -1,10 +1,9 @@
-import ArrowRight from '@/assets/icons/Arrow Right.png'
-import ArrowLeft from '@/assets/icons/Arrow_Left.png'
-import onboadingImage1 from '@/assets/onboardingImages/onboarding01.png'
-import onboadingImage2 from '@/assets/onboardingImages/onboarding02.png'
-import onboadingImage3 from '@/assets/onboardingImages/onboarding03.png'
-import onboadingImage4 from '@/assets/onboardingImages/onboarding04.png'
+import onboadingImage1 from '@/assets/onboardingImages/onboarding01.webp'
+import onboadingImage2 from '@/assets/onboardingImages/onboarding02.webp'
+import onboadingImage3 from '@/assets/onboardingImages/onboarding03.webp'
+import onboadingImage4 from '@/assets/onboardingImages/onboarding04.webp'
 import { useEffect, useRef, useState } from 'react'
+import Icon from '../common/Icon'
 
 const OnboardingUI = () => {
     const [currentSlide, setCurrentSlide] = useState(0)
@@ -236,7 +235,7 @@ const OnboardingUI = () => {
                     onClick={prevSlide}
                     className='p-3 text-gray-700 transition-all duration-200 bg-transparent rounded-full hover:bg-white hover:scale-110'
                 >
-                    <img src={ArrowLeft} className='h-2' />
+                    <Icon name='arrow' direction='left' />
                 </button>
             </div>
 
@@ -245,7 +244,7 @@ const OnboardingUI = () => {
                     onClick={nextSlide}
                     className='p-3 text-gray-700 transition-all duration-200 bg-transparent rounded-full hover:bg-white hover:scale-110'
                 >
-                    <img src={ArrowRight} className='h-2' />
+                    <Icon name='arrow' direction='right' />
                 </button>
             </div>
         </>

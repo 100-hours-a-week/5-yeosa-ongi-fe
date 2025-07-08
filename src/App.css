@@ -1,5 +1,6 @@
 /* App.css */
 @import '@fontsource/pretendard';
+
 body {
     margin: 0;
     padding: 0;
@@ -21,6 +22,43 @@ body {
     width: 100%;
     position: relative;
     min-height: 100vh;
-
+    background-color: #fafafa;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 선택적: 그림자 효과 */
+
+    /* 드래그 방지 */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* 표준 */
+
+    /* 이미지 드래그 방지 */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+/* 래퍼 내 모든 요소에 드래그 방지 적용 */
+.app-wrapper * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+/* 입력 필드는 선택 가능하도록 예외 처리 */
+.app-wrapper input,
+.app-wrapper textarea,
+.app-wrapper select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }

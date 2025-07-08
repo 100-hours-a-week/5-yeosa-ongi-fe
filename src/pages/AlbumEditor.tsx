@@ -2,15 +2,21 @@ import { memo, useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 // Components
+// Components
 import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
 import FileManager from '@/components/AlbumEditor/FileManager'
 import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
 import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
 
 // Hooks
+
+// Hooks
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
 
 // Types
+
+import TagContainer from '@/components/AlbumEditor/TagContainer'
+import CollapsibleContainer from '@/components/common/CollapsibleContainer'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 
 interface ButtonState {
@@ -31,9 +37,8 @@ const MemoizedCreateAlbumButton = memo(CreateAlbumButton)
 const AlbumEditor = () => {
     const [albumTitle, setAlbumTitle] = useState('이름 없는 앨범')
     const { albumId } = useParams()
-
+    const [selectedTags, setSelectedTags] = useState<string[]>([])
     const albumData = useAlbumCreation()
-    // const fileManager = useFileUpload({ maxFiles: 30 })
 
     const { count, isValid: isFileValid } = useFileCount()
     const files = useFileStore(fileSelectors.files)
@@ -47,13 +52,11 @@ const AlbumEditor = () => {
      * 앨범 생성 핸들러
      */
     const handleCreateAlbum = useCallback(async (): Promise<void> => {
-        // 생성 조건 검사 (1장 이상으로 변경)
         if (files.length < 1 || albumData.loading || isProcessing) {
             return
         }
-
         try {
-            await albumData.createAlbumWithFiles(albumTitle, files, albumId as string)
+            await albumData.createAlbumWithFiles(albumTitle, files, albumId as string, selectedTags)
         } catch (error) {
             console.error('앨범 생성 중 오류:', error)
         }
@@ -73,19 +76,37 @@ const AlbumEditor = () => {
         [albumTitle, albumData.loading, isProcessing]
     )
 
+    const handleTagsChange = (newTags: string[]) => {
+        setSelectedTags(newTags)
+        console.log('선택된 태그들:', newTags)
+    }
+
     return (
         <div className='flex flex-col min-h-screen'>
+            <MemoizedAlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
             <MemoizedAlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
             {albumId ? ' ' : <MemoizedAlbumTitleForm value={albumTitle} onChange={handleTitleChange} />}
 
+            {albumId ? (
+                ' '
+            ) : (
+                <>
+                    <CollapsibleContainer title='태그 선택'>
+                        <TagContainer activeTags={selectedTags} onTagChange={handleTagsChange}></TagContainer>
+                    </CollapsibleContainer>
+                </>
+            )}
+
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
+                <FileManager />
                 <FileManager />
             </main>
 
             <footer className='px-4 py-3 mt-auto'>
+                <CreateAlbumButton buttonState={buttonState} onClick={handleCreateAlbum}></CreateAlbumButton>
                 <CreateAlbumButton buttonState={buttonState} onClick={handleCreateAlbum}></CreateAlbumButton>
             </footer>
         </div>

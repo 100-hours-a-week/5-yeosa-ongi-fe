@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import { useUpdateAlbumName } from '@/hooks/useAlbum'
+=======
 import { changeAlbumName } from '@/api/album'
+>>>>>>> main
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
@@ -19,6 +23,21 @@ interface AlbumTitleProps {
 const AlbumTitle = ({ title }: AlbumTitleProps) => {
     const { albumId } = useParams()
     const [currentTitle, setCurrentTitle] = useState<string>(title)
+<<<<<<< HEAD
+    const changeAlbumName = useUpdateAlbumName()
+
+    const handleSaveName = async (newValue: string) => {
+        if (albumId) {
+            changeAlbumName.mutate({ albumId, albumName: newValue })
+        }
+        setCurrentTitle(newValue)
+    }
+
+    return (
+        <div className='p-4 pb-0'>
+            <EditableText
+                displayClassName='font-semibold text-gray-600'
+=======
 
     const handleSaveName = async (newValue: string) => {
         try {
@@ -33,6 +52,7 @@ const AlbumTitle = ({ title }: AlbumTitleProps) => {
     return (
         <div className='p-4'>
             <EditableText
+>>>>>>> main
                 value={currentTitle}
                 onSave={handleSaveName}
                 textFieldProps={{

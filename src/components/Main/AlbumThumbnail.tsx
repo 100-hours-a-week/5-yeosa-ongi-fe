@@ -1,42 +1,46 @@
+import { useAlbumSummary } from '@/hooks/useAlbum'
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
-import { getAlubmSummary } from '../../api/album'
+import OptimizedImage from '../common/OptimizedImage'
 
 interface AlbumThumbnailProps {
     id: string
+    props: { height: number; width: number }
 }
-const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
+const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
     const navigate = useNavigate()
     const { albums } = useAlbumStore()
     const album = albums[id.toString()]
 
+    const { data: albumSummary } = useAlbumSummary(id)
     const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
     const isSelected = selectedId === id
 
     const handleSelect = async () => {
         if (isSelected) {
-            console.log('앨범 상세페이지로 이동 : ', id)
             navigate(`/album/${id}`)
         } else {
             selectItem(id)
-            const response = await getAlubmSummary(id)
-            setSelectedAlbumSummary(response.data)
+            setSelectedAlbumSummary(albumSummary)
         }
     }
-
     return (
         <div data-album-thumbnail='true' className='relative w-full h-full border-solid' onClick={handleSelect}>
-            <img
-                className='absolute inset-0 object-cover w-full h-full'
+            <OptimizedImage
                 src={album?.thumbnailURL || '/default-thumbnail.jpg'}
                 alt='Album thumbnail'
+                className='absolute inset-0'
+                lazy={true}
+                placeholder={true}
+                onLoad={() => console.log(`이미지 로드 완료: ${id}`)}
             />
+
             {isSelected && (
                 <div className='absolute inset-0 z-10 flex items-center justify-center bg-black opacity-55'>
                     <span className='z-20 text-lg text-white'>{album.albumName}</span>
                 </div>
             )}
-            {album?.memberProfileImageURL.length !== 0 && (
+            {album?.memberProfileImageURL.length > 1 && (
                 <div className='absolute flex bottom-2 right-2'>
                     {album?.memberProfileImageURL.map((url: string, index: number) => (
                         <div
@@ -49,10 +53,14 @@ const AlbumThumbnail = ({ id }: AlbumThumbnailProps) => {
                                 zIndex: album.memberProfileImageURL.length - index,
                             }}
                         >
-                            <img
-                                className='object-cover w-full h-full'
-                                src={`${url}`}
+                            <OptimizedImage
+                                src={url}
                                 alt={`Collaborator ${index + 1}`}
+                                width={24}
+                                height={24}
+                                className='w-full h-full'
+                                lazy={true}
+                                placeholder={true}
                             />
                         </div>
                     ))}

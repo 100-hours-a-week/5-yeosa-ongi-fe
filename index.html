@@ -6,6 +6,29 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ongi</title>
+
+  <!-- DNS Prefetch & Preconnect -->
+  <link rel="preconnect" href="https://cdn-dev.ongi.today">
+  <link rel="dns-prefetch" href="https://cdn-dev.ongi.today">
+
+  <!-- 중요한 CSS 우선 로드 -->
+  <link rel="preload" href="/src/index.css" as="style">
+
+  <!-- 폰트 프리로드 (가장 중요한 weight들) -->
+  <link rel="preload" href="/node_modules/@fontsource/pretendard/files/pretendard-korean-400-normal.woff2" as="font"
+    type="font/woff2" crossorigin>
+  <link rel="preload" href="/node_modules/@fontsource/pretendard/files/pretendard-korean-500-normal.woff2" as="font"
+    type="font/woff2" crossorigin>
+
+  <!-- 카카오맵 스크립트 프리로드 -->
+  <link rel="preload"
+    href="https://dapi.kakao.com/v2/maps/sdk.js?appkey=f15dee0d63f581e725ea42d340e6dbb5&libraries=clusterer&autoload=false"
+    as="script">
+
+  <!-- 중요한 JavaScript 모듈 프리로드 -->
+  <link rel="modulepreload" href="/src/main.tsx">
+  <link rel="modulepreload" href="/src/App.tsx">
+  <link rel="modulepreload" href="/src/stores/authStore.ts">
 </head>
 
 <body class="font-sans">
