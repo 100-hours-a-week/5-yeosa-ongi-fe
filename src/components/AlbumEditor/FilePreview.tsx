@@ -10,21 +10,10 @@ interface FilePreviewProps {
     isConverting: boolean
     conversionError: string | null
     onDelete: () => void
-    onImageError?: () => void
-    onImageLoad?: () => void
 }
 
 const FilePreview = memo(
-    ({
-        previewUrl,
-        fileName,
-        fileType,
-        isConverting,
-        conversionError,
-        onDelete,
-        onImageError,
-        onImageLoad,
-    }: FilePreviewProps) => {
+    ({ previewUrl, fileName, fileType, isConverting, conversionError, onDelete }: FilePreviewProps) => {
         return (
             <div className='relative w-full h-full'>
                 {/* 변환 중일 때만 Skeleton */}
@@ -40,13 +29,7 @@ const FilePreview = memo(
                     </SkeletonTheme>
                 ) : (
                     // 변환 중이 아닐 때 이미지
-                    <img
-                        src={previewUrl}
-                        alt={fileName}
-                        className='absolute inset-0 object-cover w-full h-full'
-                        onError={onImageError}
-                        onLoad={onImageLoad}
-                    />
+                    <img src={previewUrl} alt={fileName} className='absolute inset-0 object-cover w-full h-full' />
                 )}
 
                 {/* 삭제 버튼 */}
