@@ -19,6 +19,38 @@ const loadHeic2AnyDynamic = async () => {
 
     return module.default
 }
+
+export const convertToWebP = async (file, quality = 0.8) => {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const img = new Image()
+
+        img.onload = () => {
+            canvas.width = img.width
+            canvas.height = img.height
+            ctx?.drawImage(img, 0, 0)
+
+            canvas.toBlob(
+                blob => {
+                    if (blob) {
+                        const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), {
+                            type: 'image/webp',
+                        })
+                        resolve(webpFile)
+                    } else {
+                        reject(new Error('WebP 변환 실패'))
+                    }
+                },
+                'image/webp',
+                quality
+            )
+        }
+
+        img.onerror = () => reject(new Error('이미지 로드 실패'))
+        img.src = URL.createObjectURL(file)
+    })
+}
 /**
  * HEIC/HEIF 파일을 JPG로 변환합니다.
  * @param {File} heicFile - 변환할 HEIC/HEIF 파일
