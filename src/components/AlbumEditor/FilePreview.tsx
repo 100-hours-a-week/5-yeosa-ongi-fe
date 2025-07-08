@@ -1,5 +1,3 @@
-// components/FilePreview/PureFilePreview.tsx (새 파일)
-
 import { memo } from 'react'
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
@@ -9,29 +7,14 @@ interface FilePreviewProps {
     previewUrl: string
     fileName: string
     fileType: string
-    fileName: string
-    fileType: string
     isConverting: boolean
     conversionError: string | null
-    onDelete: () => void
-    onImageError?: () => void
-    onImageLoad?: () => void
     onDelete: () => void
     onImageError?: () => void
     onImageLoad?: () => void
 }
 
 const FilePreview = memo(
-    ({
-        previewUrl,
-        fileName,
-        fileType,
-        isConverting,
-        conversionError,
-        onDelete,
-        onImageError,
-        onImageLoad,
-    }: FilePreviewProps) => {
     ({
         previewUrl,
         fileName,
@@ -61,8 +44,6 @@ const FilePreview = memo(
                         src={previewUrl}
                         alt={fileName}
                         className='absolute inset-0 object-cover w-full h-full'
-                        onError={onImageError}
-                        onLoad={onImageLoad}
                         onError={onImageError}
                         onLoad={onImageLoad}
                     />
