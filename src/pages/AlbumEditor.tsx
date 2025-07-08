@@ -84,7 +84,6 @@ const AlbumEditor = () => {
     return (
         <div className='flex flex-col min-h-screen'>
             <MemoizedAlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
-            <MemoizedAlbumEditorHeader title={albumId ? '사진 추가' : '앨범 생성'} />
 
             {/* 앨범 제목 폼 */}
             {albumId ? ' ' : <MemoizedAlbumTitleForm value={albumTitle} onChange={handleTitleChange} />}
@@ -102,11 +101,9 @@ const AlbumEditor = () => {
             {/* 메인 콘텐츠 */}
             <main className='flex-grow px-4'>
                 <FileManager />
-                <FileManager />
             </main>
 
             <footer className='px-4 py-3 mt-auto'>
-                <CreateAlbumButton buttonState={buttonState} onClick={handleCreateAlbum}></CreateAlbumButton>
                 <CreateAlbumButton buttonState={buttonState} onClick={handleCreateAlbum}></CreateAlbumButton>
             </footer>
         </div>

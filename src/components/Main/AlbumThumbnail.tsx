@@ -61,6 +61,7 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
                                 className='w-full h-full'
                                 lazy={true}
                                 placeholder={true}
+                                size='medium'
                             />
                         </div>
                     ))}
