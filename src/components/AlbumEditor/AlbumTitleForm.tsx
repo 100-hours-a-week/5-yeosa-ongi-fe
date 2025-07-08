@@ -1,4 +1,5 @@
-import { ChangeEvent, useState } from 'react'
+import { useState } from 'react'
+import TextField from '../common/TextField'
 
 interface AlbumTitleFormProps {
     value: string
@@ -28,8 +29,7 @@ const AlbumTitleForm = ({ value, onChange, onValidationChange }: AlbumTitleFormP
         return true
     }
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const newTitle = e.target.value
+    const handleChange = (newTitle: string) => {
         onChange(newTitle)
 
         // 입력 중에는 에러 메시지만 클리어
@@ -39,20 +39,17 @@ const AlbumTitleForm = ({ value, onChange, onValidationChange }: AlbumTitleFormP
         }
     }
 
-    const handleBlur = () => {
-        validateTitle(value)
-    }
-
     return (
         <div className='flex flex-col w-full mt-4 mb-2'>
             <div className='flex items-center pb-2 mx-4 border-b border-gray-300'>
                 <div className='w-16 mx-4 font-medium text-gray-900'> 제목</div>
-                <input
-                    className='w-full text-lg focus:outline-none'
+                <TextField
+                    className='w-full text-md focus:outline-none'
                     value={value}
                     onChange={handleChange}
-                    onBlur={handleBlur}
                     maxLength={12}
+                    validator={validateTitle}
+                    helperText={validationMessage}
                 />
             </div>
         </div>
