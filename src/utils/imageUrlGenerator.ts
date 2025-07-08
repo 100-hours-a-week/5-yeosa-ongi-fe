@@ -15,14 +15,15 @@ export interface SizeConfig {
 }
 
 /**
- * 이미지 URL 생성 및 관리를 위한 유틸리티 클래스
+ * 환경변수 기반 이미지 URL 생성 유틸리티
  */
 export class ImageUrlGenerator {
-    private readonly originalCdnUrl: string
+    private readonly cdnUrl: string
     private readonly sizes: Record<ImageSize, SizeConfig>
 
-    constructor(originalCdnUrl = 'https://cdn-dev.ongi.today') {
-        this.originalCdnUrl = originalCdnUrl
+    constructor() {
+        // 환경변수에서 CDN URL 가져오기
+        this.cdnUrl = this.getCdnUrl()
         this.sizes = {
             thumbnail: { width: 200, height: 200 },
             medium: { width: 800, height: 600 },
@@ -31,94 +32,91 @@ export class ImageUrlGenerator {
     }
 
     /**
+     * 환경변수에서 CDN URL 추출 (Vite 환경)
+     */
+    private getCdnUrl(): string {
+        // Vite 환경변수 (VITE_ 접두사)
+        const envCdnUrl = import.meta.env.VITE_CDN_URL
+
+        if (envCdnUrl) {
+            return envCdnUrl
+        }
+
+        // 환경변수가 없을 때 MODE 기반 기본값 (Vite의 NODE_ENV 대신 MODE 사용)
+        const mode = import.meta.env.MODE || 'development'
+
+        switch (mode) {
+            case 'production':
+                return 'https://cdn.ongi.today'
+            case 'staging':
+                return 'https://cdn-staging.ongi.today'
+            default:
+                return 'https://cdn-dev.ongi.today'
+        }
+    }
+
+    /**
      * CDN URL에서 파일명만 추출
      */
-    getFileNameFromCdnUrl(cdnUrl: string): string {
-        return cdnUrl.split('/').pop() || ''
+    private extractFileName(urlOrFileName: string): string {
+        if (!urlOrFileName.includes('http')) {
+            return urlOrFileName
+        }
+        return urlOrFileName.split('/').pop() || ''
     }
 
     /**
      * 파일명에서 확장자 제거
      */
-    getFileNameWithoutExtension(fileName: string): string {
+    private removeFileExtension(fileName: string): string {
         return fileName.replace(/\.[^/.]+$/, '')
     }
 
     /**
-     * 특정 크기의 리사이징된 이미지 URL 생성 (같은 CDN, resized 폴더)
+     * 특정 크기의 리사이징된 이미지 URL 생성
      */
-    getResizedImageUrl(originalCdnUrlOrFileName: string, size: ImageSize = 'medium'): string {
-        const fileName = originalCdnUrlOrFileName.includes('http')
-            ? this.getFileNameFromCdnUrl(originalCdnUrlOrFileName)
-            : originalCdnUrlOrFileName
-
-        const fileNameWithoutExt = this.getFileNameWithoutExtension(fileName)
+    getResizedImageUrl(originalUrlOrFileName: string, size: ImageSize = 'medium'): string {
+        const fileName = this.extractFileName(originalUrlOrFileName)
+        const fileNameWithoutExt = this.removeFileExtension(fileName)
         const { width, height } = this.sizes[size]
 
-        // 같은 CDN의 resized 폴더 사용
-        return `${this.originalCdnUrl}/resized/${size}/${fileNameWithoutExt}_${width}x${height}.webp`
+        return `${this.cdnUrl}/resized/${size}/${fileNameWithoutExt}_${width}x${height}.webp`
+    }
+
+    /**
+     * 원본 이미지 URL 생성
+     */
+    getOriginalImageUrl(originalUrlOrFileName: string): string {
+        if (originalUrlOrFileName.includes('http')) {
+            return originalUrlOrFileName
+        }
+        return `${this.cdnUrl}/${originalUrlOrFileName}`
     }
 
     /**
      * 모든 크기의 이미지 URL 반환
      */
-    getAllImageUrls(originalCdnUrlOrFileName: string): ImageUrls {
-        const originalUrl = originalCdnUrlOrFileName.includes('http')
-            ? originalCdnUrlOrFileName
-            : `${this.originalCdnUrl}/${originalCdnUrlOrFileName}`
-
+    getAllImageUrls(originalUrlOrFileName: string): ImageUrls {
         return {
-            thumbnail: this.getResizedImageUrl(originalCdnUrlOrFileName, 'thumbnail'),
-            medium: this.getResizedImageUrl(originalCdnUrlOrFileName, 'medium'),
-            large: this.getResizedImageUrl(originalCdnUrlOrFileName, 'large'),
-            original: originalUrl,
+            thumbnail: this.getResizedImageUrl(originalUrlOrFileName, 'thumbnail'),
+            medium: this.getResizedImageUrl(originalUrlOrFileName, 'medium'),
+            large: this.getResizedImageUrl(originalUrlOrFileName, 'large'),
+            original: this.getOriginalImageUrl(originalUrlOrFileName),
         }
     }
 
     /**
      * 반응형 이미지를 위한 srcSet 생성
      */
-    generateSrcSet(originalCdnUrlOrFileName: string): string {
-        const urls = this.getAllImageUrls(originalCdnUrlOrFileName)
-        return `
-            ${urls.thumbnail} 200w,
-            ${urls.medium} 800w,
-            ${urls.large} 1200w
-        `.trim()
+    generateSrcSet(originalUrlOrFileName: string): string {
+        const urls = this.getAllImageUrls(originalUrlOrFileName)
+        return [`${urls.thumbnail} 200w`, `${urls.medium} 800w`, `${urls.large} 1200w`].join(', ')
     }
 
     /**
-     * 이미지 존재 여부 확인 (향상된 버전)
+     * img 태그를 사용한 이미지 존재 확인
      */
-    async checkImageExists(url: string): Promise<boolean> {
-        try {
-            // 먼저 HEAD 요청으로 시도
-            const headResponse = await fetch(url, {
-                method: 'HEAD',
-                cache: 'no-cache', // 캐시 무시
-            })
-
-            if (headResponse.ok) {
-                return true
-            }
-
-            // HEAD 요청 실패시 GET 요청으로 재시도 (CORS 문제일 수 있음)
-            const getResponse = await fetch(url, {
-                method: 'GET',
-                cache: 'no-cache',
-            })
-
-            return getResponse.ok
-        } catch (error) {
-            console.warn(`이미지 존재 확인 실패: ${url}`, error)
-            return false
-        }
-    }
-
-    /**
-     * 더 안전한 이미지 존재 확인 (img 태그 사용)
-     */
-    async checkImageExistsWithImg(url: string): Promise<boolean> {
+    checkImageExists(url: string): Promise<boolean> {
         return new Promise(resolve => {
             const img = new Image()
 
@@ -137,7 +135,7 @@ export class ImageUrlGenerator {
                 resolve(false)
             }
 
-            // 캐시 방지를 위해 타임스탬프 추가
+            // 캐시 방지
             img.src = `${url}?t=${Date.now()}`
 
             // 10초 타임아웃
@@ -149,40 +147,46 @@ export class ImageUrlGenerator {
     }
 
     /**
-     * 처리된 이미지가 준비될 때까지 대기 (향상된 버전)
+     * 처리된 이미지가 준비될 때까지 대기
      */
     async waitForProcessedImage(
-        originalCdnUrlOrFileName: string,
+        originalUrlOrFileName: string,
         size: ImageSize = 'medium',
-        maxAttempts: number = 15,
-        useImgCheck: boolean = true // img 태그 방식 사용 여부
+        maxAttempts: number = 15
     ): Promise<string> {
-        const url = this.getResizedImageUrl(originalCdnUrlOrFileName, size)
+        const url = this.getResizedImageUrl(originalUrlOrFileName, size)
 
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-            console.log(`이미지 처리 대기 중... (${attempt}/${maxAttempts}) - ${url}`)
+            console.log(`🔄 이미지 처리 대기 중... (${attempt}/${maxAttempts})`)
 
-            const exists = useImgCheck ? await this.checkImageExistsWithImg(url) : await this.checkImageExists(url)
+            const exists = await this.checkImageExists(url)
 
             if (exists) {
                 console.log(`✅ 이미지 처리 완료: ${url}`)
                 return url
             }
 
-            // 대기 시간을 점진적으로 증가 (첫 번째는 1초, 이후 2초)
+            // 첫 번째 시도는 1초, 나머지는 2초 대기
             const waitTime = attempt === 1 ? 1000 : 2000
             await new Promise(resolve => setTimeout(resolve, waitTime))
         }
 
         console.warn(`⚠️ 이미지 처리 시간 초과: ${url}`)
-        throw new Error(`이미지 처리 시간 초과: ${url}`)
+        throw new Error(`이미지 처리 시간 초과`)
+    }
+
+    /**
+     * 현재 CDN URL 반환
+     */
+    getCdnBaseUrl(): string {
+        return this.cdnUrl
     }
 
     /**
      * 크기 설정 정보 반환
      */
     getSizeConfig(size: ImageSize): SizeConfig {
-        return this.sizes[size]
+        return { ...this.sizes[size] }
     }
 
     /**
@@ -193,10 +197,10 @@ export class ImageUrlGenerator {
     }
 }
 
-// 싱글톤 인스턴스 생성 및 내보내기
+// 싱글톤 인스턴스
 export const imageUrlGenerator = new ImageUrlGenerator()
 
-// 편의성을 위한 헬퍼 함수들
+// 편의 함수들
 export const getResizedImageUrl = (originalUrl: string, size: ImageSize = 'medium') =>
     imageUrlGenerator.getResizedImageUrl(originalUrl, size)
 
@@ -206,3 +210,5 @@ export const generateSrcSet = (originalUrl: string) => imageUrlGenerator.generat
 
 export const waitForProcessedImage = (originalUrl: string, size: ImageSize = 'medium', maxAttempts?: number) =>
     imageUrlGenerator.waitForProcessedImage(originalUrl, size, maxAttempts)
+
+export const getOriginalImageUrl = (originalUrl: string) => imageUrlGenerator.getOriginalImageUrl(originalUrl)
