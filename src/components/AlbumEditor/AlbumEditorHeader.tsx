@@ -1,11 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
 // Assets
-<<<<<<< HEAD
 import Icon from '../common/Icon'
-=======
-import Arrow_Left from '@/assets/icons/Arrow_Left.png'
->>>>>>> main
 
 interface AlbumEditorHeaderProps {
     title: string
