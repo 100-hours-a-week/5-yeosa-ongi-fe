@@ -1,6 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-
-// Assets
 import Icon from '../common/Icon'
 
 interface AlbumEditorHeaderProps {
