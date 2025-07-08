@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 import { useUpdateClusterTitle } from '@/hooks/useAlbum'
-=======
-import { changeClusterTitle } from '@/api/album'
-
->>>>>>> main
 import { ChangeEvent, CSSProperties, FocusEvent, KeyboardEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextInput from '../common/TextInput'

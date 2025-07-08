@@ -1,18 +1,16 @@
 import { useAlbumClusterMarkers } from '@/hooks/useAlbumClusterMarkers'
 import { useKakaoMap } from '@/hooks/useKakaoMap'
 import { useRef } from 'react'
-<<<<<<< HEAD
+
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
-=======
->>>>>>> main
+
 import { useAlbumStore, useMainPageStore } from '../../stores/mainPageStore'
 
 interface KakaoMapProps {
     height: number
 }
 
-<<<<<<< HEAD
 // 지도 스켈레톤 컴포넌트
 const MapSkeleton = ({ height }: { height: number }) => (
     <SkeletonTheme baseColor='#e2e8f0' highlightColor='#f1f5f9'>
@@ -26,21 +24,13 @@ const MapSkeleton = ({ height }: { height: number }) => (
 
 const KakaoMap = ({ height }: KakaoMapProps) => {
     const mapContainer = useRef<HTMLDivElement>(null)
-=======
-const KakaoMap = ({ height }: KakaoMapProps) => {
-    const mapContainer = useRef(null)
->>>>>>> main
 
     // Hooks
     const { selectedId } = useMainPageStore()
     const { albums } = useAlbumStore()
-<<<<<<< HEAD
 
     // ✅ useKakaoMap의 loadingStage를 직접 사용
     const { mapInstance, isMapReady, loadingStage, panTo, setBounds } = useKakaoMap(mapContainer)
-=======
-    const { mapInstance, isMapReady, panTo, setBounds } = useKakaoMap(mapContainer)
->>>>>>> main
 
     useAlbumClusterMarkers({
         albums,
@@ -51,7 +41,6 @@ const KakaoMap = ({ height }: KakaoMapProps) => {
         setBounds,
     })
 
-<<<<<<< HEAD
     // ✅ 항상 DOM 구조를 유지하면서 조건부 렌더링
     return (
         <div className='h-full' style={{ position: 'relative' }}>
@@ -96,38 +85,6 @@ const KakaoMap = ({ height }: KakaoMapProps) => {
                     </div>
                 </div>
             )}
-=======
-    return (
-        <div className='h-full' style={{ position: 'relative' }}>
-            {/* 로딩 상태 표시 */}
-            {!isMapReady && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '25%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        zIndex: 1000,
-                        background: 'rgba(255,255,255,0.9)',
-                        padding: '20px',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                        textAlign: 'center',
-                    }}
-                >
-                    <div>지도를 로딩 중...</div>
-                    <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>잠시만 기다려주세요</div>
-                </div>
-            )}
-
-            <div
-                ref={mapContainer}
-                style={{
-                    width: '100%',
-                    height: height,
-                }}
-            />
->>>>>>> main
         </div>
     )
 }
