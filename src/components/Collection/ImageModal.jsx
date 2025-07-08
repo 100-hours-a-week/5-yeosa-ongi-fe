@@ -1,4 +1,3 @@
-
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Icon from '../common/Icon'
@@ -16,41 +15,95 @@ const ImageModal = ({ idx, pictures }) => {
      * @returns
      */
     const prepareDownload = async imageUrl => {
-        const proxies = [
-            `https://api.allorigins.win/raw?url=${encodeURIComponent(imageUrl)}`,
-            `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`,
-            `https://cors-anywhere.herokuapp.com/${imageUrl}`, // 사전 활성화 필요
-            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(imageUrl)}`,
-        ]
+        const [downloadUrl, setDownloadUrl] = useState(null)
+        const [isPreparingDownload, setIsPreparingDownload] = useState(true)
+        // Event Handlers
 
-        for (let i = 0; i < proxies.length; i++) {
+        /**
+         * 다운로드 링크 사전 생성
+         * @param {*} imageUrl
+         * @returns
+         */
+        const prepareDownload = async imageUrl => {
+            const proxies = [
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(imageUrl)}`,
+                `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`,
+                `https://cors-anywhere.herokuapp.com/${imageUrl}`, // 사전 활성화 필요
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(imageUrl)}`,
+            ]
+
+            for (let i = 0; i < proxies.length; i++) {
+                try {
+                    console.log(`프록시 ${i + 1} 시도 중...`)
+
+                    const response = await fetch(proxies[i])
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`)
+                    }
+
+                    const blob = await response.blob()
+
+                    if (blob.size === 0) {
+                        throw new Error('빈 파일')
+                    }
+
+                    const url = window.URL.createObjectURL(blob)
+                    setDownloadUrl(url)
+                    console.log('다운로드 링크 생성 성공!')
+                    setDownloadUrl(url)
+                    console.log('다운로드 링크 생성 성공!')
+                    return // 성공하면 루프 종료
+                } catch (error) {
+                    console.error(`프록시 ${i + 1} 실패:`, error)
+
+                    // 마지막 프록시도 실패하면 에러 표시
+                    if (i === proxies.length - 1) {
+                        console.error('모든 다운로드 링크 생성 방법이 실패했습니다.')
+                        setDownloadUrl(null)
+                        console.error('모든 다운로드 링크 생성 방법이 실패했습니다.')
+                        setDownloadUrl(null)
+                    }
+                }
+            }
+        }
+
+        const handleDownload = async () => {
+            if (!downloadUrl) {
+                if (isPreparingDownload) {
+                    console.log('다운로드 준비 중입니다. 잠시만 기다려주세요.')
+                    return
+                }
+
+                // 다운로드 링크 생성 재시도
+                setIsPreparingDownload(true)
+                await prepareDownload(pictures[index].pictureURL)
+                setIsPreparingDownload(false)
+
+                if (!downloadUrl) {
+                    alert('다운로드 링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요.')
+                    return
+                }
+            }
+
+            setIsDownloading(true)
+
             try {
-                console.log(`프록시 ${i + 1} 시도 중...`)
+                const link = document.createElement('a')
+                link.href = downloadUrl
+                link.download = `image_${Date.now()}.jpg`
+                link.style.display = 'none'
 
-                const response = await fetch(proxies[i])
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
-                }
-
-                const blob = await response.blob()
-
-                if (blob.size === 0) {
-                    throw new Error('빈 파일')
-                }
-
-                const url = window.URL.createObjectURL(blob)
-                setDownloadUrl(url)
-                console.log('다운로드 링크 생성 성공!')
-                return // 성공하면 루프 종료
+                console.log('다운로드 시작!')
             } catch (error) {
-                console.error(`프록시 ${i + 1} 실패:`, error)
-
-                // 마지막 프록시도 실패하면 에러 표시
-                if (i === proxies.length - 1) {
-                    console.error('모든 다운로드 링크 생성 방법이 실패했습니다.')
-                    setDownloadUrl(null)
-                }
+                console.error('다운로드 실패:', error)
+                alert('다운로드에 실패했습니다.')
+            } finally {
+                setIsDownloading(false)
             }
         }
     }

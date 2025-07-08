@@ -9,14 +9,29 @@ interface FilePreviewProps {
     previewUrl: string
     fileName: string
     fileType: string
+    fileName: string
+    fileType: string
     isConverting: boolean
     conversionError: string | null
+    onDelete: () => void
+    onImageError?: () => void
+    onImageLoad?: () => void
     onDelete: () => void
     onImageError?: () => void
     onImageLoad?: () => void
 }
 
 const FilePreview = memo(
+    ({
+        previewUrl,
+        fileName,
+        fileType,
+        isConverting,
+        conversionError,
+        onDelete,
+        onImageError,
+        onImageLoad,
+    }: FilePreviewProps) => {
     ({
         previewUrl,
         fileName,
@@ -46,6 +61,8 @@ const FilePreview = memo(
                         src={previewUrl}
                         alt={fileName}
                         className='absolute inset-0 object-cover w-full h-full'
+                        onError={onImageError}
+                        onLoad={onImageLoad}
                         onError={onImageError}
                         onLoad={onImageLoad}
                     />

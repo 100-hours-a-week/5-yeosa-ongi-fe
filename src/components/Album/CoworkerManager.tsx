@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 
-
 import { useAlbumAccess, useAlbumMembers, useRemoveMember } from '@/hooks/useAlbum.ts'
 
 import Coworker from './Coworker.tsx'
@@ -18,7 +17,6 @@ interface Coworker {
 }
 
 const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
-
     // 앨범 접근 권한 조회
 
     const {
@@ -28,7 +26,6 @@ const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
     } = useAlbumAccess(albumId!, {
         enabled: !!albumId,
     })
-
 
     // 앨범 멤버 목록 조회
     const {
@@ -44,7 +41,6 @@ const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
 
     // 로딩 상태 통합
     const isLoading = isAccessLoading || isMembersLoading
-
 
     // 에러 상태 확인
     const hasError = accessError || membersError

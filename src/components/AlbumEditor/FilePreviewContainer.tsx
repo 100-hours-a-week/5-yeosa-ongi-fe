@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { useFileConversion } from '@/hooks/useFileConversion'
 import { FileItem } from '@/types/upload'
 import React, { useCallback } from 'react'
 import Icon from '../common/Icon'
+=======
+import crossIcon from '@/assets/cross_icon.png'
+import { useFileConversion } from '@/hooks/useFileConversion'
+import { FileItem } from '@/types/upload'
+import React, { useCallback } from 'react'
+>>>>>>> main
 import FilePreview from './FilePreview'
 
 interface FilePreviewContainerProps {
@@ -34,7 +41,11 @@ const FilePreviewContainer = React.memo<FilePreviewContainerProps>(
                 <div className='relative flex items-center justify-center w-full h-full bg-gray-200'>
                     <span className='text-gray-500'>파일 오류</span>
                     <button className='absolute z-10 top-2 right-2' onClick={handleDelete}>
+<<<<<<< HEAD
                         <Icon name='close' />
+=======
+                        <img className='w-4 h-4' src={crossIcon} alt='삭제' />
+>>>>>>> main
                     </button>
                 </div>
             )
