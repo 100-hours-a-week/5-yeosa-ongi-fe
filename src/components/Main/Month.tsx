@@ -3,7 +3,7 @@ import { GridItem } from '@/types'
 import { useEffect, useRef } from 'react'
 import AlbumThumbnail from './AlbumThumbnail'
 
-interface MonthProps {
+export interface MonthProps {
     albumIds: string[]
     title: string
     handleOutsideClick: () => void
