@@ -1,4 +1,5 @@
 import Icon from '@/components/common/Icon'
+
 import { useTotalStatistics } from '@/hooks/useUser'
 
 const AlbumListHeader = () => {
