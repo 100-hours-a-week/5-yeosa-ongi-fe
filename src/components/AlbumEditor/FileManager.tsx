@@ -1,5 +1,3 @@
-// components/FileManager.tsx (변환 콜백 버전)
-
 import { useToast } from '@/contexts/ToastContext'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 import { memo, useCallback } from 'react'
