@@ -1,6 +1,7 @@
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Icon from '../common/Icon'
+import OptimizedImage from '../common/OptimizedImage'
 
 const ImageModal = ({ idx, pictures }) => {
     const [index, setIndex] = useState(idx)
@@ -188,11 +189,7 @@ const ImageModal = ({ idx, pictures }) => {
             <div className='flex bg-transparent'></div>
 
             <div className='flex justify-center'>
-                <img
-                    className='max-w-full max-h-[60vh] object-contain'
-                    src={pictures[index].pictureURL}
-                    alt={`이미지 ${index + 1}`}
-                />
+                <OptimizedImage src={pictures[index].pictureURL} alt={`이미지 ${index + 1}`} size='medium' />
                 {/* 왼쪽 버튼 */}
                 {index !== 0 && (
                     <button

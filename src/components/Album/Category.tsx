@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
 import { RawPicture } from '@/types'
+import OptimizedImage from '../common/OptimizedImage'
 
 interface CategoryProps {
     pictures: RawPicture[]
@@ -23,16 +24,7 @@ const Category = ({ pictures, title, albumId }: CategoryProps) => {
                 {/* 이미지 부분 */}
                 {pictures && pictures.length > 0 && pictures[0].pictureURL ? (
                     <div className='size-[96px] w-[100px] border border-gray-300 overflow-hidden'>
-                        <img
-                            src={pictures[0].pictureURL}
-                            alt={title}
-                            className='object-cover w-full h-full'
-                            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                                const target = e.target as HTMLImageElement
-                                target.style.display = 'none'
-                                target.parentNode?.appendChild(renderDefaultThumbnail())
-                            }}
-                        />
+                        <OptimizedImage src={pictures[0].pictureURL} alt={title} size='thumbnail' />
                     </div>
                 ) : (
                     <div className='w-full'></div>

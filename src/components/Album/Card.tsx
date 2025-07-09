@@ -71,6 +71,7 @@ const Card = () => {
                     height={240}
                     src={pictures[currentImageIndex]?.pictureURL}
                     alt={`사진 ${currentImageIndex + 1}`}
+                    size='medium'
                 />
 
                 {/* 이미지 번호 표시 */}

@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 // Components
 import ConfirmModal from '../components/common/ConfirmModal'
-import Grid from '../components/common/Grid'
 import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
 
@@ -18,19 +17,41 @@ import useModal from '../hooks/useModal'
 // Assets
 import CollectionHeader from '@/components/Collection/CollectionHeader'
 import ImageModal from '@/components/Collection/ImageModal'
+import { GridWithChildren } from '@/components/common/GridWithChildren'
 import Icon from '@/components/common/Icon'
 import MovingDotsLoader from '@/components/common/MovingDotsLoader'
 import { useDeleteAlbumPictures, useRecoverAlbumPictures } from '@/hooks/useAlbum'
 
-const Collection = () => {
-    const { albumId, collectionName } = useParams()
+// Types
+import { GridItemConfig } from '@/components/common/GridWithChildren'
+import OptimizedImage from '@/components/common/OptimizedImage'
+
+interface Picture {
+    pictureId: string
+    pictureURL: string
+    [key: string]: any
+}
+
+interface Collection {
+    name: string
+    alt?: string
+    pictures: Picture[]
+    [key: string]: any
+}
+
+const Collection: React.FC = () => {
+    const { albumId, collectionName } = useParams<{
+        albumId: string
+        collectionName: string
+    }>()
     const navigate = useNavigate()
 
-    const [currentCollection, setCurrentCollection] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [isSelectMode, setIsSelectMode] = useState(false)
-    const [isRecovery, setIsRecovery] = useState(false)
-    const [selectedPictures, setSelectedPictures] = useState(new Set())
+    const [currentCollection, setCurrentCollection] = useState<Collection | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
+    const [isSelectMode, setIsSelectMode] = useState<boolean>(false)
+    const [isRecovery, setIsRecovery] = useState<boolean>(false)
+    const [selectedPictures, setSelectedPictures] = useState<Set<string>>(new Set())
+
     const { isOpen, modalData, openModal, closeModal } = useModal()
     const {
         isOpen: isImageModalOpen,
@@ -38,6 +59,7 @@ const Collection = () => {
         openModal: openImageModal,
         closeModal: closeImageModal,
     } = useModal()
+
     const getCollectionByName = useCollectionStore(state => state.getCollectionByName)
     const removePictures = useCollectionStore(state => state.removePictures)
     const recoverPictures = useCollectionStore(state => state.recoverPictures)
@@ -49,10 +71,12 @@ const Collection = () => {
             const pictureIds = Array.from(selectedPictures)
             removePictures(pictureIds)
 
+            if (!collectionName) return
+
             const updatedCollection = getCollectionByName(collectionName)
             // 타입 가드를 사용하여 안전하게 처리
             if (updatedCollection && 'pictures' in updatedCollection) {
-                setCurrentCollection(updatedCollection)
+                setCurrentCollection(updatedCollection as Collection)
 
                 if (updatedCollection.pictures.length === 0) {
                     navigate(`/album/${albumId}`)
@@ -64,9 +88,6 @@ const Collection = () => {
             setIsSelectMode(false)
             setSelectedPictures(new Set())
         },
-        onError: error => {
-            console.error('사진 삭제 중 오류 발생:', error)
-        },
     })
 
     const recoverAlbumPictures = useRecoverAlbumPictures({
@@ -76,10 +97,12 @@ const Collection = () => {
             const pictureIds = Array.from(selectedPictures)
             recoverPictures(pictureIds)
 
+            if (!collectionName) return
+
             const updatedCollection = getCollectionByName(collectionName)
             // 타입 가드를 사용하여 안전하게 처리
             if (updatedCollection && 'pictures' in updatedCollection) {
-                setCurrentCollection(updatedCollection)
+                setCurrentCollection(updatedCollection as Collection)
 
                 if (updatedCollection.pictures.length === 0) {
                     navigate(`/album/${albumId}`)
@@ -92,12 +115,9 @@ const Collection = () => {
             setIsRecovery(false)
             setSelectedPictures(new Set())
         },
-        onError: error => {
-            console.error('사진 복원 중 오류 발생:', error)
-        },
     })
 
-    const toggleSelect = pictureId => {
+    const toggleSelect = (pictureId: string): void => {
         setSelectedPictures(prev => {
             const newSelected = new Set(prev)
             if (newSelected.has(pictureId)) {
@@ -110,48 +130,64 @@ const Collection = () => {
     }
 
     // 로딩 중이거나 currentCollection이 없으면 빈 배열 사용
-    const pictures = currentCollection?.pictures || []
+    const pictures: Picture[] = currentCollection?.pictures || []
 
-    const formattedPictures = pictures.map((picture, index) => ({
-        ElementType: () => {
-            const isSelected = selectedPictures.has(picture.pictureId)
-
-            return (
-                <div className='relative w-full h-full' onClick={() => isSelectMode && toggleSelect(picture.pictureId)}>
-                    <img
-                        src={picture.pictureURL}
-                        className='absolute inset-0 object-cover w-full h-full'
-                        onClick={() => handleImageClick(index)}
-                    />
-                    {isSelectMode && (
-                        <div className='absolute z-10 top-2 right-2'>
-                            <div
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                    isSelected ? 'bg-primary' : 'border-gray-light bg-transparent'
-                                }`}
-                            >
-                                {isSelected && <span className='text-xs text-white'>✓</span>}
-                            </div>
-                        </div>
-                    )}
+    // PictureItem 컴포넌트
+    const PictureItem: React.FC<{
+        picture: Picture
+        index: number
+        isSelectMode: boolean
+        isSelected: boolean
+        onToggleSelect: (pictureId: string) => void
+        onImageClick: (index: number) => void
+    }> = ({ picture, index, isSelectMode, isSelected, onToggleSelect, onImageClick }) => {
+        return (
+            <div className='relative w-full h-full' onClick={() => isSelectMode && onToggleSelect(picture.pictureId)}>
+                <div onClick={() => onImageClick(index)}>
+                    <OptimizedImage src={picture.pictureURL} alt={`Photo ${picture.pictureId}`} size='thumbnail' />
                 </div>
-            )
-        },
-        element: picture,
+                {isSelectMode && (
+                    <div className='absolute z-10 top-2 right-2'>
+                        <div
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                isSelected ? 'bg-primary' : 'border-gray-light bg-transparent'
+                            }`}
+                        >
+                            {isSelected && <span className='text-xs text-white'>✓</span>}
+                        </div>
+                    </div>
+                )}
+            </div>
+        )
+    }
+
+    const handleImageClick = (index: number): void => {
+        console.log('이미지 클릭')
+        openImageModal(index)
+    }
+
+    // 개선된 items 방식으로 변경
+    const gridItems: GridItemConfig[] = pictures.map((picture, index) => ({
+        id: picture.pictureId,
+        component: PictureItem,
         props: {
-            alt: `Photo ${picture.pictureId || ''}`,
-            className: 'w-full h-full object-cover',
+            picture,
+            index,
+            isSelectMode,
+            isSelected: selectedPictures.has(picture.pictureId),
+            onToggleSelect: toggleSelect,
+            onImageClick: handleImageClick,
         },
     }))
 
-    const isCollectionShaky = () => {
-        if (collectionName == '흔들림' || collectionName == '중복') {
+    const isCollectionShaky = (): boolean => {
+        if (collectionName === '흔들림' || collectionName === '중복') {
             return true
         }
         return false
     }
 
-    const handleClick = () => {
+    const handleClick = (): void => {
         if (selectedPictures.size === 0) {
             setIsSelectMode(false)
             return
@@ -159,7 +195,7 @@ const Collection = () => {
         openModal('사진 삭제')
     }
 
-    const handleRecoverClick = () => {
+    const handleRecoverClick = (): void => {
         console.log('복원 모달 온')
         if (selectedPictures.size === 0) {
             setIsSelectMode(false)
@@ -168,15 +204,10 @@ const Collection = () => {
         openModal('사진 복원')
     }
 
-    const handleImageClick = index => {
-        console.log('이미지 클릭')
-        openImageModal(index)
-    }
-
     /**
      * 사진 삭제 핸들러 - 현재 시스템의 훅 사용
      */
-    const handleDelete = async () => {
+    const handleDelete = async (): Promise<void> => {
         if (!albumId) return
 
         const pictureIds = Array.from(selectedPictures)
@@ -191,7 +222,7 @@ const Collection = () => {
     /**
      * 사진 복원 핸들러 - 현재 시스템의 훅 사용
      */
-    const handleRecover = async () => {
+    const handleRecover = async (): Promise<void> => {
         if (!albumId) return
 
         const pictureIds = Array.from(selectedPictures)
@@ -205,6 +236,12 @@ const Collection = () => {
     useEffect(() => {
         try {
             setLoading(true)
+
+            if (!collectionName) {
+                navigate(`/album/${albumId}`)
+                return
+            }
+
             const collection = getCollectionByName(collectionName)
 
             if (!collection) {
@@ -213,13 +250,13 @@ const Collection = () => {
                 return
             }
 
-            setCurrentCollection(collection)
+            setCurrentCollection(collection as Collection)
             setLoading(false)
         } catch (error) {
             navigate(`/album/${albumId}`)
             console.log(error)
         }
-    }, [collectionName, albumId])
+    }, [collectionName, albumId, navigate, getCollectionByName])
 
     if (loading || !currentCollection) {
         console.log('Loading, currentCollection:', currentCollection)
@@ -254,7 +291,7 @@ const Collection = () => {
                 hasButtons={currentCollection.alt ? false : true}
             />
 
-            <Grid col={3} items={formattedPictures} />
+            <GridWithChildren col={3} items={gridItems} />
 
             {/* Modal */}
             {isRecovery ? (
