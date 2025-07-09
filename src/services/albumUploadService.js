@@ -121,7 +121,7 @@ export class AlbumUploadService {
             // 기존 앨범에 사진 추가
             const result = await new Promise((resolve, reject) => {
                 addAlbumPictureMutation.mutate(
-                    { albumId, albumData },
+                    { albumId, pictureData: albumData },
                     {
                         onSuccess: (data) => {
                             console.log('사진 추가 결과:', data)
