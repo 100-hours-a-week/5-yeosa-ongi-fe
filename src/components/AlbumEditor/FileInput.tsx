@@ -1,7 +1,7 @@
 import { validateFileCount, validateImageFiles } from '@/services/validateImageFile'
 import { ChangeEvent, useRef } from 'react'
 
-interface FileInputProps {
+export interface FileInputProps {
     onFileSelect: (files: File | File[]) => void | Promise<void>
     disabled?: boolean
     setProcessing: (processing: boolean) => void
@@ -13,7 +13,7 @@ interface FileInputProps {
 
 const CONSTANTS = {
     DEFAULT_MAX_FILES: 30,
-    VALIDATION_MAX_FILES: 10,
+    VALIDATION_MAX_FILES: 30,
     ACCEPT_TYPES: 'image/jpg,image/png,image/jpeg,image/heic',
     MESSAGES: {
         MAX_FILES_EXCEEDED: '사진은 최대 30장 선택할 수 있습니다.',
@@ -63,7 +63,6 @@ const FileInput = ({
             }
 
             const validFiles = validationResult.validFiles
-            console.log('검증 통과한 파일들:', validFiles)
 
             if (validFiles.length === 1) {
                 await onFileSelect(validFiles[0])
@@ -71,7 +70,6 @@ const FileInput = ({
                 await onFileSelect(validFiles)
             }
         } catch (error) {
-            console.error('파일 처리 중 오류 발생:', error)
             onError('파일 처리 중 오류가 발생했습니다.')
         } finally {
             setProcessing(false)
@@ -84,7 +82,7 @@ const FileInput = ({
             return
         }
         if (disabled) {
-            onError(`사진은 최대 ${maxFiles}장 선택할 수 있습니다.`)
+            onError(CONSTANTS.MESSAGES.MAX_FILES_EXCEEDED)
             return
         }
         fileInputRef.current?.click()

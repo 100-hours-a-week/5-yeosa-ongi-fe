@@ -10,7 +10,6 @@ import useAuthStore from './stores/authStore'
 
 const Login = lazy(() => import('./pages/LoginPage'))
 const KakaoCallback = lazy(() => import('./pages/auth/KakaoCallback'))
-
 const AlbumEditor = lazy(() => import('./pages/AlbumEditor'))
 const Album = lazy(() => import('./pages/Album'))
 const Collection = lazy(() => import('./pages/Collection'))

@@ -1,18 +1,11 @@
-import Grid from '@/components/common/Grid'
-import { GridItem } from '@/types'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import { GridItemConfig, GridWithChildren } from '../common/GridWithChildren'
 import AlbumThumbnail from './AlbumThumbnail'
 
-interface MonthProps {
+export interface MonthProps {
     albumIds: string[]
     title: string
     handleOutsideClick: () => void
-}
-
-interface item {
-    ElementType: any
-    element: string
-    id: any
 }
 
 const Month = ({ albumIds, title, handleOutsideClick }: MonthProps) => {
@@ -20,44 +13,34 @@ const Month = ({ albumIds, title, handleOutsideClick }: MonthProps) => {
     const gridRef = useRef<HTMLDivElement>(null)
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
-    let items: GridItem[] = []
-    albumIds.forEach(id => {
-        items.push({ ElementType: AlbumThumbnail, element: id as any, id })
-    })
+    const items: GridItemConfig[] = useMemo(() => {
+        return albumIds.map(id => ({
+            id: id,
+            component: AlbumThumbnail,
+            props: {
+                id: id,
+                'data-album-thumbnail': true,
+                className: 'album-thumbnail',
+            },
+        }))
+    }, [albumIds])
 
     useEffect(() => {
         const handleClick = (event: MouseEvent) => {
-            if (!event.target || !(event.target instanceof Element)) {
-                return
+            const target = event.target
+
+            if (!target || !(target instanceof Element)) return
+
+            const isInsideMonth = monthRef.current?.contains(target)
+            const isAlbumThumbnail = target.closest('[data-album-thumbnail], .album-thumbnail')
+
+            if (!isInsideMonth || isAlbumThumbnail) return
+
+            if (debounceTimeout.current) {
+                clearTimeout(debounceTimeout.current)
             }
 
-            const clickedInsideMonth = monthRef.current && monthRef.current.contains(event.target)
-            const clickedInsideGrid = gridRef.current && gridRef.current.contains(event.target)
-
-            // AlbumThumbnail 요소인지 확인 (data attribute나 className으로)
-            const isAlbumThumbnail =
-                event.target.closest('[data-album-thumbnail]') || event.target.closest('.album-thumbnail')
-
-            if (clickedInsideMonth) {
-                if (clickedInsideGrid && !isAlbumThumbnail) {
-                    console.log('Grid 빈 공간 클릭됨')
-                    // Grid 내 빈 공간 클릭
-                } else if (!clickedInsideGrid) {
-                    console.log('제목 영역 클릭됨')
-                    // 제목 영역 클릭
-                } else {
-                    console.log('AlbumThumbnail 클릭됨 - 무시')
-                    return // AlbumThumbnail 클릭은 무시
-                }
-
-                if (debounceTimeout.current) {
-                    clearTimeout(debounceTimeout.current)
-                }
-
-                debounceTimeout.current = setTimeout(() => {
-                    handleOutsideClick()
-                }, 100)
-            }
+            debounceTimeout.current = setTimeout(handleOutsideClick, 100)
         }
 
         document.addEventListener('mousedown', handleClick)
@@ -74,7 +57,7 @@ const Month = ({ albumIds, title, handleOutsideClick }: MonthProps) => {
         <div ref={monthRef} className='py-1 '>
             <div className='h-8 p-1 ml-1 text-sm '>{title}</div>
             <div ref={gridRef} className='min-h-[100px] '>
-                <Grid items={items}></Grid>
+                <GridWithChildren items={items}></GridWithChildren>
             </div>
         </div>
     )

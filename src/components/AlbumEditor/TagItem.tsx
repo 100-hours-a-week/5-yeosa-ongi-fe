@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react'
 
-interface TagItemProps {
+export interface TagItemProps {
     label: string
     isActive: boolean
     onClick: (label: string) => void

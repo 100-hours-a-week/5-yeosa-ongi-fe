@@ -1,49 +1,37 @@
-import { ChangeEvent, useRef, useState } from 'react'
+import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
+import { useState } from 'react'
+import TextField from '../common/TextField'
 
-interface AlbumTitleFormProps {
+export interface AlbumTitleFormProps {
     value: string
     onChange: (title: string) => void
+    onValidationChange?: (isValid: boolean) => void
 }
 
-const AlbumTitleForm = ({ value, onChange }: AlbumTitleFormProps) => {
-    const titleRef = useRef<HTMLInputElement>(null)
-    const [title, setTitle] = useState(value)
+const AlbumTitleForm = ({ value, onChange, onValidationChange }: AlbumTitleFormProps) => {
     const [isValid, setIsValid] = useState(true)
     const [validationMessage, setValidationMessage] = useState('')
 
-    const validateTitle = () => {
-        // 타입 가드
-        if (!titleRef.current) {
-            console.error('Title input ref is not available')
-            return false
-        }
-        const currentTitle = titleRef.current.value
-        if (!currentTitle.trim()) {
+    const validateTitle = (title: string) => {
+        if (!title.trim()) {
             setIsValid(false)
-            setValidationMessage('제목을 입력해주세요.')
+            setValidationMessage(ALBUM_TITLE_VALIDATION_MESSAGE.TITLE_REQUIRED)
+            onValidationChange?.(false)
             return false
-        } else if (currentTitle.length > 12) {
+        } else if (title.length > 12) {
             setIsValid(false)
-            setValidationMessage('제목은 최대 12자까지 입력 가능합니다.')
+            setValidationMessage(ALBUM_TITLE_VALIDATION_MESSAGE.TITLE_MAX_LENGTH)
+            onValidationChange?.(false)
             return false
         }
         setIsValid(true)
         setValidationMessage('')
+        onValidationChange?.(true)
         return true
     }
 
-    const handleBlur = () => {
-        if (validateTitle()) {
-            onChange(title)
-        }
-    }
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const newTitle = e.target.value
-        setTitle(newTitle)
+    const handleChange = (newTitle: string) => {
         onChange(newTitle)
-
-        // 입력 중 유효성 메시지는 지우기
         if (!isValid) {
             setIsValid(true)
             setValidationMessage('')
@@ -53,14 +41,14 @@ const AlbumTitleForm = ({ value, onChange }: AlbumTitleFormProps) => {
     return (
         <div className='flex flex-col w-full mt-4 mb-2'>
             <div className='flex items-center pb-2 mx-4 border-b border-gray-300'>
-                <div className='w-16 mx-4 font-medium text-gray-900'> 제목</div>
-                <input
-                    className='w-full text-lg focus:outline-none'
-                    ref={titleRef}
-                    value={title}
+                <div className='w-16 mx-4 font-medium text-gray-900'> {ALBUM_TITLE_VALIDATION_MESSAGE.TITLE}</div>
+                <TextField
+                    className='w-full text-md focus:outline-none'
+                    value={value}
                     onChange={handleChange}
-                    onBlur={handleBlur}
                     maxLength={12}
+                    validator={validateTitle}
+                    helperText={validationMessage}
                 />
             </div>
         </div>

@@ -1,4 +1,4 @@
-interface CreateAlbumButtonProps {
+export interface CreateAlbumButtonProps {
     buttonState: ButtonState
     onClick: () => void
 }

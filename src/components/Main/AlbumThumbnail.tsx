@@ -3,17 +3,19 @@ import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
 import OptimizedImage from '../common/OptimizedImage'
 
-interface AlbumThumbnailProps {
+export interface AlbumThumbnailProps {
     id: string
     props: { height: number; width: number }
 }
+
 const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
-    const navigate = useNavigate()
+    const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
     const { albums } = useAlbumStore()
-    const album = albums[id.toString()]
+    const navigate = useNavigate()
 
     const { data: albumSummary } = useAlbumSummary(id)
-    const { selectedId, selectItem, setSelectedAlbumSummary } = useMainPageStore()
+
+    const album = albums[id.toString()]
     const isSelected = selectedId === id
 
     const handleSelect = async () => {
@@ -32,7 +34,7 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
                 className='absolute inset-0'
                 lazy={true}
                 placeholder={true}
-                onLoad={() => console.log(`이미지 로드 완료: ${id}`)}
+                size='thumbnail'
             />
 
             {isSelected && (
@@ -61,7 +63,7 @@ const AlbumThumbnail = ({ id, props }: AlbumThumbnailProps) => {
                                 className='w-full h-full'
                                 lazy={true}
                                 placeholder={true}
-                                size='medium'
+                                size='thumbnail'
                             />
                         </div>
                     ))}

@@ -1,30 +1,14 @@
+import { FlottingButton, Header, ResizableContainer } from '@/components/common'
+import { AlbumList, AlbumListHeader, BannerSlider, KakaoMap } from '@/components/Main'
+import { UI_HEIGHT } from '@/constants'
 import { useCallback, useState } from 'react'
-
-// Components
-import ResizableContainer from '@/components/common/ResizableContainer'
-import AlbumList from '@/components/Main/AlbumList'
-
-import AlbumListHeader from '@/components/Main/AlbumListHeader'
-import BannerSlider from '@/components/Main/BannerSlider'
-import KakaoMap from '@/components/Main/KakaoMap'
-import FlottingButton from '../components/common/FlottingButton'
-import Header from '../components/common/Header'
-
-const CONSTANTS = {
-    HEADER_HEIGHT: 56,
-    BANNER_HEIGHT: 72,
-}
 
 const Main = () => {
     const [listHeight, setListHeight] = useState(0)
 
-    /**
-     * 지도의 실제 높이 계산
-     * @returns
-     */
     const getMapHeight = () => {
-        const totalHeight = window.innerHeight - CONSTANTS.HEADER_HEIGHT
-        const availableHeight = totalHeight - CONSTANTS.BANNER_HEIGHT
+        const totalHeight = window.innerHeight - UI_HEIGHT.HEADER_HEIGHT
+        const availableHeight = totalHeight - UI_HEIGHT.BANNER_HEIGHT
         const mapHeight = availableHeight - listHeight
         return Math.max(0, mapHeight)
     }
@@ -48,7 +32,6 @@ const Main = () => {
                     </ResizableContainer>
                 </div>
             </div>
-
             <FlottingButton />
         </div>
     )

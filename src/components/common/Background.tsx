@@ -69,7 +69,7 @@ const Background = () => {
             ></div>
 
             {/* CSS 애니메이션 정의 */}
-            <style jsx>{`
+            <style>{`
                 @keyframes float {
                     0%,
                     100% {

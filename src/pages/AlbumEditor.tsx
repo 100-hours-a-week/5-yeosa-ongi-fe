@@ -1,23 +1,16 @@
+import CollapsibleContainer from '@/components/common/CollapsibleContainer'
+import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
+import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 import { memo, useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-
-// Components
-// Components
-import AlbumTitleForm from '@/components/AlbumEditor/AlbumTitleForm'
-import FileManager from '@/components/AlbumEditor/FileManager'
-import AlbumEditorHeader from '../components/AlbumEditor/AlbumEditorHeader'
-import CreateAlbumButton from '../components/AlbumEditor/CreateAlbumButton'
-
-// Hooks
-
-// Hooks
+import {
+    AlbumEditorHeader,
+    AlbumTitleForm,
+    CreateAlbumButton,
+    FileManager,
+    TagContainer,
+} from '../components/AlbumEditor'
 import { useAlbumCreation } from '../hooks/useAlbumCreation'
-
-// Types
-
-import TagContainer from '@/components/AlbumEditor/TagContainer'
-import CollapsibleContainer from '@/components/common/CollapsibleContainer'
-import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 
 interface ButtonState {
     isAlbumTitleValid: boolean
@@ -35,7 +28,7 @@ const MemoizedCreateAlbumButton = memo(CreateAlbumButton)
  * 새 앨범 생성 또는 기존 앨범에 사진 추가 기능 제공
  */
 const AlbumEditor = () => {
-    const [albumTitle, setAlbumTitle] = useState('이름 없는 앨범')
+    const [albumTitle, setAlbumTitle] = useState<string>(ALBUM_TITLE_VALIDATION_MESSAGE.UNTITLED_ALBUM)
     const { albumId } = useParams()
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const albumData = useAlbumCreation()

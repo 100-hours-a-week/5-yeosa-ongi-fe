@@ -10,7 +10,7 @@ const BannerSlider = () => {
             id: 1,
             image: banner01,
             link: '',
-            alt: '1st',
+            alt: '첫 번째 배너',
         },
         {
             id: 2,

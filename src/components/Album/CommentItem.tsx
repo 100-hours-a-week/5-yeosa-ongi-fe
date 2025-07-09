@@ -1,4 +1,4 @@
-import { formatTime } from '@/utils/formatTime'
+import { formatTime } from '@/utils/timeUtils'
 import { Edit3, Trash2 } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
