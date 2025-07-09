@@ -1,5 +1,4 @@
 import { useUpdateAlbumName } from '@/hooks/useAlbum'
-
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
