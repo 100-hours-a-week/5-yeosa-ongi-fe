@@ -1,9 +1,8 @@
-import { AlbumData, useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
-
 import { AlbumAPI } from '@/api/AlbumAPI'
+import { AlbumData, useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { APIResponse } from '@/types/api.types'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import Month from './Month'
 
 type yearMonth = string | null
@@ -18,7 +17,6 @@ type AlbumApiResponse = APIResponse<AlbumDataResponse>
 
 const AlbumList = () => {
     const { clearSelection } = useMainPageStore()
-    const [nextYearMonth, setNextYearMonth] = useState<yearMonth>(null)
     const loadMoreTriggerRef = useRef<HTMLDivElement>(null)
     const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, isError, error } =
         useInfiniteQuery<AlbumApiResponse>({
@@ -52,7 +50,6 @@ const AlbumList = () => {
             console.log(firstPage)
             // 첫 번째 페이지로 초기 설정
             if (firstPage?.code && firstPage?.data?.albumInfo) {
-                console.log('냑냑')
                 setAlbums(firstPage.data.albumInfo)
             }
             console.log(storeAlbumsByMonth)
@@ -67,6 +64,7 @@ const AlbumList = () => {
 
     // Zustand 스토어의 데이터 사용 (UI 렌더링용)
     const albumsByMonth = storeAlbumsByMonth
+
     // 무한 스크롤 트리거 함수
     const handleIntersection = useCallback(
         (entries: IntersectionObserverEntry[]) => {
