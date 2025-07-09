@@ -3,7 +3,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import Icon from '../common/Icon'
 
-interface FilePreviewProps {
+export interface FilePreviewProps {
     previewUrl: string
     fileName: string
     isConverting: boolean

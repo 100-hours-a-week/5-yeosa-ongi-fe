@@ -1,4 +1,3 @@
-// TagContainer.tsx - 상태를 부모로부터 받는 컴포넌트
 import TagItem from './TagItem'
 
 const predefinedTags: string[] = [
@@ -16,9 +15,9 @@ const predefinedTags: string[] = [
     '장소',
     '취미',
     '풍경',
-]
+] as const
 
-interface TagContainerProps {
+export interface TagContainerProps {
     activeTags: string[]
     onTagChange: (tags: string[]) => void
 }

@@ -1,7 +1,7 @@
 import { validateFileCount, validateImageFiles } from '@/services/validateImageFile'
 import { ChangeEvent, useRef } from 'react'
 
-interface FileInputProps {
+export interface FileInputProps {
     onFileSelect: (files: File | File[]) => void | Promise<void>
     disabled?: boolean
     setProcessing: (processing: boolean) => void

@@ -1,9 +1,8 @@
+import { FileInput, FilePreviewContainer } from '@/components/AlbumEditor'
 import { useToast } from '@/contexts/ToastContext'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 import { memo, useCallback } from 'react'
 import { GridWithChildren } from '../common/GridWithChildren'
-import FileInput from './FileInput'
-import FilePreviewContainer from './FilePreviewContainer'
 
 const FileManager = memo(() => {
     const { error: errorToast } = useToast()

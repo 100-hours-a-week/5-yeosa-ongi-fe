@@ -4,7 +4,7 @@ import React, { useCallback } from 'react'
 import Icon from '../common/Icon'
 import FilePreview from './FilePreview'
 
-interface FilePreviewContainerProps {
+export interface FilePreviewContainerProps {
     file: FileItem
     onDelete: (fileId: string) => void
     onConverted?: (originalFile: File, convertedFile: File) => void
