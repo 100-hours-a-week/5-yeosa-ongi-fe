@@ -1,9 +1,7 @@
-// utils/metadata.ts (정적 import 버전)
-
-// exifr를 정적으로 import
 import { gps, parse } from 'exifr'
 import ExifReader from 'exifreader'
-// 기존 타입 정의들...
+import { formatDateTime } from './timeUtils'
+
 export interface GPSMetadata {
     latitude: number | null | string
     longitude: number | null | string
@@ -286,21 +284,6 @@ export const extractHEICMetadata = async (file: File): Promise<{ gps?: GPSMetada
                 error: error instanceof Error ? error.message : 'HEIC 메타데이터 추출 실패',
             },
         }
-    }
-}
-
-// 헬퍼 함수들
-const formatDateTime = (dateTime: any) => {
-    if (!dateTime) return null
-    try {
-        const date = new Date(dateTime)
-        return {
-            date: date.toLocaleDateString('ko-KR'),
-            time: date.toLocaleTimeString('ko-KR'),
-            iso: date.toISOString(),
-        }
-    } catch {
-        return { raw: dateTime }
     }
 }
 
