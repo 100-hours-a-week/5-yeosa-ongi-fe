@@ -1,7 +1,6 @@
 import { convertToWebP } from '@/services/imageConversionService'
 import { ConversionCacheManager } from '@/utils/conversionCache'
-import { isHEICFile } from '@/utils/metadata'
-
+import { isHEICFile } from '@/utils/imageMetadata'
 import { useEffect, useRef, useState } from 'react'
 
 interface FileConversionState {
