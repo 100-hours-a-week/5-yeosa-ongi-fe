@@ -1,5 +1,3 @@
-// utils/imageUrlGenerator.ts
-
 export type ImageSize = 'thumbnail' | 'medium' | 'large'
 
 export interface ImageUrls {
