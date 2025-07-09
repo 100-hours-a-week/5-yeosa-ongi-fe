@@ -32,7 +32,6 @@ const Main = () => {
                     </ResizableContainer>
                 </div>
             </div>
-
             <FlottingButton />
         </div>
     )

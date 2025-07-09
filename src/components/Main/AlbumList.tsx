@@ -5,8 +5,6 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
 import Month from './Month'
 
-type yearMonth = string | null
-
 type AlbumDataResponse = {
     albumInfo: AlbumData[]
     nextYearMonth: string | null
@@ -16,8 +14,10 @@ type AlbumDataResponse = {
 type AlbumApiResponse = APIResponse<AlbumDataResponse>
 
 const AlbumList = () => {
-    const { clearSelection } = useMainPageStore()
     const loadMoreTriggerRef = useRef<HTMLDivElement>(null)
+    const { clearSelection } = useMainPageStore()
+    const { albumsByMonth: storeAlbumsByMonth, setAlbums, addAlbums } = useAlbumStore()
+
     const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, isError, error } =
         useInfiniteQuery<AlbumApiResponse>({
             queryKey: ['albums'],
@@ -39,9 +39,6 @@ const AlbumList = () => {
             refetchOnWindowFocus: false,
         })
 
-    const { albumsByMonth: storeAlbumsByMonth, setAlbums, addAlbums } = useAlbumStore()
-
-    // React Query 데이터가 변경될 때 Zustand 스토어 업데이트
     useEffect(() => {
         console.log(data?.pages)
         if (data?.pages && data.pages.length > 0) {
