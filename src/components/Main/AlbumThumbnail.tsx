@@ -3,7 +3,7 @@ import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
 import OptimizedImage from '../common/OptimizedImage'
 
-interface AlbumThumbnailProps {
+export interface AlbumThumbnailProps {
     id: string
     props: { height: number; width: number }
 }
