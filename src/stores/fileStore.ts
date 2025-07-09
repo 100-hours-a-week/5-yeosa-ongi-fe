@@ -1,6 +1,6 @@
 // stores/fileStore.ts
 import { FileItem } from '@/types/upload'
-import { extractHEICMetadata, extractJPEGMetadata, isHEICFile } from '@/utils/metadata'
+import { extractGPSMetadata, extractJPEGGPSMetadata, isHEICFile } from '@/utils/imageMetadata'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -66,9 +66,9 @@ const createFileItem = async (file: File): Promise<FileItem> => {
     try {
         let metadata
         if (isHEICFile(file)) {
-            metadata = await extractHEICMetadata(file)
+            metadata = await extractGPSMetadata(file)
         } else {
-            metadata = await extractJPEGMetadata(file)
+            metadata = await extractJPEGGPSMetadata(file)
         }
 
         return {
@@ -76,8 +76,8 @@ const createFileItem = async (file: File): Promise<FileItem> => {
             preview: URL.createObjectURL(file),
             id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             GPS: {
-                longitude: metadata?.gps?.longitude,
-                latitude: metadata?.gps?.latitude,
+                longitude: metadata?.longitude,
+                latitude: metadata?.latitude,
             },
             isProcessed: false,
         }
