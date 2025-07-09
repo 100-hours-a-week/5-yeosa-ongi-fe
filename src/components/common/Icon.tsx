@@ -1,9 +1,5 @@
-
 import { ArrowIcon, CheckIcon, CloseIcon, EditIcon, HeartIcon, ImageIcon, LocationIcon } from '@/icons/index'
-
-
 import { BaseIconProps } from '@/types/icon.types'
-import React from 'react'
 
 // 개별 아이콘 컴포넌트들을 등록
 const iconComponents = {
@@ -14,7 +10,6 @@ const iconComponents = {
     edit: EditIcon,
     image: ImageIcon,
     location: LocationIcon,
-
 } as const
 
 export type IconName = keyof typeof iconComponents
@@ -32,6 +27,9 @@ interface IconProps extends BaseIconProps {
 
     // CheckIcon props
     checked?: boolean
+
+    // ImageIcon props
+    variant?: 'multiple' | 'single'
 }
 
 const Icon: React.FC<IconProps> = ({ name, ...props }) => {
