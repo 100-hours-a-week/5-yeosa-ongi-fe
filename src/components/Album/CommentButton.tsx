@@ -1,6 +1,6 @@
 import React from 'react'
 
-interface CommentButtonProps {
+export interface CommentButtonProps {
     commentCount?: number
     showCount?: boolean
     className?: string

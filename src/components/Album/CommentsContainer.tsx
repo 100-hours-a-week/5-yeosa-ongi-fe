@@ -14,7 +14,7 @@ interface Comment {
     createdAt: string
 }
 
-interface CommentsContainerProps {
+export interface CommentsContainerProps {
     albumId: string
     isOpen: boolean
     onClose: () => void

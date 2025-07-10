@@ -4,7 +4,7 @@ import { useAlbumAccess, useAlbumMembers, useRemoveMember } from '@/hooks/useAlb
 
 import Coworker from './Coworker.tsx'
 
-interface CoworkerManagerProps {
+export interface CoworkerManagerProps {
     albumId: string
 }
 
