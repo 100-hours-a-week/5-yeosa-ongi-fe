@@ -14,7 +14,6 @@ import Category from '../components/Album/Category'
 import FlottingButton from '../components/common/FlottingButton'
 import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
-import MovingDotsLoader from '../components/common/MovingDotsLoader'
 
 //Custom Hooks
 import { useAlbumAccess, useAlbumComments, useAlbumDetail, useDeleteAlbum } from '@/hooks/useAlbum'
@@ -29,6 +28,7 @@ import iconShaky from '../assets/icons/icon_shaky.svg'
 
 //Types
 import Icon from '@/components/common/Icon'
+import { AlbumLayout } from '@/components/ui/skeleton/AlbumLayout'
 import { Settings } from 'lucide-react'
 import { RawPicture } from '../types'
 
@@ -173,24 +173,12 @@ const Album = () => {
         return (
             <>
                 <Header />
-                <MovingDotsLoader />
+                <AlbumLayout />
             </>
         )
     }
 
-    // 데이터가 없을 때
-    if (!albumDetail) {
-        return (
-            <>
-                <Header />
-                <div className='flex items-center justify-center h-64'>
-                    <p>앨범을 찾을 수 없습니다.</p>
-                </div>
-            </>
-        )
-    }
-
-    // ✅ 댓글 수는 React Query 데이터에서 직접 가져오기
+    // 댓글 수는 React Query 데이터에서 직접 가져오기
     const commentCount = commentsData?.length || albumDetail.commentCount || 0
 
     return (
