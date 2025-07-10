@@ -1,17 +1,9 @@
+import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
 import { useUpdateAlbumName } from '@/hooks/useAlbum'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
 
-const validator = (value: string) => {
-    if (value === '') {
-        return '제목을 입력하세요'
-    } else if (value.length > 12) {
-        return '12글자 이하'
-    } else {
-        return true
-    }
-}
 export interface AlbumTitleProps {
     title: string
 }
@@ -20,6 +12,15 @@ const AlbumTitle = ({ title }: AlbumTitleProps) => {
     const { albumId } = useParams()
     const [currentTitle, setCurrentTitle] = useState<string>(title)
     const changeAlbumName = useUpdateAlbumName()
+
+    const validateTitle = (title: string) => {
+        if (!title.trim()) {
+            return false
+        } else if (title.length > 12) {
+            return false
+        }
+        return true
+    }
 
     const handleSaveName = async (newValue: string) => {
         if (albumId) {
@@ -35,9 +36,9 @@ const AlbumTitle = ({ title }: AlbumTitleProps) => {
                 value={currentTitle}
                 onSave={handleSaveName}
                 textFieldProps={{
-                    placeholder: '이름을 입력하세요',
+                    placeholder: ALBUM_TITLE_VALIDATION_MESSAGE.TITLE_REQUIRED,
                     required: true,
-                    validator: validator,
+                    validator: validateTitle,
                 }}
             />
         </div>
