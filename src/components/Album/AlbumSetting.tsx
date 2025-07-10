@@ -8,7 +8,7 @@ export interface AlbumSettingProps {
     albumName: string
     handleDelete: () => void
 
-    isDeleting?: boolean // 삭제 중 상태
+    isDeleting?: boolean
 }
 
 const AlbumSetting = ({ albumId, albumName, handleDelete, isDeleting = false }: AlbumSettingProps) => {
