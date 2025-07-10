@@ -11,12 +11,6 @@ export interface CategoryProps {
 
 const Category = ({ pictures, title, albumId }: CategoryProps) => {
     const navigate = useNavigate()
-    const renderDefaultThumbnail = (): HTMLElement => {
-        const placeholder = document.createElement('div')
-        placeholder.className = 'default-thumbnail'
-        placeholder.innerHTML = '📷'
-        return placeholder
-    }
 
     return (
         <div className='w-[104px] h-[128px] min-w-[120px] bg-gray-light rounded-md overflow-hidden shadow-sm flex flex-col items-center p-2 pb-0'>
