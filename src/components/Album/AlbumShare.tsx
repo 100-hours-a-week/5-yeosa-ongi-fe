@@ -1,9 +1,8 @@
 import { Copy } from 'lucide-react'
-
 import { useState } from 'react'
 import Icon from '../common/Icon'
 
-const AlbumShare = ({ sharingLink = 'https://example.com/share/album123456' }) => {
+const AlbumShare = ({ sharingLink = '' }) => {
     const [copied, setCopied] = useState(false)
 
     const handleCopy = () => {
