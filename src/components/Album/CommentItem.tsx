@@ -10,7 +10,7 @@ interface Comment {
     createdAt: string
 }
 
-interface CommentItemProps {
+export interface CommentItemProps {
     comment: Comment
     userName?: string
     className?: string

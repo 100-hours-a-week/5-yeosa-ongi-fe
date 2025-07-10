@@ -12,7 +12,7 @@ const validator = (value: string) => {
         return true
     }
 }
-interface AlbumTitleProps {
+export interface AlbumTitleProps {
     title: string
 }
 

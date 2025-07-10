@@ -13,7 +13,7 @@ interface Cluster {
     clusterPicture: string[]
 }
 
-interface ClusterProps {
+export interface ClusterProps {
     cluster: Cluster
     albumId: string
 }

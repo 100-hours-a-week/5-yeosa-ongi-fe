@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { RawPicture } from '@/types'
 import OptimizedImage from '../common/OptimizedImage'
 
-interface CategoryProps {
+export interface CategoryProps {
     pictures: RawPicture[]
     title: string
     albumId: string

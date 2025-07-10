@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-interface SideScrollableSectionProps {
+export interface SideScrollableSectionProps {
     children: React.ReactNode
     showIndicator?: boolean
     className?: string
