@@ -103,11 +103,7 @@ export class AlbumAPI {
      * 초대 확인 (공동 작업자 추가)
      */
     static confirmInvite(inviteToken: string) {
-        return APIBuilder.post(`/api/album/invite?inviteToken=${inviteToken}`, {})
-            .params({ inviteToken })
-            .requiresAuth()
-            .build()
-            .call<any>()
+        return APIBuilder.post(`/api/album/invite?inviteToken=${inviteToken}`, {}).requiresAuth().build().call<any>()
     }
 
     /**
