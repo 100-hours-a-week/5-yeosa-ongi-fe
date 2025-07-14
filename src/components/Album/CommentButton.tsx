@@ -1,18 +1,13 @@
-import React from 'react'
+import { FC } from 'react'
 
-interface CommentButtonProps {
+export interface CommentButtonProps {
     commentCount?: number
     showCount?: boolean
     className?: string
     onClick: () => void
 }
 
-const CommentButton: React.FC<CommentButtonProps> = ({
-    commentCount = 0,
-    showCount = true,
-    className = '',
-    onClick,
-}) => {
+const CommentButton: FC<CommentButtonProps> = ({ commentCount = 0, showCount = true, className = '', onClick }) => {
     return (
         <button
             onClick={onClick}

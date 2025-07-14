@@ -4,11 +4,9 @@ import OptimizedImage from '../common/OptimizedImage'
 
 const Card = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
-    const [imagesLoaded, setImagesLoaded] = useState(false)
     const [isAnimating, setIsAnimating] = useState(false)
 
     const { allCollection } = useCollectionStore()
-
     const pictures = allCollection?.pictures || []
     const canNavigate = pictures.length > 1
 
@@ -71,6 +69,7 @@ const Card = () => {
                     height={240}
                     src={pictures[currentImageIndex]?.pictureURL}
                     alt={`사진 ${currentImageIndex + 1}`}
+                    size='medium'
                 />
 
                 {/* 이미지 번호 표시 */}

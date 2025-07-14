@@ -1,4 +1,4 @@
-interface CoworkerProps {
+export interface CoworkerProps {
     userId: string
     nickname: string
     profileImageURL: string

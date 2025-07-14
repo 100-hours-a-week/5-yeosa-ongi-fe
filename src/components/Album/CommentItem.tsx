@@ -1,16 +1,10 @@
+
+import { Comment } from '@/types/album.types'
 import { formatTime } from '@/utils/timeUtils'
 import { Edit3, Trash2 } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 
-interface Comment {
-    commentId: string
-    userName: string
-    userProfile?: string
-    content: string
-    createdAt: string
-}
-
-interface CommentItemProps {
+export interface CommentItemProps {
     comment: Comment
     userName?: string
     className?: string
@@ -18,7 +12,7 @@ interface CommentItemProps {
     onDelete?: (commentId: string) => void
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, userName, className = '', onEdit, onDelete }) => {
+const CommentItem: FC<CommentItemProps> = ({ comment, userName, className = '', onEdit, onDelete }) => {
     const [slideOffset, setSlideOffset] = useState(0)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isSliding, setIsSliding] = useState(false)
