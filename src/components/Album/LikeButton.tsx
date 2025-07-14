@@ -1,7 +1,7 @@
 import { useAlbumLikes, useToggleLike } from '@/hooks/useAlbum'
 import React from 'react'
 
-interface LikeButtonProps {
+export interface LikeButtonProps {
     albumId: string
     initialLiked?: boolean
     initialCount?: number

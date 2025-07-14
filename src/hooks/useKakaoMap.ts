@@ -1,7 +1,5 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 
-// 타입 정의는 동일...
-
 declare global {
     interface Window {
         kakao: {
@@ -9,10 +7,14 @@ declare global {
                 LatLng: new (lat: number, lng: number) => KakaoLatLng
                 LatLngBounds: new () => KakaoLatLngBounds
                 Map: new (container: HTMLElement, options: KakaoMapOptions) => KakaoMap
+                Marker: new (options: any) => KakaoMarker
+                CustomOverlay: new (options: any) => KakaoCustomOverlay
+                MarkerClusterer: new (options: any) => KakaoMarkerClusterer
                 load: (callback: () => void) => void
 
                 event: {
                     addListener: (target: any, type: string, handler: () => void) => void
+                    removeListener: (target: any, type: string, handler: () => void) => void
                 }
                 MapTypeId: {
                     ROADMAP: string
@@ -51,6 +53,22 @@ interface KakaoMap {
     setBounds: (bounds: KakaoLatLngBounds) => void
     getLevel: () => number
     setLevel: (level: number) => void
+}
+
+interface KakaoMarker {
+    setMap: (map: KakaoMap | null) => void
+    albumId?: string
+}
+
+interface KakaoCustomOverlay {
+    setMap: (map: KakaoMap | null) => void
+    getContent: () => HTMLElement | null
+}
+
+interface KakaoMarkerClusterer {
+    clear: () => void
+    addMarker: (marker: KakaoMarker) => void
+    addMarkers: (markers: KakaoMarker[]) => void
 }
 
 interface Location {
@@ -283,3 +301,6 @@ export const useKakaoMap = (mapContainer: RefObject<HTMLElement | null>): UseKak
         setBounds,
     }
 }
+
+// 타입들을 export하여 다른 파일에서 사용할 수 있도록 함
+export type { KakaoCustomOverlay, KakaoLatLng, KakaoMap, KakaoMarker, KakaoMarkerClusterer, Location }

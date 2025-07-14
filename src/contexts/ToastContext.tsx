@@ -1,4 +1,4 @@
-import ToastContainer from '@/components/common/Toast/ToastContainer'
+import ToastContainer from '@/components/ui/Toast/ToastContainer'
 import { Toast, ToastContextValue, ToastProviderProps } from '@/types/toast.type'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 

@@ -1,20 +1,45 @@
+import {
+    type KakaoCustomOverlay,
+    type KakaoMap,
+    type KakaoMarker,
+    type KakaoMarkerClusterer,
+} from '@/hooks/useKakaoMap' // 타입을 useKakaoMap에서 import
 import { useMainPageStore } from '@/stores/mainPageStore'
 import {
     CLUSTER_CONFIG,
     createCustomOverlayContent,
     createMarkerClickHandler,
-    createOverlayClickHandler
+    createOverlayClickHandler,
+    type AlbumData,
+    type PanToCallback,
 } from '@/utils/mapMarkerUtils'
 import { useEffect, useRef } from 'react'
+
+// 타입 정의
+interface UseAlbumClusterMarkersProps {
+    albums: Record<string, AlbumData> | null
+    isMapReady: boolean
+    mapInstance: React.RefObject<KakaoMap | null>
+    panTo: PanToCallback
+    selectedId: string | null
+    setBounds: (albums: AlbumData[], padding?: number) => void
+}
 
 /**
  * 앨범 클러스터 마커 관리 훅
  */
-export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo, selectedId, setBounds }) => {
-    const markersRef = useRef([])
-    const customOverlaysRef = useRef([])
-    const clustererRef = useRef(null)
-    const zoomHandlerRef = useRef(null) // 이벤트 리스너 참조 저장
+export const useAlbumClusterMarkers = ({
+    albums,
+    isMapReady,
+    mapInstance,
+    panTo,
+    selectedId,
+    setBounds,
+}: UseAlbumClusterMarkersProps) => {
+    const markersRef = useRef<KakaoMarker[]>([])
+    const customOverlaysRef = useRef<KakaoCustomOverlay[]>([])
+    const clustererRef = useRef<KakaoMarkerClusterer | null>(null)
+    const zoomHandlerRef = useRef<(() => void) | null>(null) // 이벤트 리스너 참조 저장
 
     const clearMarkers = () => {
         // 클러스터러 정리
@@ -69,8 +94,8 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
     /**
      * 선택된 앨범 포커스 처리
      */
-    const focusSelectedAlbum = (selectedAlbumId) => {
-        if (!selectedAlbumId || !albums[selectedAlbumId] || !mapInstance.current) return
+    const focusSelectedAlbum = (selectedAlbumId: string) => {
+        if (!selectedAlbumId || !albums?.[selectedAlbumId] || !mapInstance.current) return
 
         const selectedAlbum = albums[selectedAlbumId]
 
@@ -90,8 +115,8 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
         }
 
         // 모든 오버레이의 스타일 초기화
-        customOverlaysRef.current.forEach((overlay, index) => {
-            const element = overlay.getContent()
+        customOverlaysRef.current.forEach(overlay => {
+            const element = overlay.getContent() as HTMLElement | null
             if (element) {
                 // 기본 스타일로 리셋
                 element.style.transform = 'scale(1)'
@@ -105,7 +130,7 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
         customOverlaysRef.current.forEach((overlay, index) => {
             const marker = markersRef.current[index]
             if (marker && marker.albumId === selectedAlbumId) {
-                const element = overlay.getContent()
+                const element = overlay.getContent() as HTMLElement | null
                 if (element) {
                     // 선택된 마커 하이라이트
                     element.style.transform = 'scale(1.2)'
@@ -154,7 +179,7 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
         // 클러스터러 초기화
         clustererRef.current = new window.kakao.maps.MarkerClusterer({
             map: mapInstance.current,
-            ...CLUSTER_CONFIG
+            ...CLUSTER_CONFIG,
         })
 
         // 위치 정보가 있는 앨범들만 필터링
@@ -170,56 +195,73 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
         const { selectItem } = useMainPageStore.getState()
 
         // 각 앨범에 대해 마커와 커스텀 오버레이 생성
-        albumsWithLocation.forEach(([albumId, albumData]) => {
-            const position = new window.kakao.maps.LatLng(albumData.latitude, albumData.longitude)
+        const createMarkersAsync = async () => {
+            const markerPromises = albumsWithLocation.map(async ([albumId, albumData]) => {
+                const position = new window.kakao.maps.LatLng(albumData.latitude, albumData.longitude)
+                console.log('!!!!!', albumData)
+                // 클러스터링용 마커 생성
+                const marker = new window.kakao.maps.Marker({
+                    position,
+                    clickable: true,
+                })
 
-            // 클러스터링용 마커 생성
-            const marker = new window.kakao.maps.Marker({
-                position,
-                clickable: true
+                // 마커에 앨범 ID 저장
+                marker.albumId = albumId
+
+                // 마커 클릭 이벤트
+                const markerClickHandler = createMarkerClickHandler(albumId, albumData, selectItem, panTo)
+                window.kakao.maps.event.addListener(marker, 'click', markerClickHandler)
+
+                // 커스텀 오버레이 생성 (비동기)
+                const markerDiv = await createCustomOverlayContent(albumData.thumbnailURL)
+                const customOverlay = new window.kakao.maps.CustomOverlay({
+                    content: markerDiv,
+                    position,
+                    yAnchor: 1,
+                    clickable: true,
+                })
+
+                // 커스텀 오버레이 클릭 이벤트
+                const overlayClickHandler = createOverlayClickHandler(albumId, albumData, selectItem, panTo)
+                markerDiv.addEventListener('click', overlayClickHandler)
+
+                return { marker, customOverlay }
             })
 
-            // 마커에 앨범 ID 저장
-            marker.albumId = albumId
+            try {
+                const results = await Promise.all(markerPromises)
 
-            // 마커 클릭 이벤트
-            const markerClickHandler = createMarkerClickHandler(albumId, albumData, selectItem, panTo)
-            window.kakao.maps.event.addListener(marker, 'click', markerClickHandler)
+                // 결과를 refs에 저장
+                results.forEach(({ marker, customOverlay }) => {
+                    markersRef.current.push(marker)
+                    customOverlaysRef.current.push(customOverlay)
+                    clustererRef.current!.addMarker(marker)
+                })
 
-            // 커스텀 오버레이 생성
-            const markerDiv = createCustomOverlayContent(albumData.thumbnailURL)
-            const customOverlay = new window.kakao.maps.CustomOverlay({
-                content: markerDiv,
-                position,
-                yAnchor: 1,
-                clickable: true,
-            })
+                // 줌 레벨 변경 이벤트 리스너 등록 (안전한 방식으로)
+                addZoomListener()
 
-            // 커스텀 오버레이 클릭 이벤트
-            const overlayClickHandler = createOverlayClickHandler(albumId, albumData, selectItem, panTo)
-            markerDiv.addEventListener('click', overlayClickHandler)
+                // 초기 표시 상태 설정
+                handleZoomChange()
 
-            markersRef.current.push(marker)
-            customOverlaysRef.current.push(customOverlay)
-            clustererRef.current.addMarker(marker)
-        })
-
-        // 줌 레벨 변경 이벤트 리스너 등록 (안전한 방식으로)
-        addZoomListener()
-
-        // 초기 표시 상태 설정
-        handleZoomChange()
-
-        // 모든 앨범이 보이도록 지도 범위 조정 (선택된 앨범이 없을 때만)
-        if (!selectedId) {
-            setBounds(albumsWithLocation.map(([, albumData]) => albumData), 3)
+                // 모든 앨범이 보이도록 지도 범위 조정 (선택된 앨범이 없을 때만)
+                if (!selectedId) {
+                    setBounds(
+                        albumsWithLocation.map(([, albumData]) => albumData),
+                        3
+                    )
+                }
+            } catch (error) {
+                console.error('마커 생성 중 오류 발생:', error)
+            }
         }
+
+        createMarkersAsync()
 
         // cleanup 함수에서 안전한 제거
         return () => {
             removeZoomListener()
         }
-
     }, [albums, isMapReady]) // selectedId 제거하여 의존성 최적화
 
     // 선택된 앨범 변경 시 포커스 처리 (별도 useEffect로 분리)
@@ -232,7 +274,7 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
         } else {
             // 선택 해제 시 모든 마커 스타일 초기화
             customOverlaysRef.current.forEach(overlay => {
-                const element = overlay.getContent()
+                const element = overlay.getContent() as HTMLElement | null
                 if (element) {
                     element.style.transform = 'scale(1)'
                     element.style.zIndex = '100'
@@ -248,7 +290,10 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
                     ([albumId, albumData]) => albumData.latitude && albumData.longitude
                 )
                 if (albumsWithLocation.length > 0) {
-                    setBounds(albumsWithLocation.map(([, albumData]) => albumData), 3)
+                    setBounds(
+                        albumsWithLocation.map(([, albumData]) => albumData),
+                        3
+                    )
                 }
             }
         }
@@ -261,5 +306,4 @@ export const useAlbumClusterMarkers = ({ albums, isMapReady, mapInstance, panTo,
             clearMarkers()
         }
     }, []) // 빈 의존성 배열로 마운트/언마운트에만 실행
-
 }

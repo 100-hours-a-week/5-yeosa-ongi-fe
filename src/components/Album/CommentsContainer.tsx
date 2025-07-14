@@ -6,15 +6,7 @@ import ConfirmModal from '../common/ConfirmModal'
 import { Modal } from '../common/Modal'
 import CommentItem from './CommentItem'
 
-interface Comment {
-    commentId: string
-    userName: string
-    userProfile?: string
-    content: string
-    createdAt: string
-}
-
-interface CommentsContainerProps {
+export interface CommentsContainerProps {
     albumId: string
     isOpen: boolean
     onClose: () => void
