@@ -24,3 +24,11 @@ export interface AlbumData {
     id: string
     title?: string
 }
+
+export interface Comment {
+    commentId: string
+    userName: string
+    userProfile?: string
+    content: string
+    createdAt: string
+}
