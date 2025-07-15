@@ -136,9 +136,9 @@ const useAlbumStore = create<AlbumState>((set, get) => ({
         // 새 앨범이 추가된 월들만 정렬
         affectedMonths.forEach((monthKey: string) => {
             updatedAlbumsByMonth[monthKey].sort((a: string, b: string) => {
-                const dateA = new Date(updatedAlbums[a].createdAt)
-                const dateB = new Date(updatedAlbums[b].createdAt)
-                return dateB.getTime() - dateA.getTime()
+                const albumIdA = parseInt(a, 10)
+                const albumIdB = parseInt(b, 10)
+                return albumIdB - albumIdA // albumId 내림차순 정렬
             })
         })
 
