@@ -83,9 +83,9 @@ const useAlbumStore = create<AlbumState>((set, get) => ({
         // 각 월별 배열을 createdAt 기준으로 내림차순 정렬
         Object.keys(albumsByMonth).forEach(monthKey => {
             albumsByMonth[monthKey].sort((a: string, b: string) => {
-                const dateA = new Date(albums[a].createdAt)
-                const dateB = new Date(albums[b].createdAt)
-                return dateB.getTime() - dateA.getTime() // 내림차순 (최신순)
+                const albumIdA = parseInt(a, 10)
+                const albumIdB = parseInt(b, 10)
+                return albumIdB - albumIdA // albumId 내림차순 정렬
             })
         })
 
