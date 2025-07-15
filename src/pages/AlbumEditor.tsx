@@ -1,6 +1,5 @@
 import CollapsibleContainer from '@/components/common/CollapsibleContainer'
 import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
-import { useToast } from '@/contexts/ToastContext'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
 import { memo, useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -33,7 +32,7 @@ const AlbumEditor = () => {
     const { albumId } = useParams()
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const albumData = useAlbumCreation()
-    const { error: errorToast } = useToast()
+
     const { count, isValid: isFileValid } = useFileCount()
     const files = useFileStore(fileSelectors.files)
     const { isProcessing } = useFileProcessing()
@@ -53,7 +52,6 @@ const AlbumEditor = () => {
             await albumData.createAlbumWithFiles(albumTitle, files, albumId as string, selectedTags)
         } catch (error) {
             console.error('앨범 생성 중 오류:', error)
-            errorToast(error as string)
         }
     }, [files, albumData.loading, isProcessing, albumTitle, albumId])
 
