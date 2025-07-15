@@ -219,7 +219,7 @@ const Album = () => {
                 )}
             </div>
 
-            {duplicatedCollection?.count !== 0 && shakyCollection?.count !== 0 && (
+            {(duplicatedCollection?.count !== 0 || shakyCollection?.count !== 0) && (
                 <div className='m-4 mt-6'>
                     <div className='ml-4 font-sans text-md'>검토해줘 </div>
 
