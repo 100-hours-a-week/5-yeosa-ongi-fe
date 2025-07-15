@@ -36,6 +36,7 @@ const AlbumTitle = ({ title }: AlbumTitleProps) => {
                 value={currentTitle}
                 onSave={handleSaveName}
                 textFieldProps={{
+                    maxLength: 12,
                     placeholder: ALBUM_TITLE_VALIDATION_MESSAGE.TITLE_REQUIRED,
                     required: true,
                     validator: validateTitle,
