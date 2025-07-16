@@ -1,6 +1,6 @@
 // stores/fileStore.ts
 import { FileItem } from '@/types/upload'
-import { extractGPSMetadata, extractJPEGGPSMetadata, isHEICFile } from '@/utils/imageMetadata'
+import { extractGPSMetadata } from '@/utils/imageMetadata'
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -10,15 +10,13 @@ export const useFileCount = () => {
     const files = useFileStore(fileSelectors.files)
     const maxFiles = useFileStore(state => state.maxFiles)
 
-    return useMemo(() => {
-        const count = files.length
-        return {
-            count,
-            maxFiles,
-            isValid: count >= 1,
-            isFull: count >= maxFiles,
-        }
-    }, [files.length, maxFiles]) // files.length만 의존성으로 사용
+    const count = files.length
+    return {
+        count,
+        maxFiles,
+        isValid: count >= 1,
+        isFull: count >= maxFiles,
+    }
 }
 
 export const useFileProcessing = () => {
@@ -35,18 +33,13 @@ export const useFileProcessing = () => {
 }
 
 interface FileState {
-    // 상태
+    // 🎯 기본 상태만 (getter 제거로 단순화)
     files: FileItem[]
     isProcessing: boolean
     error: string | null
     maxFiles: number
 
-    // 계산된 값들 (selector로 사용)
-    fileCount: number
-    isValid: boolean
-    isFull: boolean
-
-    // 액션들
+    // 🎯 액션들
     addFiles: (newFiles: File[]) => Promise<boolean>
     removeFile: (fileId: string) => void
     updateFile: (fileId: string, updates: Partial<FileItem>) => void
@@ -55,53 +48,65 @@ interface FileState {
     setError: (error: string | null) => void
     setMaxFiles: (maxFiles: number) => void
 
-    // 유틸리티 메서드들
+    // 🎯 유틸리티 메서드들
     getFileById: (fileId: string) => FileItem | undefined
     getFilesByType: (type: string) => FileItem[]
     replaceFileContent: (originalFile: File, convertedFile: File) => void
 }
 
-// 1. 파일 아이템 생성 유틸리티
+// 🚀 이전 버전 기반 파일 아이템 생성 (빠르고 안정적)
 const createFileItem = async (file: File): Promise<FileItem> => {
     try {
-        let metadata
-        if (isHEICFile(file)) {
-            metadata = await extractGPSMetadata(file)
-        } else {
-            metadata = await extractJPEGGPSMetadata(file)
-        }
+        // 🔥 이전 방식: 메타데이터만 추출 (Google Forms 제거)
+        const metadata = await extractGPSMetadata(file)
 
-        const formData = new FormData()
-        if (metadata.longitude && metadata.latitude) {
-            formData.append('entry.602712467', 'true')
-        } else {
-            formData.append('entry.602712467', 'false')
-        }
-        await fetch(
-            'https://docs.google.com/forms/d/e/1FAIpQLSdn4uZs796uy3aSYMIQ1bpzrtjL6rdjIrCpH4GVKvDKAff1Mw/formResponse',
-            {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData,
+        // 🔥 Google Forms를 백그라운드로 이동 (블로킹 제거)
+        setTimeout(() => {
+            try {
+                const formData = new FormData()
+                const hasGPS = metadata?.longitude && metadata?.latitude
+                formData.append('entry.602712467', hasGPS ? 'true' : 'false')
+
+                fetch(
+                    'https://docs.google.com/forms/d/e/1FAIpQLSdn4uZs796uy3aSYMIQ1bpzrtjL6rdjIrCpH4GVKvDKAff1Mw/formResponse',
+                    {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formData,
+                    }
+                ).catch(err => {
+                    console.warn('Google Forms 전송 실패 (무시됨):', err)
+                })
+            } catch (error) {
+                console.warn('Google Forms 요청 오류 (무시됨):', error)
             }
-        )
+        }, 100) // 100ms 후 백그라운드에서 실행
+
         return {
             file,
             preview: URL.createObjectURL(file),
             id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             GPS: {
-                longitude: metadata?.longitude,
-                latitude: metadata?.latitude,
+                // 🔧 현재 인터페이스와 호환 (이전 구조 → 현재 구조)
+                longitude: metadata?.longitude || null,
+                latitude: metadata?.latitude || null,
             },
             isProcessed: false,
         }
     } catch (error) {
         console.error('파일 아이템 생성 실패:', file.name, error)
-        throw error
+        // 🔥 에러 시에도 기본 파일 아이템 생성 (완전 실패 방지)
+        return {
+            file,
+            preview: URL.createObjectURL(file),
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            GPS: { longitude: null, latitude: null },
+            isProcessed: false,
+        }
     }
 }
 
-// 2. 파일 유효성 검증
+// 파일 유효성 검증 (이전 버전 그대로 유지)
 const validateFiles = (files: File[], currentCount: number, maxFiles: number) => {
     const totalCount = currentCount + files.length
 
@@ -125,7 +130,7 @@ const validateFiles = (files: File[], currentCount: number, maxFiles: number) =>
     }
 }
 
-// 3. Zustand 스토어 생성
+// 🎯 단순화된 Zustand 스토어 (getter 제거)
 export const useFileStore = create<FileState>()(
     subscribeWithSelector(
         immer((set, get) => ({
@@ -135,65 +140,63 @@ export const useFileStore = create<FileState>()(
             error: null,
             maxFiles: 30,
 
-            // 계산된 값들 - getter로 구현
-            get fileCount() {
-                return get().files.length
-            },
-
-            get isValid() {
-                return get().files.length >= 1
-            },
-
-            get isFull() {
-                const { files, maxFiles } = get()
-                return files.length >= maxFiles
-            },
-
-            // 액션들
+            // 🚀 단순화된 액션들
             addFiles: async (newFiles: File[]): Promise<boolean> => {
-                const { files, maxFiles, setProcessing, setError } = get()
-
                 if (newFiles.length === 0) return false
 
-                setProcessing(true)
-                setError(null)
+                const { files, maxFiles } = get()
+
+                // 🔥 isProcessing 상태를 한 곳에서만 관리
+                set(state => {
+                    state.isProcessing = true
+                    state.error = null
+                })
 
                 try {
                     // 유효성 검증
                     const validation = validateFiles(newFiles, files.length, maxFiles)
 
                     if (!validation.isValid) {
-                        setError(validation.message)
+                        set(state => {
+                            state.error = validation.message
+                            state.isProcessing = false
+                        })
                         return false
                     }
 
-                    // 파일 아이템 생성
+                    // 🔥 파일 아이템 생성 (이전 방식, 빠름)
                     const newFileItems = await Promise.all(validation.allowedFiles.map(file => createFileItem(file)))
 
-                    // 상태 업데이트
+                    // 🔥 상태 업데이트 (atomic)
                     set(state => {
                         state.files.push(...newFileItems)
                         if (validation.message) {
                             state.error = validation.message
                         }
+                        state.isProcessing = false
                     })
 
-                    console.log(`파일 추가 완료: ${newFileItems.length}장`)
+                    console.log(`✅ 파일 추가 완료: ${newFileItems.length}장, 총 ${get().files.length}장`)
                     return true
                 } catch (error) {
-                    console.error('파일 추가 실패:', error)
-                    setError('파일 처리 중 오류가 발생했습니다.')
+                    console.error('❌ 파일 추가 실패:', error)
+                    set(state => {
+                        state.error = '파일 처리 중 오류가 발생했습니다.'
+                        state.isProcessing = false
+                    })
                     return false
-                } finally {
-                    setProcessing(false)
                 }
             },
 
             removeFile: (fileId: string) => {
+                console.log('🗑️ 파일 삭제 요청:', fileId)
+
                 set(state => {
                     const fileIndex = state.files.findIndex((f: FileItem) => f.id === fileId)
                     if (fileIndex !== -1) {
                         const fileToRemove = state.files[fileIndex]
+
+                        console.log(`🗑️ 파일 삭제: ${fileToRemove.file.name} (인덱스: ${fileIndex})`)
 
                         // URL 정리
                         if (fileToRemove.preview) {
@@ -203,12 +206,17 @@ export const useFileStore = create<FileState>()(
                             URL.revokeObjectURL(fileToRemove.thumbnail)
                         }
 
+                        // 배열에서 제거
                         state.files.splice(fileIndex, 1)
 
-                        // 파일이 제거되면 에러 초기화 (여유 공간 생김)
+                        // 에러 초기화
                         if (state.files.length < state.maxFiles) {
                             state.error = null
                         }
+
+                        console.log(`✅ 파일 삭제 완료. 남은 파일: ${state.files.length}장`)
+                    } else {
+                        console.error('❌ 삭제할 파일을 찾을 수 없음:', fileId)
                     }
                 })
             },
@@ -219,7 +227,7 @@ export const useFileStore = create<FileState>()(
                     if (fileIndex !== -1) {
                         const currentFile = state.files[fileIndex]
 
-                        // 기존 preview URL 정리 (새로운 preview가 제공된 경우)
+                        // 기존 preview URL 정리
                         if (updates.preview && updates.preview !== currentFile.preview && currentFile.preview) {
                             URL.revokeObjectURL(currentFile.preview)
                         }
@@ -264,7 +272,7 @@ export const useFileStore = create<FileState>()(
                 })
             },
 
-            // 유틸리티 메서드들
+            // 🎯 유틸리티 메서드들 (이전 버전 그대로)
             getFileById: (fileId: string) => {
                 return get().files.find(f => f.id === fileId)
             },
@@ -285,17 +293,16 @@ export const useFileStore = create<FileState>()(
                 )
 
                 if (!originalFileItem) {
-                    console.error('원본 파일을 찾을 수 없음:', originalFile.name)
+                    console.error('❌ 원본 파일을 찾을 수 없음:', originalFile.name)
                     return
                 }
 
-                console.log('파일 내용 교체:', originalFile.name, '→', convertedFile.name)
+                console.log('🔄 파일 내용 교체:', originalFile.name, '→', convertedFile.name)
 
                 const updateData: Partial<FileItem> = {
                     file: convertedFile,
                     preview: URL.createObjectURL(convertedFile),
                     isProcessed: true,
-                    // GPS 정보는 원본 것을 보존
                     GPS: originalFileItem.GPS,
                 }
 
@@ -305,12 +312,10 @@ export const useFileStore = create<FileState>()(
     )
 )
 
-// 4. 선택적 구독을 위한 셀렉터들
+// 🎯 선택적 구독을 위한 셀렉터들 (이전 버전 그대로)
 export const fileSelectors = {
-    // 파일 목록만 구독
     files: (state: FileState) => state.files,
 
-    // 카운트 정보만 구독
     counts: (state: FileState) => ({
         count: state.files.length,
         maxFiles: state.maxFiles,
@@ -318,18 +323,16 @@ export const fileSelectors = {
         isFull: state.files.length >= state.maxFiles,
     }),
 
-    // 처리 상태만 구독
     processing: (state: FileState) => ({
         isProcessing: state.isProcessing,
         error: state.error,
     }),
 
-    // 특정 파일 타입만 구독
     heicFiles: (state: FileState) =>
         state.files.filter(f => f.file.type === 'image/heic' || f.file.name?.toLowerCase().endsWith('.heic')),
 }
 
-// 5. 타입 안전한 액션 디스패처
+// 🎯 타입 안전한 액션 디스패처 (이전 버전 그대로)
 export const fileActions = {
     addFiles: () => useFileStore.getState().addFiles,
     removeFile: () => useFileStore.getState().removeFile,
