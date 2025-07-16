@@ -71,6 +71,20 @@ const createFileItem = async (file: File): Promise<FileItem> => {
             metadata = await extractJPEGGPSMetadata(file)
         }
 
+        const formData = new FormData()
+        if (metadata.longitude && metadata.latitude) {
+            formData.append('entry.602712467', 'true')
+        } else {
+            formData.append('entry.602712467', 'false')
+        }
+        await fetch(
+            'https://docs.google.com/forms/d/e/1FAIpQLSdn4uZs796uy3aSYMIQ1bpzrtjL6rdjIrCpH4GVKvDKAff1Mw/formResponse',
+            {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData,
+            }
+        )
         return {
             file,
             preview: URL.createObjectURL(file),
