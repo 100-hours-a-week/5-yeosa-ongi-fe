@@ -2,7 +2,7 @@ import { FileInput, FilePreviewContainer } from '@/components/AlbumEditor'
 import { useToast } from '@/contexts/ToastContext'
 import { useExperimentTracking } from '@/hooks/useExperimentTracking'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
-import { memo, useCallback, useEffect } from 'react'
+import { memo, useCallback } from 'react'
 import { GridWithChildren } from '../common/GridWithChildren'
 
 const FileManager = memo(() => {
@@ -81,19 +81,6 @@ const FileManager = memo(() => {
         },
         [errorToast]
     )
-
-    useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            const timer = setInterval(() => {
-                const stats = getStats()
-                if (stats?.collectedToday > 0) {
-                    console.log('📊 실험 통계:', stats)
-                }
-            }, 10000)
-
-            return () => clearInterval(timer)
-        }
-    }, [getStats])
 
     return (
         <div className={`file-manager `}>

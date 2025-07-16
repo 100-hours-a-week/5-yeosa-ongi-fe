@@ -64,11 +64,11 @@ const AlbumEditor = () => {
     const buttonState = useMemo(
         (): ButtonState => ({
             isAlbumTitleValid: albumTitle.trim() !== '',
-            isFileUploadValid: count >= 1,
+            isFileUploadValid: isFileValid,
             isLoading: albumData.loading,
             isProcessing: isProcessing,
         }),
-        [albumTitle, albumData.loading, isProcessing]
+        [albumTitle, albumData.loading, isProcessing, isFileValid]
     )
 
     const handleTagsChange = (newTags: string[]) => {
