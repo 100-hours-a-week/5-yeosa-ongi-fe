@@ -177,7 +177,7 @@ export class AlbumAPI {
 
     // 앨범 사진 복원
     static recoverAlbumPictures(albumId: string, selectedPictureIds: string[]) {
-        return APIBuilder.put(`/api/album/${albumId}/picture`, selectedPictureIds)
+        return APIBuilder.put(`/api/album/${albumId}/picture`, { pictureIds: selectedPictureIds })
             .requiresAuth(true)
             .build()
             .call<void>()
