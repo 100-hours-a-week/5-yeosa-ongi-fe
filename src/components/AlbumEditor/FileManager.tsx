@@ -1,7 +1,8 @@
 import { FileInput, FilePreviewContainer } from '@/components/AlbumEditor'
 import { useToast } from '@/contexts/ToastContext'
+import { useExperimentTracking } from '@/hooks/useExperimentTracking'
 import { fileSelectors, useFileCount, useFileProcessing, useFileStore } from '@/stores/fileStore'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useEffect } from 'react'
 import { GridWithChildren } from '../common/GridWithChildren'
 
 const FileManager = memo(() => {
@@ -15,6 +16,8 @@ const FileManager = memo(() => {
     const removeFile = useFileStore(state => state.removeFile)
     const replaceFileContent = useFileStore(state => state.replaceFileContent)
     const setProcessing = useFileStore(state => state.setProcessing)
+
+    const { trackFile, getStats } = useExperimentTracking()
 
     // 파일 추가 핸들러 (원본 파일 그대로 추가)
     const handleFileAdded = useCallback(
@@ -34,7 +37,7 @@ const FileManager = memo(() => {
                 }
 
                 console.log('FileManager: Adding files (원본 파일로 추가)', fileList.length, fileList)
-
+                fileList.forEach(trackFile)
                 const success = await addFiles(fileList)
                 if (!success) {
                     // 에러는 스토어에서 설정되므로 여기서는 추가 처리 없음
@@ -78,6 +81,19 @@ const FileManager = memo(() => {
         },
         [errorToast]
     )
+
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            const timer = setInterval(() => {
+                const stats = getStats()
+                if (stats?.collectedToday > 0) {
+                    console.log('📊 실험 통계:', stats)
+                }
+            }, 10000)
+
+            return () => clearInterval(timer)
+        }
+    }, [getStats])
 
     return (
         <div className={`file-manager `}>
