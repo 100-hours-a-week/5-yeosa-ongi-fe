@@ -19,7 +19,7 @@ import { AlbumLayout } from '@/components/ui/skeleton/AlbumLayout'
 import { Modal } from '../components/common/Modal'
 
 // hooks
-import { useAlbumAccess, useAlbumComments, useAlbumDetail, useDeleteAlbum } from '@/hooks/useAlbum'
+import { useAlbumAccess, useAlbumComments, useAlbumDetail } from '@/queries/album/queries'
 import useModal from '../hooks/useModal'
 import useCollectionStore from '../stores/collectionStore'
 
@@ -27,6 +27,7 @@ import useCollectionStore from '../stores/collectionStore'
 import { RawPicture } from '../types'
 
 // assets
+import { useDeleteAlbum } from '@/queries/album/mutations'
 import { ClusterInterface } from '@/types/album.types'
 import { Settings } from 'lucide-react'
 import iconDuplicated from '../assets/icons/icon_duplicated.svg'

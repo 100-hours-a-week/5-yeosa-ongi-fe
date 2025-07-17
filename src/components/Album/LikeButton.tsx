@@ -1,4 +1,5 @@
-import { useAlbumLikes, useToggleLike } from '@/hooks/useAlbum'
+import { useToggleLike } from '@/queries/album/mutations'
+import { useAlbumLikes } from '@/queries/album/queries'
 import React from 'react'
 
 export interface LikeButtonProps {

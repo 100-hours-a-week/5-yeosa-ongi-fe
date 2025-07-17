@@ -1,5 +1,5 @@
 import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
-import { useUpdateAlbumName } from '@/hooks/useAlbum'
+import { useUpdateAlbumName } from '@/queries/album/mutations'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
