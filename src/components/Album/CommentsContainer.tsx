@@ -1,5 +1,6 @@
-import { useAlbumComments, useCreateComment, useDeleteComment, useUpdateComment } from '@/hooks/useAlbum'
 import useModal from '@/hooks/useModal'
+import { useCreateComment, useDeleteComment, useUpdateComment } from '@/queries/album/mutations'
+import { useAlbumComments } from '@/queries/album/queries'
 import useAuthStore from '@/stores/authStore'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import ConfirmModal from '../common/ConfirmModal'

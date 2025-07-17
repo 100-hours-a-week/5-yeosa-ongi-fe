@@ -1,4 +1,4 @@
-import { useAlbumSummary } from '@/hooks/useAlbum'
+import { useAlbumSummary } from '@/queries/album/queries'
 import { useAlbumStore, useMainPageStore } from '@/stores/mainPageStore'
 import { useNavigate } from 'react-router-dom'
 import OptimizedImage from '../common/OptimizedImage'

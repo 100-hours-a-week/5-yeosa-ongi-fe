@@ -5,7 +5,9 @@ import './App.css'
 import Background from './components/common/Background'
 import MovingDotsLoader from './components/common/MovingDotsLoader'
 import { ToastProvider } from './contexts/ToastContext'
+
 import Main from './pages/Main'
+import { setupAlbumMutationDefaults } from './queries/config/mutation-defaults'
 import useAuthStore from './stores/authStore'
 
 const Login = lazy(() => import('./pages/LoginPage'))
@@ -40,6 +42,12 @@ function AppRoutes() {
     const refreshToken = useAuthStore(state => state.refreshToken)
     const logout = useAuthStore(state => state.logout)
     const queryClient = new QueryClient()
+
+    useEffect(() => {
+        // 앱 시작 시 mutation 기본값 설정
+        setupAlbumMutationDefaults(queryClient)
+        console.log('🚀 Album mutation defaults 설정 완료')
+    }, [queryClient])
 
     useEffect(() => {
         // 인증 상태와 토큰 상태 불일치 시에만 정리
