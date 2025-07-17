@@ -156,7 +156,7 @@ const Album = () => {
         <>
             <Header />
             <div className='relative'>
-                <AlbumTitle title={albumDetail.title || ''} />
+                <AlbumTitle />
                 <Card />
                 <div className='flex m-4'>
                     {/* 좋아요 버튼 */}
