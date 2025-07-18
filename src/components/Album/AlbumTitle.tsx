@@ -1,7 +1,6 @@
 import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
 import { useToast } from '@/contexts/ToastContext'
-import { useUpdateAlbumName } from '@/queries/album/mutations'
-import { useAlbumDetail } from '@/queries/album/queries'
+import { useAlbumDetail, useUpdateAlbumName } from '@/queries/album'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
 
@@ -27,8 +26,11 @@ const AlbumTitle = () => {
             changeAlbumName.mutate(
                 { albumId, albumName: newValue },
                 {
-                    onSuccess: data => {
+                    onSuccess: () => {
                         toast.success('앨범 이름 수정에 성공하였습니다.')
+                    },
+                    onError: () => {
+                        toast.error('앨범 이름 수정에 실패하였습니다.')
                     },
                 }
             )
