@@ -1,17 +1,17 @@
 import { ALBUM_TITLE_VALIDATION_MESSAGE } from '@/constants/validation'
-import { useToast } from '@/contexts/ToastContext'
 import { useUpdateAlbumName } from '@/queries/album/mutations'
-import { useAlbumDetail } from '@/queries/album/queries'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import EditableText from '../common/EditableText'
 
-const AlbumTitle = () => {
-    const { albumId } = useParams()
+export interface AlbumTitleProps {
+    title: string
+}
 
-    //Custom Hooks
-    const { data: albumDetail } = useAlbumDetail(albumId!)
+const AlbumTitle = ({ title }: AlbumTitleProps) => {
+    const { albumId } = useParams()
+    const [currentTitle, setCurrentTitle] = useState<string>(title)
     const changeAlbumName = useUpdateAlbumName()
-    const toast = useToast()
 
     const validateTitle = (title: string) => {
         if (!title.trim()) {
@@ -24,22 +24,16 @@ const AlbumTitle = () => {
 
     const handleSaveName = async (newValue: string) => {
         if (albumId) {
-            changeAlbumName.mutate(
-                { albumId, albumName: newValue },
-                {
-                    onSuccess: data => {
-                        toast.success('앨범 이름 수정에 성공하였습니다.')
-                    },
-                }
-            )
+            changeAlbumName.mutate({ albumId, albumName: newValue })
         }
+        setCurrentTitle(newValue)
     }
 
     return (
         <div className='p-4 pb-0'>
             <EditableText
                 displayClassName='font-semibold text-gray-600'
-                value={albumDetail.title}
+                value={currentTitle}
                 onSave={handleSaveName}
                 textFieldProps={{
                     maxLength: 12,
