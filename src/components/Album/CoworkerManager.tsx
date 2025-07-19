@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 
 import { useAlbumAccess, useAlbumMembers } from '@/queries/album/queries.ts'
 
-import { useToast } from '@/contexts/ToastContext.tsx'
 import { useRemoveMember } from '@/queries/album/mutations.ts'
 import Coworker from './Coworker.tsx'
 
@@ -20,8 +19,14 @@ interface Coworker {
 
 const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
     // 앨범 접근 권한 조회
-    const toast = useToast()
-    const { data: albumAccess, isLoading: isAccessLoading, error: accessError } = useAlbumAccess(albumId)
+
+    const {
+        data: albumAccess,
+        isLoading: isAccessLoading,
+        error: accessError,
+    } = useAlbumAccess(albumId!, {
+        enabled: !!albumId,
+    })
 
     // 앨범 멤버 목록 조회
     const {
@@ -55,8 +60,15 @@ const CoworkerManager = ({ albumId }: CoworkerManagerProps) => {
             deleteAlbumMemberMutation.mutate(
                 { albumId, userId },
                 {
+                    onSuccess: result => {
+                        console.log('멤버 삭제 성공!', result)
+                        // React Query가 자동으로 캐시를 업데이트하므로
+                        // 수동으로 상태를 업데이트할 필요 없음
+                    },
                     onError: error => {
-                        toast.error('공동작업자 삭제에 실패했습니다.')
+                        console.error('멤버 삭제 실패:', error)
+                        // 에러 알림 표시 로직 추가 가능
+                        alert('멤버 삭제에 실패했습니다. 다시 시도해주세요.')
                     },
                 }
             )

@@ -1,37 +1,60 @@
 import { useToggleLike } from '@/queries/album/mutations'
 import { useAlbumLikes } from '@/queries/album/queries'
-import { FC } from 'react'
+import React from 'react'
 
 export interface LikeButtonProps {
     albumId: string
+    initialLiked?: boolean
+    initialCount?: number
     showCount?: boolean
+    className?: string
+    onLikeChange?: (liked: boolean, count: number) => void
 }
 
-const LikeButton: FC<LikeButtonProps> = ({ albumId, showCount = true }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({
+    albumId,
+    initialLiked = false,
+    initialCount = 0,
+    showCount = true,
+    className = '',
+    onLikeChange,
+}) => {
     const { data: likesData, isLoading: isLikesLoading, error: likesError } = useAlbumLikes(albumId)
-    const toggleLikeMutation = useToggleLike()
+
+    const toggleLikeMutation = useToggleLike({
+        onSuccess: data => {
+            console.log('좋아요 토글 성공:', data)
+            // 성공 시 콜백 호출
+            if (onLikeChange && likesData) {
+                onLikeChange(!likesData.isLike, data.like || likesData.like)
+            }
+        },
+        onError: error => {
+            console.error('좋아요 토글 실패:', error)
+            // 에러 토스트 등 처리 가능
+        },
+    })
 
     // 좋아요 클릭 핸들러
     const handleLikeClick = async () => {
-        if (isLikesLoading || !!likesError) {
-            // 낙관적 업데이트이므로 mutation.isPending은 체크하지 않음
-            return
+        if (isLikesLoading || toggleLikeMutation.isPending) {
+            return // 로딩 중이면 클릭 무시
         }
+
         toggleLikeMutation.mutate(albumId)
     }
 
-    // 안전한 데이터 추출
-    const isLiked = likesData?.isLike || false
-    const likeCount = likesData?.like || 0
-    const isDisabled = isLikesLoading || toggleLikeMutation.isPending || !!likesError
-
     // 로딩 중이거나 에러일 때 초기값 사용
+    const isLiked = likesData?.isLike ?? initialLiked
+    const likeCount = likesData?.like ?? initialCount
+
+    const isDisabled = isLikesLoading || toggleLikeMutation.isPending || !!likesError
 
     return (
         <button
             onClick={handleLikeClick}
             disabled={isDisabled}
-            className={`flex items-center gap-1 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed  w-12`}
+            className={`flex items-center gap-1 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${className} w-12`}
         >
             {/* 하트 아이콘 */}
             <div className='relative'>
