@@ -20,7 +20,7 @@ import ImageModal from '@/components/Collection/ImageModal'
 import { GridWithChildren } from '@/components/common/GridWithChildren'
 import Icon from '@/components/common/Icon'
 import MovingDotsLoader from '@/components/common/MovingDotsLoader'
-import { useDeleteAlbumPictures, useRecoverAlbumPictures } from '@/hooks/useAlbum'
+import { useDeleteAlbumPictures, useRecoverAlbumPictures } from '@/queries/album/mutations'
 
 // Types
 import { GridItemConfig } from '@/components/common/GridWithChildren'
