@@ -1,12 +1,11 @@
 import { FlottingButton, Header, ResizableContainer } from '@/components/common'
 import { AlbumList, AlbumListHeader, KakaoMap } from '@/components/Main'
-import ViewToggleButton from '@/components/Main/viewToggleButton'
+import ViewToggleButton from '@/components/Main/ViewToggleButton'
 import { UI_HEIGHT } from '@/constants'
 import { useCallback, useState } from 'react'
 
 type view = 'LIST_VIEW' | 'MAP_VIEW'
 
-//a
 const Main = () => {
     const [listHeight, setListHeight] = useState(0)
     const [view, setView] = useState<view>('LIST_VIEW')

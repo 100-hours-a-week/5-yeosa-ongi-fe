@@ -5,10 +5,12 @@ interface ViewToggleButtonProps {
 
 const ViewToggleButton = ({ toggleView, view }: ViewToggleButtonProps) => {
     return (
+
         <div className='absolute top-[6px] right-1 z-10'>
             <button
                 onClick={toggleView}
                 className='flex items-center gap-2 px-4 py-2 transition-shadow bg-white border border-gray-300 rounded-md'
+
             >
                 {view === 'LIST_VIEW' ? (
                     <>
@@ -22,6 +24,7 @@ const ViewToggleButton = ({ toggleView, view }: ViewToggleButtonProps) => {
                             <circle cx='12' cy='9' r='2.5' stroke='currentColor' strokeWidth='2' fill='none' />
                         </svg>
                         <span className='text-sm '>Map</span>
+
                     </>
                 ) : (
                     <>
@@ -29,6 +32,7 @@ const ViewToggleButton = ({ toggleView, view }: ViewToggleButtonProps) => {
                             <path d='M3 6h18M3 12h18M3 18h18' stroke='currentColor' strokeWidth='2' />
                         </svg>
                         <span className='text-sm'>List</span>
+
                     </>
                 )}
             </button>

@@ -119,6 +119,7 @@ const AlbumItem = ({ id }: { id: string }) => {
             {/* 앨범 썸네일 */}
             <div className='relative flex-shrink-0 mr-4'>
                 <div className='relative w-20 h-20 overflow-hidden bg-gray-100 border border-gray-200 '>
+
                     {isVisible && (
                         <OptimizedImage
                             src={album.thumbnailURL || '/default-thumbnail.jpg'}
