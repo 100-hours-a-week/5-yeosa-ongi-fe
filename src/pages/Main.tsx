@@ -1,6 +1,6 @@
 import { FlottingButton, Header, ResizableContainer } from '@/components/common'
 import { AlbumList, AlbumListHeader, KakaoMap } from '@/components/Main'
-import ViewToggleButton from '@/components/Main/viewToggleButton'
+import ViewToggleButton from '@/components/Main/ViewToggleButton'
 import { UI_HEIGHT } from '@/constants'
 import { useCallback, useState } from 'react'
 
