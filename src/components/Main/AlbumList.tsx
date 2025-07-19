@@ -3,7 +3,6 @@ import { AlbumData, useAlbumStore, useMainPageStore } from '@/stores/mainPageSto
 import { APIResponse } from '@/types/api.types'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
-import AlbumItems from './AlbumItems'
 import Month from './Month'
 
 type AlbumDataResponse = {
@@ -14,7 +13,7 @@ type AlbumDataResponse = {
 
 type AlbumApiResponse = APIResponse<AlbumDataResponse>
 
-const AlbumList = ({ view }: { view?: 'LIST_VIEW' | 'MAP_VIEW' }) => {
+const AlbumList = () => {
     const loadMoreTriggerRef = useRef<HTMLDivElement>(null)
     const { clearSelection } = useMainPageStore()
     const { albumsByMonth: storeAlbumsByMonth, setAlbums, addAlbums } = useAlbumStore()
@@ -97,27 +96,16 @@ const AlbumList = ({ view }: { view?: 'LIST_VIEW' | 'MAP_VIEW' }) => {
 
     return (
         <div className='flex-1 overflow-y-auto'>
-            {view === 'LIST_VIEW'
-                ? Object.keys(albumsByMonth)
-                      .sort((a, b) => b.localeCompare(a))
-                      .map(month => (
-                          <AlbumItems
-                              key={month}
-                              title={month}
-                              albumIds={albumsByMonth[month]}
-                              handleOutsideClick={clearSelection}
-                          />
-                      ))
-                : Object.keys(albumsByMonth)
-                      .sort((a, b) => b.localeCompare(a))
-                      .map(month => (
-                          <Month
-                              key={month}
-                              title={month}
-                              albumIds={albumsByMonth[month]}
-                              handleOutsideClick={clearSelection}
-                          />
-                      ))}
+            {Object.keys(albumsByMonth)
+                .sort((a, b) => b.localeCompare(a)) // 최신순 정렬
+                .map(month => (
+                    <Month
+                        key={month}
+                        title={month}
+                        albumIds={albumsByMonth[month]}
+                        handleOutsideClick={clearSelection}
+                    />
+                ))}
             {/* 무한 스크롤 트리거 요소 */}
             {hasNextPage && (
                 <div ref={loadMoreTriggerRef} className='flex items-center justify-center h-20'>
