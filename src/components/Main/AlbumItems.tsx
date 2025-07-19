@@ -14,13 +14,13 @@ const AlbumItems = ({ albumIds, title, handleOutsideClick }: AlbumItemsProps) =>
     return (
         <div ref={monthRef} className='mb-6'>
             {/* 월별 헤더 */}
-            <div className='sticky top-0 z-10 pb-2 mb-3 border-b border-gray-100 bg-white/90 backdrop-blur-sm'>
+            <div className='sticky top-0 z-10 flex items-center pb-2 my-2 space-x-44'>
                 <h3 className='px-4 text-lg font-semibold text-gray-800'>{title}</h3>
                 <div className='px-4 text-sm text-gray-500'>{albumIds.length}개의 앨범</div>
             </div>
 
             {/* 앨범 리스트 */}
-            <div className='px-4 space-y-3'>
+            <div className='px-4 space-y-5'>
                 {albumIds.map((id, index) => (
                     <AlbumItem id={id} />
                 ))}

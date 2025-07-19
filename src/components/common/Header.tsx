@@ -47,7 +47,7 @@ const Header = ({ showButtons = true }) => {
     }
 
     return (
-        <header className='flex items-center justify-between px-4 shadow-sm h-14 bg-white-blue'>
+        <header className='flex items-center justify-between px-4 shadow-sm h-14 '>
             <button onClick={() => navigate('/')}>
                 <img src={ongiLogoFlat} alt='logo' className='h-8' />
             </button>

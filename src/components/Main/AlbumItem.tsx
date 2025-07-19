@@ -114,11 +114,12 @@ const AlbumItem = ({ id }: { id: string }) => {
     return (
         <div
             ref={itemRef}
-            className='relative flex items-center p-4 transition-all duration-300 bg-white border border-gray-100 shadow-sm cursor-pointer group rounded-xl hover:shadow-md hover:border-gray-200'
+            className='relative flex items-center pr-3 transition-all duration-300 bg-white border border-gray-100 rounded-md shadow-sm cursor-pointer group hover:shadow-md hover:border-gray-200'
         >
             {/* 앨범 썸네일 */}
             <div className='relative flex-shrink-0 mr-4'>
-                <div className='relative w-16 h-16 overflow-hidden bg-gray-100 border border-gray-200 '>
+                <div className='relative w-20 h-20 overflow-hidden bg-gray-100 border border-gray-200 '>
+
                     {isVisible && (
                         <OptimizedImage
                             src={album.thumbnailURL || '/default-thumbnail.jpg'}
