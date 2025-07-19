@@ -6,7 +6,6 @@ import Background from './components/common/Background'
 import MovingDotsLoader from './components/common/MovingDotsLoader'
 import { ToastProvider } from './contexts/ToastContext'
 
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Main from './pages/Main'
 import { setupAlbumMutationDefaults } from './queries/config/mutation-defaults'
 import useAuthStore from './stores/authStore'
@@ -37,12 +36,12 @@ const ProtectedRoute = ({ children, isAuthenticated }: ProtectedRouteProps) => {
     return isAuthenticated ? children : <Navigate to='/login' replace />
 }
 
-const queryClient = new QueryClient()
 function AppRoutes() {
     const navigate = useNavigate()
     const isAuthenticated = useAuthStore(state => state.isAuthenticated)
     const refreshToken = useAuthStore(state => state.refreshToken)
     const logout = useAuthStore(state => state.logout)
+    const queryClient = new QueryClient()
 
     useEffect(() => {
         // 앱 시작 시 mutation 기본값 설정
@@ -131,7 +130,6 @@ function AppRoutes() {
                         <Route path='*' element={<Navigate to='/' replace />} />
                     </Routes>
                 </Suspense>
-                {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
             </QueryClientProvider>
         </ToastProvider>
     )
