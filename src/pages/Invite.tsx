@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { useAlbumAccess, useConfirmInvite } from '@/hooks/useAlbum'
+import { useAlbumAccess } from '@/queries/album'
+import { useConfirmInvite } from '@/queries/album/mutations'
 import useAuthStore from '../stores/userStore'
 
 const Invite: React.FC = () => {
