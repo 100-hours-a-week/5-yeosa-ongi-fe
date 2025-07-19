@@ -7,6 +7,7 @@ import { ALBUM_KEYS } from './keys'
 /**
  * 앨범 생성
  */
+
 export const useCreateAlbum = (options?: { onSuccess?: (data: any) => void; onError?: (error: APIError) => void }) => {
     return useMutation({
         mutationKey: ALBUM_MUTATION_KEYS.ALBUM.CREATE,
@@ -20,7 +21,10 @@ export const useCreateAlbum = (options?: { onSuccess?: (data: any) => void; onEr
 /**
  * 앨범 이름 수정
  */
-export const useUpdateAlbumName = () => {
+export const useUpdateAlbumName = (options?: {
+    onSuccess?: (data: any) => void
+    onError?: (error: APIError) => void
+}) => {
     return useMutation({
         mutationKey: ALBUM_MUTATION_KEYS.ALBUM.UPDATE,
         mutationFn: async ({ albumId, albumName }: { albumId: string; albumName: string }) => {
@@ -34,9 +38,26 @@ export const useUpdateAlbumName = () => {
  * 앨범 삭제
  */
 export const useDeleteAlbum = (options?: { onSuccess?: () => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.ALBUM.DELETE,
         mutationFn: async (albumId: string) => await AlbumAPI.deleteAlbum(albumId),
+        onSuccess: (_, albumId) => {
+            // 앨범 리스트 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.MONTHLY(undefined) })
+
+            // 삭제된 앨범의 모든 캐시 제거
+            queryClient.removeQueries({ queryKey: ALBUM_KEYS.DETAIL(albumId) })
+            queryClient.removeQueries({ queryKey: ALBUM_KEYS.SUMMARY(albumId) })
+            queryClient.removeQueries({ queryKey: ALBUM_KEYS.ACCESS(albumId) })
+            queryClient.removeQueries({ queryKey: ALBUM_KEYS.MEMBERS(albumId) })
+            queryClient.removeQueries({ queryKey: ALBUM_KEYS.COMMENTS(albumId) })
+            queryClient.removeQueries({ queryKey: ALBUM_KEYS.LIKES(albumId) })
+            options?.onSuccess?.()
+        },
+        onError: (error: APIError) => {
+            console.error('앨범 삭제 실패:', error.message)
+            options?.onError?.(error)
+        },
     })
 }
 
@@ -44,11 +65,22 @@ export const useDeleteAlbum = (options?: { onSuccess?: () => void; onError?: (er
  * 사진 추가
  */
 export const useAddPicture = (options?: { onSuccess?: (data: any) => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.PICTURE.ADD,
         mutationFn: async ({ albumId, pictureData }: { albumId: number; pictureData: any }) => {
             const response = await AlbumAPI.addPicture(albumId, pictureData)
             return response.data
+        },
+        onSuccess: (data, variables) => {
+            // 앨범 상세 정보 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.DETAIL(variables.albumId.toString()) })
+            console.log('사진 추가 성공')
+            options?.onSuccess?.(data)
+        },
+        onError: (error: APIError) => {
+            console.error('사진 추가 실패:', error.message)
+            options?.onError?.(error)
         },
     })
 }
@@ -57,11 +89,31 @@ export const useAddPicture = (options?: { onSuccess?: (data: any) => void; onErr
  * 앨범 사진 삭제
  */
 export const useDeleteAlbumPictures = (options?: { onSuccess?: () => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.PICTURE.DELETE,
         mutationFn: async ({ albumId, pictureIds }: { albumId: string; pictureIds: string[] }) => {
+            console.log(pictureIds)
             const response = await AlbumAPI.deleteAlbumPictures(albumId, pictureIds)
             return response
+        },
+        onSuccess: (_, variables) => {
+            // 해당 앨범의 사진 목록 캐시 무효화
+            queryClient.invalidateQueries({
+                queryKey: ALBUM_KEYS.PICTURES(variables.albumId),
+            })
+
+            // 앨범 상세 정보도 무효화 (사진 개수 등이 변경될 수 있음)
+            queryClient.invalidateQueries({
+                queryKey: ALBUM_KEYS.DETAIL(variables.albumId),
+            })
+
+            console.log('앨범 사진 삭제 성공')
+            options?.onSuccess?.()
+        },
+        onError: (error: APIError) => {
+            console.error('앨범 사진 삭제 실패:', error.message)
+            options?.onError?.(error)
         },
     })
 }
@@ -70,11 +122,30 @@ export const useDeleteAlbumPictures = (options?: { onSuccess?: () => void; onErr
  * 앨범 사진 복원
  */
 export const useRecoverAlbumPictures = (options?: { onSuccess?: () => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.PICTURE.RECOVER,
         mutationFn: async ({ albumId, pictureIds }: { albumId: string; pictureIds: string[] }) => {
             const response = await AlbumAPI.recoverAlbumPictures(albumId, pictureIds)
             return response
+        },
+        onSuccess: (_, variables) => {
+            // 해당 앨범의 사진 목록 캐시 무효화
+            queryClient.invalidateQueries({
+                queryKey: ALBUM_KEYS.PICTURES(variables.albumId),
+            })
+
+            // 앨범 상세 정보도 무효화
+            queryClient.invalidateQueries({
+                queryKey: ALBUM_KEYS.DETAIL(variables.albumId),
+            })
+
+            console.log('앨범 사진 복원 성공')
+            options?.onSuccess?.()
+        },
+        onError: (error: APIError) => {
+            console.error('앨범 사진 복원 실패:', error.message)
+            options?.onError?.(error)
         },
     })
 }
@@ -87,10 +158,17 @@ export const useGetPreSignedUrl = (options?: {
     onError?: (error: APIError) => void
 }) => {
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.PRESIGNED_URL.GET,
         mutationFn: async (pictures: any) => {
             const response = await AlbumAPI.getPreSignedUrl(pictures)
             return response.data
+        },
+        onSuccess: data => {
+            console.log('PreSigned URL 발급 성공')
+            options?.onSuccess?.(data)
+        },
+        onError: (error: APIError) => {
+            console.error('PreSigned URL 발급 실패:', error.message)
+            options?.onError?.(error)
         },
     })
 }
@@ -102,8 +180,9 @@ export const useUpdateClusterTitle = (options?: {
     onSuccess?: (data: any) => void
     onError?: (error: APIError) => void
 }) => {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.CLUSTER.UPDATE_TITLE,
         mutationFn: async ({
             albumId,
             clusterId,
@@ -116,11 +195,21 @@ export const useUpdateClusterTitle = (options?: {
             const response = await AlbumAPI.updateClusterTitle(albumId, clusterId, clusterName)
             return response.data
         },
+        onSuccess: (data, variables) => {
+            // 앨범 상세 정보 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.DETAIL(variables.albumId) })
+            console.log('클러스터 제목 변경 성공')
+            options?.onSuccess?.(data)
+        },
+        onError: (error: APIError) => {
+            console.error('클러스터 제목 변경 실패:', error.message)
+            options?.onError?.(error)
+        },
     })
 }
 
 /**
- * 초대 링크 생성 (디폴트 설정 안함)
+ * 초대 링크 생성
  */
 export const useCreateInviteLink = (options?: {
     onSuccess?: (data: any) => void
@@ -149,11 +238,22 @@ export const useConfirmInvite = (options?: {
     onSuccess?: (data: any) => void
     onError?: (error: APIError) => void
 }) => {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.INVITE.CONFIRM,
         mutationFn: async (inviteToken: string) => {
             const response = await AlbumAPI.confirmInvite(inviteToken)
             return response.data
+        },
+        onSuccess: data => {
+            // 모든 앨범 목록 캐시 무효화 (새 앨범이 추가됨)
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.all })
+            console.log('초대 확인 성공')
+            options?.onSuccess?.(data)
+        },
+        onError: (error: APIError) => {
+            console.error('초대 확인 실패:', error.message)
+            options?.onError?.(error)
         },
     })
 }
@@ -162,10 +262,21 @@ export const useConfirmInvite = (options?: {
  * 공동 작업자 삭제
  */
 export const useRemoveMember = (options?: { onSuccess?: () => void; onError?: (error: APIError) => void }) => {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationKey: ALBUM_MUTATION_KEYS.MEMBER.REMOVE,
         mutationFn: async ({ albumId, userId }: { albumId: string; userId: string }) => {
             await AlbumAPI.removeMember(albumId, userId)
+        },
+        onSuccess: (_, variables) => {
+            // 멤버 목록 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.MEMBERS(variables.albumId.toString()) })
+            console.log('공동 작업자 삭제 성공')
+            options?.onSuccess?.()
+        },
+        onError: (error: APIError) => {
+            console.error('공동 작업자 삭제 실패:', error.message)
+            options?.onError?.(error)
         },
     })
 }
