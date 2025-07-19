@@ -1,6 +1,5 @@
 import { AlbumShare, CoworkerManager } from '@/components/Album'
-import { useCreateInviteLink } from '@/queries/album/mutations'
-import { useAlbumAccess } from '@/queries/album/queries'
+import { useAlbumAccess, useCreateInviteLink } from '@/hooks/useAlbum'
 import { useEffect, useState } from 'react'
 import AlbumDeleteSection from './AlbumDeleteSection'
 

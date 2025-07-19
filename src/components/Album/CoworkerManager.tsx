@@ -1,8 +1,7 @@
 import { useCallback } from 'react'
 
-import { useAlbumAccess, useAlbumMembers } from '@/queries/album/queries.ts'
+import { useAlbumAccess, useAlbumMembers, useRemoveMember } from '@/hooks/useAlbum.ts'
 
-import { useRemoveMember } from '@/queries/album/mutations.ts'
 import Coworker from './Coworker.tsx'
 
 export interface CoworkerManagerProps {
