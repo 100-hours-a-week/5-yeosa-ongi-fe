@@ -7,4 +7,5 @@ export const ALBUM_KEYS = {
     MEMBERS: (albumId: string) => [...ALBUM_KEYS.all, 'members', albumId] as const,
     COMMENTS: (albumId: string) => [...ALBUM_KEYS.all, 'comments', albumId] as const,
     LIKES: (albumId: string) => [...ALBUM_KEYS.all, 'likes', albumId] as const,
+    PICTURES: (albumId: string) => [...ALBUM_KEYS.all, 'pictures', albumId] as const,
 } as const
