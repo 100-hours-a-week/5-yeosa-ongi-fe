@@ -4,7 +4,7 @@ import { AlbumUploadService } from '../services/albumUploadService'
 import { FileItem } from '../types/upload'
 // 실제 앨범 관련 API 훅들을 import하세요
 import { useToast } from '@/contexts/ToastContext'
-import { useAddPicture, useCreateAlbum, useGetPreSignedUrl } from '@/queries/album/mutations'
+import { useAddPicture, useCreateAlbum, useGetPreSignedUrl } from '@/hooks/useAlbum'
 
 interface useAlbumCreationReturn {
     loading: boolean
