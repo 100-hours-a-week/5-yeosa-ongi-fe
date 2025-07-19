@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react'
 
 type view = 'LIST_VIEW' | 'MAP_VIEW'
 
+//a
 const Main = () => {
     const [listHeight, setListHeight] = useState(0)
     const [view, setView] = useState<view>('LIST_VIEW')
