@@ -196,16 +196,123 @@ export const setupAlbumMutationDefaults = (queryClient: QueryClient) => {
     })
 
     /**
-     * 공동 작업자 삭제
+     * 공동 작업자 삭제 (낙관적 업데이트 적용)
      */
     queryClient.setMutationDefaults(ALBUM_MUTATION_KEYS.MEMBER.REMOVE, {
+        onMutate: async (variables: { albumId: string; userId: string }) => {
+            const { albumId, userId } = variables
+
+            // 1. 진행 중인 쿼리들 취소
+            await queryClient.cancelQueries({ queryKey: ALBUM_KEYS.MEMBERS(albumId) })
+
+            // 2. 현재 멤버 목록 백업
+            const previousMembers = queryClient.getQueryData(ALBUM_KEYS.MEMBERS(albumId))
+
+            // 3. 낙관적 업데이트 - 해당 멤버를 목록에서 즉시 제거
+            queryClient.setQueryData(ALBUM_KEYS.MEMBERS(albumId), (old: any) => {
+                if (!old) return old
+                return {
+                    ...old,
+                    userInfo: old.userInfo?.filter((member: any) => member.userId !== userId) || [],
+                }
+            })
+
+            return { previousMembers }
+        },
+
+        onError: (error: APIError, variables: any, context: any) => {
+            const { albumId } = variables as { albumId: string }
+
+            // 4. 실패 시 이전 상태로 복원
+            if (context?.previousMembers) {
+                queryClient.setQueryData(ALBUM_KEYS.MEMBERS(albumId), context.previousMembers)
+            }
+            console.error('공동 작업자 삭제 실패:', error.message)
+        },
+
         onSuccess: (data, variables: any) => {
             const { albumId } = variables as { albumId: string }
-            // 멤버 목록 캐시 무효화
+
+            // 5. 성공 시 서버 데이터로 동기화 (선택적)
             queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.MEMBERS(albumId) })
         },
+    })
+
+    /**
+     * 댓글 작성
+     */
+    queryClient.setMutationDefaults(ALBUM_MUTATION_KEYS.COMMENT.CREATE, {
+        onSuccess: (data, variables: any) => {
+            const { albumId } = variables as { albumId: string }
+            // 댓글 목록 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.COMMENTS(albumId) })
+        },
         onError: (error: APIError) => {
-            console.error('공동 작업자 삭제 실패:', error.message)
+            console.error('댓글 작성 실패:', error.message)
+        },
+    })
+
+    /**
+     * 댓글 수정
+     */
+    queryClient.setMutationDefaults(ALBUM_MUTATION_KEYS.COMMENT.UPDATE, {
+        onSuccess: (data, variables: any) => {
+            const { albumId } = variables as { albumId: string }
+            // 댓글 목록 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.COMMENTS(albumId) })
+        },
+        onError: (error: APIError) => {
+            console.error('댓글 수정 실패:', error.message)
+        },
+    })
+
+    /**
+     * 댓글 삭제
+     */
+    queryClient.setMutationDefaults(ALBUM_MUTATION_KEYS.COMMENT.DELETE, {
+        onSuccess: (data, variables: any) => {
+            const { albumId } = variables as { albumId: string }
+            // 댓글 목록 캐시 무효화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.COMMENTS(albumId) })
+        },
+        onError: (error: APIError) => {
+            console.error('댓글 삭제 실패:', error.message)
+        },
+    })
+
+    /**
+     * 좋아요 토글 (낙관적 업데이트)
+     */
+    queryClient.setMutationDefaults(ALBUM_MUTATION_KEYS.LIKE.TOGGLE, {
+        onMutate: async (albumId: string) => {
+            // 진행 중인 쿼리 취소
+            await queryClient.cancelQueries({ queryKey: ALBUM_KEYS.LIKES(albumId) })
+
+            // 현재 좋아요 상태 백업
+            const previousLikes = queryClient.getQueryData(ALBUM_KEYS.LIKES(albumId))
+
+            // 낙관적 업데이트 - 좋아요 상태 토글
+            queryClient.setQueryData(ALBUM_KEYS.LIKES(albumId), (old: any) => {
+                if (!old) return old
+                return {
+                    ...old,
+                    isLiked: !old.isLiked,
+                    likeCount: old.isLiked ? old.likeCount - 1 : old.likeCount + 1,
+                }
+            })
+
+            return { previousLikes }
+        },
+        onError: (error: APIError, albumId: string, context: any) => {
+            // 실패 시 이전 상태로 복원
+            if (context?.previousLikes) {
+                queryClient.setQueryData(ALBUM_KEYS.LIKES(albumId), context.previousLikes)
+            }
+            console.error('좋아요 토글 실패:', error.message)
+        },
+        onSuccess: (data, albumId: string) => {
+            // 성공 시 서버 데이터로 다시 동기화
+            queryClient.invalidateQueries({ queryKey: ALBUM_KEYS.LIKES(albumId) })
         },
     })
 }
