@@ -41,7 +41,6 @@ const AlbumItem = ({ id }: { id: string }) => {
         staleTime: 1000 * 60 * 10,
         refetchOnWindowFocus: false,
     })
-
     const handleClick = (e: React.MouseEvent) => {
         navigate(`/album/${id}`)
     }
