@@ -1,6 +1,7 @@
 import { useAlbumDetail } from '@/queries/album'
 import { useAlbumStore } from '@/stores/mainPageStore'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LikeButton } from '../Album'
 import OptimizedImage from '../common/OptimizedImage'
 
@@ -11,7 +12,7 @@ const AlbumItem = ({ id }: { id: string }) => {
     const [isVisible, setIsVisible] = useState(false)
     const [shouldLoadDetail, setShouldLoadDetail] = useState(false)
     const itemRef = useRef<HTMLDivElement>(null)
-
+    const navigate = useNavigate()
     // Intersection Observer로 뷰포트 진입 감지
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -40,11 +41,8 @@ const AlbumItem = ({ id }: { id: string }) => {
         staleTime: 1000 * 60 * 10,
         refetchOnWindowFocus: false,
     })
-
-    const handleLikeToggle = (e: React.MouseEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsLiked(!isLiked)
+    const handleClick = (e: React.MouseEvent) => {
+        navigate(`/album/${id}`)
     }
 
     // 앨범 진행 상태에 따른 배지 스타일과 아이콘 결정
@@ -115,11 +113,11 @@ const AlbumItem = ({ id }: { id: string }) => {
         <div
             ref={itemRef}
             className='relative flex items-center pr-3 transition-all duration-300 bg-white border border-gray-100 rounded-md shadow-sm cursor-pointer group hover:shadow-md hover:border-gray-200'
+            onClick={handleClick}
         >
             {/* 앨범 썸네일 */}
             <div className='relative flex-shrink-0 mr-4'>
                 <div className='relative w-20 h-20 overflow-hidden bg-gray-100 border border-gray-200 '>
-
                     {isVisible && (
                         <OptimizedImage
                             src={album.thumbnailURL || '/default-thumbnail.jpg'}
