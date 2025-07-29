@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useAuthStore from '../../stores/authStore'
+import useAuthStore from '../../domains/auth/stores/authStore'
 import OptimizedImage from './OptimizedImage'
 import defaultProfileImage from '/src/assets/default_user_imgae.png'
 import ongiLogoFlat from '/src/assets/ongi_logo_flat.webp'

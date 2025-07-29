@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import Icon from '@/components/common/Icon'
-import { useLogout } from '@/hooks/useAuth'
+import { useLogout } from '@/domains/auth/hooks/useAuth'
 import { useUpdateUserInfo } from '@/hooks/useUser'
 import { useGetPreSignedUrl } from '@/queries/album/mutations'
 import axios from 'axios'
@@ -13,8 +13,8 @@ import Header from '../components/common/Header'
 import { Modal } from '../components/common/Modal'
 import TextInput from '../components/common/TextInput'
 import ImageInput from '../components/MyPage/ImageInput'
+import useAuthStore from '../domains/auth/stores/authStore'
 import useModal from '../hooks/useModal'
-import useAuthStore from '../stores/authStore'
 
 const MyPage = () => {
     const navigate = useNavigate()

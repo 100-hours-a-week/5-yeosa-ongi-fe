@@ -1,5 +1,5 @@
 // UserAPI.ts
-import { User } from '@/types/auth.types'
+import { User } from '@/domains/auth/types/auth.types'
 import APIBuilder from './core/APIBuilder'
 
 // 사용자 통계 관련 타입 정의

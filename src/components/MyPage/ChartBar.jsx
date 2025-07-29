@@ -1,12 +1,12 @@
+import useAuthStore from '@/domains/auth/stores/authStore'
 import { usePlaceStatistics } from '@/hooks/useUser'
-import useAuthStore from '@/stores/userStore'
 import { useEffect, useRef, useState } from 'react'
 
 function StorageWidget() {
     const [place, setPlace] = useState({})
     const [maxMemory, setMaxMemory] = useState(0)
     const [data, setData] = useState([])
-    const { getUser } = useAuthStore()
+    const user = useAuthStore(state => state.user)
 
     // 현재 년월 생성 (예: "2025-01")
     const currentYearMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
@@ -88,8 +88,6 @@ function StorageWidget() {
     for (let i = 0; i < memoryOnly.length; ++i) {
         memoryCompounded.push(memoryOnly.slice(0, i + 1).reduce((a, b) => a + b))
     }
-
-    const user = getUser()
 
     return (
         <div className='px-3 py-3 m-2 transition bg-gray-100 shadow-md box-shadow rounded-xl'>

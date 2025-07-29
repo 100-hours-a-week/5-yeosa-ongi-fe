@@ -1,5 +1,5 @@
-import useAuthStore from '@/stores/authStore'
-import { User } from '@/types/auth.types'
+import useAuthStore from '@/domains/auth/stores/authStore'
+import { User } from '@/domains/auth/types/auth.types'
 
 export class TokenManager {
     private static refreshPromise: Promise<string | null> | null = null
