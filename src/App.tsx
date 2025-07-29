@@ -7,12 +7,12 @@ import MovingDotsLoader from './components/common/MovingDotsLoader'
 import { ToastProvider } from './contexts/ToastContext'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import useAuthStore from './domains/auth/stores/authStore'
 import Main from './pages/Main'
 import { setupAlbumMutationDefaults } from './queries/config/mutation-defaults'
-import useAuthStore from './stores/authStore'
 
-const Login = lazy(() => import('./pages/LoginPage'))
-const KakaoCallback = lazy(() => import('./pages/auth/KakaoCallback'))
+const Login = lazy(() => import('./domains/auth/login/LoginPage'))
+const KakaoCallback = lazy(() => import('./domains/auth/login/KakaoCallback'))
 const AlbumEditor = lazy(() => import('./pages/AlbumEditor'))
 const Album = lazy(() => import('./pages/Album'))
 const Collection = lazy(() => import('./pages/Collection'))

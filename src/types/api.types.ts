@@ -1,4 +1,4 @@
-import { User } from './auth.types'
+import { User } from '../domains/auth/types/auth.types'
 
 export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 

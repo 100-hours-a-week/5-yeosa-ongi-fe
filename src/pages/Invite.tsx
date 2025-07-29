@@ -1,15 +1,15 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
+import useAuthStore from '@/domains/auth/stores/authStore'
 import { useAlbumAccess } from '@/queries/album'
 import { useConfirmInvite } from '@/queries/album/mutations'
-import useAuthStore from '../stores/userStore'
 
 const Invite: React.FC = () => {
     const [searchParams] = useSearchParams()
     const navigate = useNavigate()
     const token = searchParams.get('token')
 
-    const isAuthenticated = useAuthStore(state => state.isAuthenticated())
+    const isAuthenticated = useAuthStore(state => state.isAuthenticated)
 
     // 초대 확인 훅
     const confirmInvite = useConfirmInvite({

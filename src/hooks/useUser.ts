@@ -1,8 +1,8 @@
 // useUser.ts
 import { PictureStatistic, PlaceStatistic, UserActivity, UserAPI, UserStatistics } from '@/api/UserAPI'
-import useAuthStore from '@/stores/authStore'
+import useAuthStore from '@/domains/auth/stores/authStore'
+import { User } from '@/domains/auth/types/auth.types'
 import { APIError } from '@/types/api.types'
-import { User } from '@/types/auth.types'
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 
 export const userKeys = {
