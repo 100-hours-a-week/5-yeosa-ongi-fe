@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '@/api/config'
-import { LoginResponse, User } from '@/types/auth.types'
+import { LoginResponse, User } from '@/domains/auth/types/auth.types'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 

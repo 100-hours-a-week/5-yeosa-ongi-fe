@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 // Components
-import MovingDotsLoader from '../../components/common/MovingDotsLoader'
+import MovingDotsLoader from '../../../components/common/MovingDotsLoader'
 
 // Hooks
-import { useKakaoLogin } from '@/hooks/useAuth'
+import { useKakaoLogin } from '@/domains/auth/hooks/useAuth'
 
 interface InviteData {
     type: 'invite'
