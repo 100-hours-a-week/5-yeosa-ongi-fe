@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 // Assets
 import kakaoLoginButton from '@/assets/kakao_login_medium_narrow.png'
 import ongiLogo from '@/assets/ongi_Logo.webp'
-import OnboardingUI from '@/components/Login/OnboardingUI'
+import OnboardingUI from './OnboardingUI'
 
 interface AuthState {
     type: 'normal' | 'invite' | 'protected' | 'expired'

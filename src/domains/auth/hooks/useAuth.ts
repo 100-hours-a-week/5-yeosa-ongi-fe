@@ -1,7 +1,7 @@
 import { AuthAPI } from '@/api/AuthAPI'
-import useAuthStore from '@/stores/authStore'
+import useAuthStore from '@/domains/auth/stores/authStore'
+import { LoginResponse, User } from '@/domains/auth/types/auth.types'
 import { APIError } from '@/types/api.types'
-import { LoginResponse, User } from '@/types/auth.types'
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 
 export const authKeys = {

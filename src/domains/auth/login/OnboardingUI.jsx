@@ -2,8 +2,8 @@ import onboadingImage1 from '@/assets/onboardingImages/onboarding01.webp'
 import onboadingImage2 from '@/assets/onboardingImages/onboarding02.webp'
 import onboadingImage3 from '@/assets/onboardingImages/onboarding03.webp'
 import onboadingImage4 from '@/assets/onboardingImages/onboarding04.webp'
+import Icon from '@/components/common/Icon'
 import { useEffect, useRef, useState } from 'react'
-import Icon from '../common/Icon'
 
 const OnboardingUI = () => {
     const [currentSlide, setCurrentSlide] = useState(0)
