@@ -6,20 +6,20 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 const ACCESS_TOKEN_EXPIRY_TIME = 300 * 1000 // 5분
 
 interface AuthState {
-    // Persistent data (sessionStorage에 저장됨)
+    // === Persistent data (sessionStorage) ===
     refreshToken: string | null
     refreshTokenExpiresIn: number | null
     user: User | null
     isAuthenticated: boolean
 
-    // Memory data (새로고침 시 사라짐)
+    // === Memory data ===
     accessToken: string | null
     accessTokenExpiresAt: number | null
 
-    // 토큰 갱신 중 상태 (중복 요청 방지)
+    // === 토큰 갱신 상태 ===
     isRefreshing: boolean
 
-    // Actions
+    // === Actions ===
     setAccessToken: (token: string | null) => void
     getAccessToken: () => string | null
     isAccessTokenValid: () => boolean
