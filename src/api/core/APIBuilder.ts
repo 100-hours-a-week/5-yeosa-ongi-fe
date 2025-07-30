@@ -1,4 +1,4 @@
-import { HTTPHeaders, HTTPMethod, HTTPParams } from '@/types/api.types'
+import { HTTPHeaders, HTTPMethod, HTTPParams } from '@/api/api.types'
 import { API_BASE_URL } from '../config'
 import API from './API'
 

@@ -1,4 +1,4 @@
-import { APIResponse } from '@/types/api.types'
+import { APIResponse } from '@/api/api.types'
 import APIBuilder from './core/APIBuilder'
 
 export class AlbumAPI {

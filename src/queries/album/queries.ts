@@ -1,5 +1,5 @@
 import { AlbumAPI } from '@/api/AlbumAPI'
-import { APIError } from '@/types/api.types'
+import { APIError } from '@/api/api.types'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { ALBUM_CACHE_POLICY } from './cache-config'
 import { ALBUM_KEYS } from './keys'

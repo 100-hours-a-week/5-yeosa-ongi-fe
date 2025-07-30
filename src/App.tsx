@@ -2,23 +2,23 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { lazy, ReactNode, Suspense, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
-import Background from './components/common/Background'
-import MovingDotsLoader from './components/common/MovingDotsLoader'
-import { ToastProvider } from './contexts/ToastContext'
+import { ToastProvider } from './queries/contexts/ToastContext'
+import Background from './shared/components/Background'
+import MovingDotsLoader from './shared/components/MovingDotsLoader'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import Main from './domains/album/components/home/Main'
 import useAuthStore from './domains/auth/stores/authStore'
-import Main from './pages/Main'
 import { setupAlbumMutationDefaults } from './queries/config/mutation-defaults'
 
 const Login = lazy(() => import('./domains/auth/login/LoginPage'))
 const KakaoCallback = lazy(() => import('./domains/auth/login/KakaoCallback'))
-const AlbumEditor = lazy(() => import('./pages/AlbumEditor'))
-const Album = lazy(() => import('./pages/Album'))
-const Collection = lazy(() => import('./pages/Collection'))
-const MyPage = lazy(() => import('./pages/MyPage'))
-const MyActivities = lazy(() => import('./pages/MyActivities'))
-const Invite = lazy(() => import('./pages/Invite'))
+const AlbumEditor = lazy(() => import('./domains/editor/components/AlbumEditor'))
+const Album = lazy(() => import('./domains/album/components/detail/Album'))
+const Collection = lazy(() => import('./domains/album/components/collection/Collection'))
+const MyPage = lazy(() => import('./domains/MyPage/MyPage'))
+const MyActivities = lazy(() => import('./domains/MyPage/MyActivities'))
+const Invite = lazy(() => import('./domains/auth/login/Invite'))
 
 interface ProtectedRouteProps {
     children: ReactNode

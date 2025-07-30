@@ -1,5 +1,5 @@
+import { LoginAPIResponse, TokenRefreshResponse } from '@/api/api.types'
 import { User } from '@/domains/auth/types/auth.types'
-import { LoginAPIResponse, TokenRefreshResponse } from '@/types/api.types'
 import APIBuilder from './core/APIBuilder'
 
 export class AuthAPI {
