@@ -22,7 +22,7 @@ const CollectionHeader = ({
                     <button onClick={isRecovery ? handleRecoverClick : handleClick}>
                         <div className='text-sm'>완료</div>
                     </button>
-                ) : isCollectionShaky() ? (
+                ) : isCollectionShaky ? (
                     <div className='flex items-center justify-between gap-4'>
                         <button
                             onClick={() => {
