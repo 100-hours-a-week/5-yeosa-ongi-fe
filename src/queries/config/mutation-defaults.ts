@@ -1,4 +1,4 @@
-import { APIError } from '@/types/api.types'
+import { APIError } from '@/api/api.types'
 import { QueryClient } from '@tanstack/react-query'
 import { ALBUM_KEYS } from '../album/keys'
 

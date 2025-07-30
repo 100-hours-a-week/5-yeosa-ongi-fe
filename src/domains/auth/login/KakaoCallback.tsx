@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 // Components
-import MovingDotsLoader from '../../../components/common/MovingDotsLoader'
+import MovingDotsLoader from '../../../shared/components/MovingDotsLoader'
 
 // Hooks
 import { useKakaoLogin } from '@/domains/auth/hooks/useAuth'

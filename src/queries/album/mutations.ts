@@ -1,5 +1,5 @@
 import { AlbumAPI } from '@/api/AlbumAPI'
-import { APIError } from '@/types/api.types'
+import { APIError } from '@/api/api.types'
 import { useMutation } from '@tanstack/react-query'
 import { ALBUM_MUTATION_KEYS } from '../config/mutation-defaults'
 

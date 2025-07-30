@@ -1,4 +1,4 @@
-import { APIError, APIResponse, HTTPHeaders, HTTPMethod, HTTPParams } from '@/types/api.types'
+import { APIError, APIResponse, HTTPHeaders, HTTPMethod, HTTPParams } from '@/api/api.types'
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { TokenManager } from './TokenManager'
 

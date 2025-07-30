@@ -1,0 +1,6 @@
+export { default as Month, type MonthProps } from '@/domains/album/components/home/Month'
+export { default as AlbumList } from './AlbumList'
+export { default as AlbumListHeader } from './AlbumListHeader'
+export { default as AlbumThumbnail, type AlbumThumbnailProps } from './AlbumThumbnail'
+export { default as KakaoMap, type KakaoMapProps } from './KakaoMap'
+export { default as OnboardingScreen } from './OnboardingScreen'
