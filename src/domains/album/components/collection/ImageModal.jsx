@@ -16,7 +16,6 @@ const ImageModal = ({ idx, pictures }) => {
      */
     const prepareDownload = async imageUrl => {
         const proxies = [
-            `https://api.allorigins.win/raw?url=${encodeURIComponent(imageUrl)}`,
             `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`,
             `https://cors-anywhere.herokuapp.com/${imageUrl}`, // 사전 활성화 필요
             `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(imageUrl)}`,

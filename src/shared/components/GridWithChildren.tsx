@@ -57,7 +57,7 @@ export const GridWithChildren: FC<GridProps> = memo(({ col = 4, children, items 
     if (items && items.length > 0) {
         return (
             <div
-                className='grid gap-2'
+                className='grid'
                 style={{
                     gridTemplateColumns: `repeat(${col}, minmax(0, 1fr))`,
                     gridAutoRows: `calc(min(100vw,430px) / ${col})`,
